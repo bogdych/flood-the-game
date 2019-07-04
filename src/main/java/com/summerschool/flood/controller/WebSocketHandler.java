@@ -7,6 +7,7 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Component
@@ -17,7 +18,9 @@ public class WebSocketHandler extends TextWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         for (WebSocketSession webSocketSession : sessions) {
-            webSocketSession.sendMessage(message);
+            if (!Objects.equals(session.getId(), webSocketSession.getId())) {
+                webSocketSession.sendMessage(message);
+            }
         }
         super.handleTextMessage(session, message);
     }
