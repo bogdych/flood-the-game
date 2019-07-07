@@ -1,7 +1,6 @@
-package com.summerschool.flood.controller;
+package com.summerschool.flood.handler;
 
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
@@ -27,7 +26,6 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
-        //the messages will be broadcasted to all users.
         sessions.add(session);
     }
 }

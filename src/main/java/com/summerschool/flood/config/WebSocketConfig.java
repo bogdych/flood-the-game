@@ -1,6 +1,6 @@
 package com.summerschool.flood.config;
 
-import com.summerschool.flood.controller.WebSocketHandler;
+import com.summerschool.flood.handler.WebSocketHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.*;
 
