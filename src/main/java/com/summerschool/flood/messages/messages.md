@@ -12,7 +12,7 @@ Client-side player action message.
 Supposed to be sent when: player wants to start new game,
 play do something in time of current game session.
 
-```$json
+```json
 {
     "messageType" : "<message type>"
     "param1" : "<param value1"
@@ -25,7 +25,7 @@ play do something in time of current game session.
 
 Server-side response.
 
-```$json
+```json
 {
     "messageType" : "<message type>"
     "serialized param1" : "<param value1>"
