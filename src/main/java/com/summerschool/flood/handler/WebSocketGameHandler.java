@@ -1,6 +1,6 @@
 package com.summerschool.flood.handler;
 
-import com.summerschool.flood.messages.ErrorMessage;
+import com.summerschool.flood.info.PlayerInfo;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -23,7 +23,7 @@ public class WebSocketGameHandler extends TextWebSocketHandler {
 
     @Override
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
-        session.sendMessage(new TextMessage(new ErrorMessage("error", "here error").serialize()));
+        session.sendMessage(new TextMessage(new PlayerInfo(session.getId()).serialize()));
     }
 
     @Override
