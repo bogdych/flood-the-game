@@ -19,7 +19,6 @@ play do something in time of current game session.
     "param2" : "<param value2"
 
     "paramN" : "<param valueN"
-    }
 }
 ```
 
@@ -41,7 +40,7 @@ Common messages types to be sent from UI (not exhaustive content):
 
 1. Get user info - score, number of attempts, stat, etc.
 2. User profile setup: set nickname
-3. User auto off playing session action: find session (with optional game mode)
+3. User find session action  (with optional game mode)
 
 User game session actions:
 
@@ -66,6 +65,24 @@ Server game session messages:
 3. Game stopped (someone disconnected)
 4. Game action accepted
 5. Game state response (map, players info)
+
+### Messages types list
+
+All the types of the messages for client-server communication.
+Type of messages: string (in java: enum? string? int?)
+
+1.  setPlayerNickname 
+2.  getPlayerInfo
+3.  findSession
+4.  makeAction
+5.  getGameState
+6.  errorMessage - some unhandled error from server
+7.  invalidGameAction - if player made some invalide action in time of the game
+8.  gameStateInfo - returns all the info about curent game state
+9.  actionResponse - returns status of the action (only for correct actions in time of the game)
+10. gameState - return game state (disconnected, won, lost)
+10. playerInfo - returns player info
+11. playerNicknameUpdated - returns updated player nickname
 
 
 
