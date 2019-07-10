@@ -52,7 +52,7 @@ User game session actions:
    
 Server side response: common messages
 
-1. Error message: some king of fatal error? (bad practice)
+1. Error message: some kind of fatal error? (bad practice)
 2. Player info response
 3. Player nickname setup response
 4. Create new session response (when new game session is created: server create new game, 
