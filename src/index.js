@@ -1,3 +1,5 @@
+import Phaser from 'phaser';
+
 var Flood = new Phaser.Class({
 
     Extends: Phaser.Scene,
