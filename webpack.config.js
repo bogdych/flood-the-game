@@ -3,6 +3,11 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
+  module: {
+    rules: [
+      { test: /\.js$/, exclude: /node_modules/, loader: "babel-loader" }
+    ]
+  },
   entry: './src/index.js',
   output: {
     filename: 'main.js',
