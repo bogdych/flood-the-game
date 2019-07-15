@@ -1,9 +1,9 @@
-package com.summerschool.flood.gameRoom;
+package com.summerschool.flood.room;
 
 import com.summerschool.flood.Prefabs.*;
-import com.summerschool.flood.gameSquare.Square;
-import com.summerschool.flood.gameSquare.DFS;
-import com.summerschool.flood.gameSquare.Pair;
+import com.summerschool.flood.field.GameField;
+import com.summerschool.flood.field.DepthFirstSearch;
+import com.summerschool.flood.field.Pair;
 
 
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import lombok.Getter;
 
-public class gameRoom {
+public class GameRoom {
     private @Getter int counter = 0;
     private @Getter int playersNumber = 4;
     private @Getter int playersNumberMax = 16;
@@ -22,61 +22,62 @@ public class gameRoom {
     private @Getter List<Player> playerList;
     private Map<Player, Integer> playersIdMap;
     private Map<Player, Integer> playersColorsMap;
-    private Map<Player, Pair<Integer, Integer>> startPosMap;
-    private Square square;
-    private DFS dfs;
+    private Map<Player, Pair<Integer, Integer>> startPositionMap;
+    private GameField gameField;
+    private DepthFirstSearch dfs;
     private @Getter Chat chat;
-    public gameRoom(int playersnumber, Pair<Integer, Integer> diagCell, int colors ){
-        this.playersNumber = playersnumber;
+    public GameRoom(int playersNum, Pair<Integer, Integer> diagCell, int colors ){
+        this.playersNumber = playersNum;
         this.colorNumber = colors;
-        playersIdMap = new ConcurrentHashMap<>();
-        playersColorsMap = new ConcurrentHashMap<>();
-        playerList = new CopyOnWriteArrayList<>();
-        this.square = new Square(diagCell.getFirst(), diagCell.getSecond(), colorNumber);
-        this.AssignPositions();
+        this.playersIdMap = new ConcurrentHashMap<>();
+        this.playersColorsMap = new ConcurrentHashMap<>();
+        this.playerList = new CopyOnWriteArrayList<>();
+        this.gameField = new GameField(diagCell.getFirst(), diagCell.getSecond(), colorNumber);
+        this.assignPositions();
+        this.dfs = new DepthFirstSearch(gameField);
         for (int i = 0; i < playersNumber; i++) {
             playerList.add(new Player());
             playersIdMap.put(playerList.get(i), i);
                                                                                 /*Because didn't override equals*/
-            playersColorsMap.put(playerList.get(i), square.getAt(startPosMap.get(playerList.get(i)).getFirst(),
-                                                                 startPosMap.get(playerList.get(i)).getSecond()));
+            playersColorsMap.put(playerList.get(i), gameField.getAt(startPositionMap.get(playerList.get(i)).getFirst(),
+                                                                 startPositionMap.get(playerList.get(i)).getSecond()));
         }
         chat = new Chat();
     }
-    public Boolean IsValidMove(Player player, int color){
+    public Boolean isValidMove(Player player, int color){
         int tmpCounter = playersIdMap.get(player);
         return (tmpCounter == counter + 1) && color != playersColorsMap.get(player) && color >= 0 && color < colorNumber;
     }
     public void move(Player player, int color){
-        if(!IsValidMove(player, color)) {
+        if(!isValidMove(player, color)) {
             status = "Invalid move";
             return;
         }
         counter = (counter + 1) % playersNumber;
-        dfs.Start(startPosMap.get(player), color);
-        CheckLoseAfterMove();
-        CheckWinAfterMove();
+        dfs.start(startPositionMap.get(player), color);
+        checkLoseAfterMove();
+        checkWinAfterMove();
     }
     /*There prefab procedures*/
     /*Some procedure to restart game with same players*/
     public void newRound(){
-        square = new Square(square.getXSize(), square.getYSize(), square.getColorNumber());
+        gameField = new GameField(gameField.getXSize(), gameField.getYSize(), gameField.getColorNumber());
     }
     /*Some procedure, that assign start positions for each player*/
-    private void AssignPositions(){
+    private void assignPositions(){
 
     }
     /*Disable some players*/
-    private void PlayersLosed(){
+    private void playersLosed(){
 
     }
 
     /*Game round ended*/
-    public Boolean CheckWinAfterMove(){
+    public Boolean checkWinAfterMove(){
         return true;
     }
     /*Some players losed*/
-    public Boolean CheckLoseAfterMove(){
+    public Boolean checkLoseAfterMove(){
         return true;
     }
 
