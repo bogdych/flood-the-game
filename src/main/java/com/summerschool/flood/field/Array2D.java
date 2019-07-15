@@ -1,4 +1,4 @@
-package com.summerschool.flood.gameSquare;
+package com.summerschool.flood.field;
 
 
 
@@ -7,5 +7,5 @@ interface Array2D<T> {
      int getYSize();
      T getAt(int i, int j);
      void setAt(int i, int j, T val);
-     Boolean IsInternalCell(int i, int j);
+     Boolean isInternalCell(int i, int j);
 }

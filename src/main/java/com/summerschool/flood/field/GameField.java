@@ -1,10 +1,10 @@
-package com.summerschool.flood.gameSquare;
+package com.summerschool.flood.field;
 
 import java.util.Random;
 import lombok.Getter;
 
 
-public class Square implements Array2D<Integer>{
+public class GameField implements Array2D<Integer>{
     private static final @Getter int xDef = 16;
     private static final @Getter int yDef = 16;
     private final @Getter int xSize;
@@ -15,7 +15,7 @@ public class Square implements Array2D<Integer>{
 
     private Matrix2D<Integer> matrix;
     private @Getter String status = "";
-    public Square(){
+    public GameField(){
         this.xSize = xDef;
         this.ySize = yDef;
         this.colorNumber = colorNumberDef;
@@ -23,7 +23,7 @@ public class Square implements Array2D<Integer>{
         rand.setSeed(System.currentTimeMillis());
         this.matrix = new Matrix2D<Integer>(xSize, ySize, 0);
     }
-    public Square(int xs, int ys, int cs){
+    public GameField(int xs, int ys, int cs){
 
         this.xSize = xs;
         this.ySize = ys;
@@ -36,28 +36,17 @@ public class Square implements Array2D<Integer>{
                 matrix.setAt(i, j, rand.nextInt(colorNumber));
         }
     }
-    public Boolean IsInternalCell(int xCell, int yCell){
+    public Boolean isInternalCell(int xCell, int yCell){
         if(xCell < 0 || xSize <= xCell ||
                 yCell < 0 || ySize <= yCell)
             return false;
         return true;
     }
-    public int getColorAt(int xc, int yc){
-        return (int) matrix.getAt(xc, yc);
-    }
-    public int getColorAt(Pair<Integer, Integer> cell){
-        return (int) matrix.getAt(cell);
-    }
-    public void setColorAt(int xc, int yc, int valueColor){
-        matrix.setAt(xc, yc, valueColor);
-    }
-    public void setColorAt(Pair<Integer, Integer> cell, int valueColor){
-        matrix.setAt(cell, valueColor);
-    }
+
     public Integer getAt(int x, int y){
-        return this.getColorAt(x, y);
+        return matrix.getAt(x, y);
     }
     public void setAt(int x, int y, Integer valueColor){
-        this.setColorAt(x, y, valueColor);
+        matrix.setAt(x, y, valueColor);
     }
 }

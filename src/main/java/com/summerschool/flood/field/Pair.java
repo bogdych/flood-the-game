@@ -1,4 +1,4 @@
-package com.summerschool.flood.gameSquare;
+package com.summerschool.flood.field;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
