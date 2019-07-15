@@ -30,7 +30,7 @@ public class GameField implements Array2D<Integer>{
         this.colorNumber = cs;
         Random rand = new Random();
         rand.setSeed(System.currentTimeMillis());
-        this.matrix = new Matrix2D<Integer>(xSize, ySize, 0);
+        this.matrix = new Matrix2D<>(xSize, ySize, 0);
         for (int j = 0; j < xSize; j++) {
             for (int i = 0; i < ySize; i++)
                 matrix.setAt(i, j, rand.nextInt(colorNumber));
