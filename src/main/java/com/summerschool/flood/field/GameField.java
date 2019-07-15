@@ -5,8 +5,8 @@ import lombok.Getter;
 
 
 public class GameField implements Array2D<Integer>{
-    private static final @Getter int xDef = 16;
-    private static final @Getter int yDef = 16;
+    private static final @Getter int XDEF = 16;
+    private static final @Getter int YDEF = 16;
     private final @Getter int xSize;
     private final @Getter int ySize;
 
@@ -16,8 +16,8 @@ public class GameField implements Array2D<Integer>{
     private Matrix2D<Integer> matrix;
     private @Getter String status = "";
     public GameField(){
-        this.xSize = xDef;
-        this.ySize = yDef;
+        this.xSize = XDEF;
+        this.ySize = YDEF;
         this.colorNumber = colorNumberDef;
         Random rand = new Random();
         rand.setSeed(System.currentTimeMillis());
@@ -37,10 +37,7 @@ public class GameField implements Array2D<Integer>{
         }
     }
     public Boolean isInternalCell(int xCell, int yCell){
-        if(xCell < 0 || xSize <= xCell ||
-                yCell < 0 || ySize <= yCell)
-            return false;
-        return true;
+        return matrix.isInternalCell(xCell, yCell);
     }
 
     public Integer getAt(int x, int y){
