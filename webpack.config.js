@@ -8,10 +8,10 @@ module.exports = {
       { test: /\.js$/, exclude: /node_modules/, loader: "babel-loader" }
     ]
   },
-  entry: './src/index.js',
+  entry: './src/game/index.js',
   output: {
     filename: 'main.js',
-    path: path.resolve(__dirname, 'dist')
+    path: __dirname + "/src/main/resources/static"
   },
   plugins: [
     new HtmlWebpackPlugin(),

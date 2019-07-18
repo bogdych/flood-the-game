@@ -7,7 +7,7 @@ module.exports = merge(config, {
     devtool: "cheap-eval-source-map",
     devServer: {
         open: true,
-        contentBase: path.join(__dirname, 'dist'),
+        contentBase: __dirname + "/src/main/resources/static",
         compress: true,
         port: 9000
       }
