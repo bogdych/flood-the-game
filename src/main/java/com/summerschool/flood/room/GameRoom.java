@@ -1,6 +1,6 @@
 package com.summerschool.flood.room;
 
-import com.summerschool.flood.Prefabs.*;
+import com.summerschool.flood.prefabs.*;
 import com.summerschool.flood.field.GameField;
 import com.summerschool.flood.field.DepthFirstSearch;
 import com.summerschool.flood.field.Pair;
@@ -13,48 +13,61 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import lombok.Getter;
 
 public class GameRoom {
-    private @Getter int counter = 0;
+    private @Getter int counterNextPlayerId = 0;
     private @Getter int playersNumber = 4;
     private @Getter int playersNumberMax = 16;
     private @Getter int colorNumber = 6;
     private @Getter int colorNumberMax = 12;
-    private @Getter String status;
+    private @Getter String status = "";
     private @Getter List<Player> playerList;
     private Map<Player, Integer> playersIdMap;
     private Map<Player, Integer> playersColorsMap;
     private Map<Player, Pair<Integer, Integer>> startPositionMap;
-    private GameField gameField;
+    private @Getter GameField gameField;
     private DepthFirstSearch dfs;
     private @Getter Chat chat;
     public GameRoom(int playersNum, Pair<Integer, Integer> diagCell, int colors ){
-        this.playersNumber = playersNum;
-        this.colorNumber = colors;
-        this.playersIdMap = new ConcurrentHashMap<>();
-        this.playersColorsMap = new ConcurrentHashMap<>();
-        this.playerList = new CopyOnWriteArrayList<>();
-        this.gameField = new GameField(diagCell.getFirst(), diagCell.getSecond(), colorNumber);
-        this.assignPositions();
-        this.dfs = new DepthFirstSearch(gameField);
+        playersNumber = playersNum;
+        colorNumber = colors;
+        playersIdMap = new ConcurrentHashMap<>();
+        playersColorsMap = new ConcurrentHashMap<>();
+        playerList = new CopyOnWriteArrayList<>();
+        gameField = new GameField(diagCell.getFirst(), diagCell.getSecond(), colorNumber);
+        dfs = new DepthFirstSearch(gameField);
         for (int i = 0; i < playersNumber; i++) {
             playerList.add(new Player());
             playersIdMap.put(playerList.get(i), i);
-                                                                                /*Because didn't override equals*/
-            playersColorsMap.put(playerList.get(i), gameField.getAt(startPositionMap.get(playerList.get(i)).getFirst(),
-                                                                 startPositionMap.get(playerList.get(i)).getSecond()));
         }
         chat = new Chat();
+        startPositionMap = new ConcurrentHashMap<>(){
+            {
+                put(playerList.get(0), Pair.of(0, 0));
+                put(playerList.get(1), Pair.of(0, diagCell.getSecond() - 1));
+                put(playerList.get(2), Pair.of(diagCell.getFirst() - 1, diagCell.getSecond() - 1));
+                put(playerList.get(3), Pair.of(diagCell.getFirst() - 1, 0));
+            }
+        };
+        for(Player player : playerList){
+
+            playersColorsMap.put(player, gameField.getAt(startPositionMap.get(player)));
+        }
     }
     public Boolean isValidMove(Player player, int color){
         int tmpCounter = playersIdMap.get(player);
-        return (tmpCounter == counter + 1) && color != playersColorsMap.get(player) && color >= 0 && color < colorNumber;
+        return (tmpCounter == (counterNextPlayerId ) % playersNumber) &&
+                color != playersColorsMap.get(player) &&
+                color >= 0 && color < colorNumber;
     }
     public void move(Player player, int color){
         if(!isValidMove(player, color)) {
             status = "Invalid move";
             return;
         }
-        counter = (counter + 1) % playersNumber;
+        counterNextPlayerId = (counterNextPlayerId ) % playersNumber;
         dfs.start(startPositionMap.get(player), color);
+        playersColorsMap.replace(player, color);
+        counterNextPlayerId = (counterNextPlayerId + 1) % playersNumber;
+        getGameField().show();
         checkLoseAfterMove();
         checkWinAfterMove();
     }
@@ -62,10 +75,6 @@ public class GameRoom {
     /*Some procedure to restart game with same players*/
     public void newRound(){
         gameField = new GameField(gameField.getXSize(), gameField.getYSize(), gameField.getColorNumber());
-    }
-    /*Some procedure, that assign start positions for each player*/
-    private void assignPositions(){
-
     }
     /*Disable some players*/
     private void playersLosed(){

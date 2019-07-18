@@ -1,4 +1,4 @@
-package com.summerschool.flood.Prefabs;
+package com.summerschool.flood.prefabs;
 
 public class Chat {
     public Chat(){
