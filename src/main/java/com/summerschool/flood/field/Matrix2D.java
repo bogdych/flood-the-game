@@ -1,8 +1,8 @@
 package com.summerschool.flood.field;
 
-import lombok.Getter;
-
 import java.util.ArrayList;
+
+import lombok.Getter;
 
 public class Matrix2D<T> implements Array2D<T> {
 
@@ -37,4 +37,5 @@ public class Matrix2D<T> implements Array2D<T> {
     public void setAt(Pair<Integer, Integer> pair, T value){
         setAt(pair.getFirst(), pair.getSecond(), value);
     }
+
 }
