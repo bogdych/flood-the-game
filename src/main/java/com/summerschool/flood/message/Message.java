@@ -1,4 +1,4 @@
-package com.summerschool.flood.server;
+package com.summerschool.flood.message;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

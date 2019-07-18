@@ -6,8 +6,8 @@ import com.summerschool.flood.game.FloodGame;
 import com.summerschool.flood.game.GameType;
 import com.summerschool.flood.game.IGame;
 import com.summerschool.flood.game.Player;
-import com.summerschool.flood.server.Message;
-import com.summerschool.flood.server.MessageType;
+import com.summerschool.flood.message.Message;
+import com.summerschool.flood.message.MessageType;
 import com.summerschool.flood.server.ServerData;
 
 import lombok.Data;
