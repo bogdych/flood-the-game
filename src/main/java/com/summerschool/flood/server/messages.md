@@ -14,9 +14,9 @@ play do something in time of current game session.
 
 ```json
 {
-    "messageType" : "<message type>"
-    "param1" : "<param value1"
-    "param2" : "<param value2"
+    "messageType" : "<message type>",
+    "param1" : "<param value1",
+    "param2" : "<param value2",
 
     "paramN" : "<param valueN"
 }
@@ -26,9 +26,9 @@ Server-side response.
 
 ```json
 {
-    "messageType" : "<message type>"
-    "serialized param1" : "<param value1>"
-    "serialized param2" : "<param value2>"
+    "messageType" : "<message type>",
+    "serialized param1" : "<param value1>",
+    "serialized param2" : "<param value2>",
 
     "serialized paramN" : "<param valueN>"
 }
