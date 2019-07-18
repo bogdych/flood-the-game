@@ -12,23 +12,27 @@ import com.summerschool.flood.server.ServerData;
 
 import lombok.Data;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import java.io.IOException;
 import java.util.Optional;
 
 @Data
 @Component
 public class WebSocketGameHandler extends TextWebSocketHandler {
 
-    @Autowired
-    private ServerData serverData;
+    private final static Logger LOG = LoggerFactory.getLogger(WebSocketGameHandler.class);
+    private final ServerData serverData;
     private final ObjectMapper mapper = new ObjectMapper();
+
+    public WebSocketGameHandler(ServerData serverData) {
+        this.serverData = serverData;
+    }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
@@ -38,13 +42,7 @@ public class WebSocketGameHandler extends TextWebSocketHandler {
     @Override
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
 
-        Message gameMessage;
-
-        try {
-            gameMessage = mapper.readValue((String) message.getPayload(), Message.class);
-        } catch (IOException e) {
-            return;
-        }
+        Message gameMessage = mapper.readValue((String) message.getPayload(), Message.class);
 
         if (gameMessage.getType() == MessageType.FIND_GAME) {
             // todo: payload info - find session via params (game params)
@@ -55,14 +53,14 @@ public class WebSocketGameHandler extends TextWebSocketHandler {
 
             if (game.isPresent()) {
                 game.get().getPlayers().add(new Player());
-                System.out.println("Add player: " + session.getId());
+                LOG.info("Added player: " + session.getId());
             } else {
                 // todo: pass game params
                 // todo: game via type [switch]
                 IGame gameSession = new FloodGame(GameType.STANDARD);
                 gameSession.getPlayers().add(new Player());
                 serverData.getGames().add(gameSession);
-                System.out.println("Create game session: " + session.getId());
+                LOG.info("Created game session: " + session.getId());
             }
         }
     }
