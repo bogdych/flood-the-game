@@ -3,11 +3,12 @@ package com.summerschool.flood.game;
 import lombok.Data;
 
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Data
 public class FloodGame implements IGame {
 
-    private List<Player> players;
+    private List<Player> players = new CopyOnWriteArrayList<>();
     private Field field;
 
     public FloodGame(GameType type) {
