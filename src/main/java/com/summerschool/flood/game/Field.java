@@ -19,7 +19,7 @@ public class Field {
         this.width = width;
         this.height = height;
         fill(cells);
-        firstSearch = new DepthFirstSearch();
+        this.firstSearch = new DepthFirstSearch();
     }
 
     private void fill(Cell[][] cells) {
@@ -50,7 +50,6 @@ public class Field {
     }
     @NoArgsConstructor
     private class DepthFirstSearch implements IFirstSearch{
-        private Cell[][] field;
         private Color startColor;
         /* O(|V| + |E|) */
         public void start(Cell cell){
