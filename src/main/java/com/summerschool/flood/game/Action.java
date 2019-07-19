@@ -6,8 +6,6 @@ import java.util.Map;
 
 @Data
 public class Action {
-
     private ActionType type;
     private Map<String, Object> params;
-
 }

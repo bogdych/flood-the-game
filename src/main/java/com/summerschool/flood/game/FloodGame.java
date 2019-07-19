@@ -10,8 +10,10 @@ public class FloodGame implements IGame {
 
     private List<Player> players = new CopyOnWriteArrayList<>();
     private Field field;
+    private int maxPlayersCount;
 
-    public FloodGame(GameType type) {
+    public FloodGame(GameType type, int maxPlayersCount) {
+        this.maxPlayersCount = maxPlayersCount;
 
         switch (type) {
             case STANDARD:
@@ -21,6 +23,16 @@ public class FloodGame implements IGame {
             case FAST:
                 this.field = new Field(5, 5);
         }
+    }
+
+    @Override
+    public void removePlayer(Player player) {
+
+    }
+
+    @Override
+    public boolean addPlayer(Player player) {
+        return false;
     }
 
     @Override

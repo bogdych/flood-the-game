@@ -3,21 +3,23 @@ package com.summerschool.flood.controller;
 import com.summerschool.flood.game.Player;
 import com.summerschool.flood.server.ServerData;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.Map;
 
 @RestController
 public class GameController {
 
-    @Autowired
-    private ServerData handler;
+    private final ServerData serverData;
+
+    public GameController(ServerData serverData) {
+        this.serverData = serverData;
+    }
 
     @GetMapping("/players")
-    public List<Player> getPlayers() {
-        return handler.getPlayers();
+    public Map<String, Player> getPlayers() {
+        return serverData.getPlayerMap();
     }
 
 }

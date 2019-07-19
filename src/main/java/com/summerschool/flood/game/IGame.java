@@ -4,7 +4,11 @@ import java.util.List;
 
 public interface IGame {
 
-    Result makeAction(Action action);
+    void removePlayer(Player player);
+
+    boolean addPlayer(Player player);
+
+    Result makeAction(Player player, Action action);
 
     List<Player> getPlayers();
 

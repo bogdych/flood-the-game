@@ -44,6 +44,8 @@ public class WebSocketGameHandler extends TextWebSocketHandler {
 
         Message gameMessage = mapper.readValue((String) message.getPayload(), Message.class);
 
+        /*
+
         if (gameMessage.getType() == MessageType.FIND_GAME) {
             // todo: payload info - find session via params (game params)
 
@@ -63,6 +65,8 @@ public class WebSocketGameHandler extends TextWebSocketHandler {
                 LOG.info("Created game session: " + session.getId());
             }
         }
+
+         */
     }
 
     @Override

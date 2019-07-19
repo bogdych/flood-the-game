@@ -16,7 +16,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class ServerData {
 
     private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
+
+    private final Map<String, Player> playerIDMap = new ConcurrentHashMap<>();
+    private final Map<String, Player> playerMap = new ConcurrentHashMap<>();
     private final List<IGame> games = new CopyOnWriteArrayList<>();
-    private final List<Player> players = new CopyOnWriteArrayList<>();
 
 }
