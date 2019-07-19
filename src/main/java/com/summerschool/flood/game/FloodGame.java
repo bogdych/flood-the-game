@@ -27,7 +27,7 @@ public class FloodGame implements IGame {
 
     @Override
     public void removePlayer(Player player) {
-
+        // todo: remove player properly for game logic
     }
 
     @Override
@@ -36,7 +36,8 @@ public class FloodGame implements IGame {
     }
 
     @Override
-    public Result makeAction(Action action) {
+    public Result makeAction(Player player, Action action) {
+        // todo: run game logic here
         return null;
     }
 

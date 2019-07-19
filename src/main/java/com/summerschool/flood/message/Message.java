@@ -16,5 +16,3 @@ public class Message implements Serializable {
     private Map<String,Object> payload;
 
 }
-
-
