@@ -8,7 +8,7 @@ module.exports = {
       { test: /\.js$/, exclude: /node_modules/, loader: "babel-loader" }
     ]
   },
-  entry: './src/game/index.js',
+  entry: './app/game/index.js',
   output: {
     filename: 'main.js',
     path: __dirname + "/src/main/resources/static"
@@ -16,7 +16,7 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin(),
     new CopyPlugin([
-      { from: './src/assets', to: './assets' },
+      { from: './app/assets', to: './assets' },
     ])
   ]
 };
