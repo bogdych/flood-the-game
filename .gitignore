@@ -1,3 +1,8 @@
+node_modules
+/src/main/resources/static
+*.map
+
+
 HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
