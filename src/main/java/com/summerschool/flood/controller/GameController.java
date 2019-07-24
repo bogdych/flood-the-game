@@ -19,6 +19,7 @@ public class GameController {
 
     @GetMapping("/players")
     public Map<String, Player> getPlayers() {
+        System.out.println("/players");
         return serverData.getPlayerMap();
     }
 

@@ -2,7 +2,9 @@ package com.summerschool.flood.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.summerschool.flood.game.GameAction;
 import com.summerschool.flood.game.GameParams;
+import com.summerschool.flood.game.PlayerInfo;
 import com.summerschool.flood.message.Message;
 import com.summerschool.flood.message.MessageType;
 import com.summerschool.flood.server.GameService;
@@ -19,8 +21,6 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-
-import java.util.Map;
 
 @Data
 @Component
@@ -39,20 +39,33 @@ public class WebSocketGameHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
         serverData.getSessions().put(session.getId(), session);
+        service.connect(session.getId());
     }
 
     @Override
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
+        String playerID = session.getId();
         Message gameMessage = mapper.readValue((String) message.getPayload(), Message.class);
+        MessageType gameType = gameMessage.getType();
 
-        if (gameMessage.getType() == MessageType.FIND_GAME) {
-            // todo: payload info - find session via params (game params)
-            GameParams gameParams = mapper.convertValue(gameMessage.getPayload(), GameParams.class);
-            service.findGame(session.getId(), gameParams);
+        switch (gameType) {
 
-            System.out.println(gameMessage.getPayload().get("gameParams").getClass());
+            case SET_PLAYER_INFO: {
+                PlayerInfo playerInfo = mapper.convertValue(gameMessage.getPayload(), PlayerInfo.class);
+                service.setPlayerInfo(playerID, playerInfo);
+            } break;
+
+            case FIND_GAME: {
+                GameParams gameParams = mapper.convertValue(gameMessage.getPayload(), GameParams.class);
+                service.findGame(playerID, gameParams);
+            } break;
+
+            case MAKE_ACTION: {
+                GameAction gameAction = mapper.convertValue(gameMessage.getPayload(), GameAction.class);
+                service.process(playerID, gameAction);
+            } break;
+
         }
-
     }
 
     @Override

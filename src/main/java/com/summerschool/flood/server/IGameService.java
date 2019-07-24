@@ -1,6 +1,6 @@
 package com.summerschool.flood.server;
 
-import com.summerschool.flood.game.Action;
+import com.summerschool.flood.game.GameAction;
 import com.summerschool.flood.game.GameParams;
 import com.summerschool.flood.game.PlayerInfo;
 
@@ -21,7 +21,7 @@ public interface IGameService {
     boolean reconnect(String playerID, String playerNickname) throws ServiceException;
 
     /** Finds game, makes game actions, validates game logic [internal] */
-    void process(String playerID, Action action) throws ServiceException;
+    void process(String playerID, GameAction action) throws ServiceException;
 
     /** Called when session [WS] is closed */
     void disconnect(String playerID) throws ServiceException;

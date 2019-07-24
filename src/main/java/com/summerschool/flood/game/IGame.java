@@ -9,7 +9,7 @@ public interface IGame {
 
     boolean addPlayer(Player player);
 
-    Result makeAction(Player player, Action action);
+    Result makeAction(Player player, GameAction action);
 
     List<Player> getPlayers();
 

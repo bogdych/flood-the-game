@@ -37,7 +37,7 @@ public class FloodGame implements IGame {
     }
 
     @Override
-    public Result makeAction(Player player, Action action) {
+    public Result makeAction(Player player, GameAction action) {
         // todo: run game logic here
         return null;
     }

@@ -23,6 +23,8 @@ public class GameService implements IGameService {
         Player player = new Player();
         player.setId(playerID);
         serverData.getPlayerIDMap().put(playerID, player);
+
+        LOG.info("Connect player: " + playerID);
     }
 
     @Override
@@ -32,9 +34,12 @@ public class GameService implements IGameService {
         String oldNickname = player.getNickname();
         String newNickname = info.getNickname();
 
-        serverData.getPlayerMap().remove(oldNickname);
+        if (oldNickname != null) serverData.getPlayerMap().remove(oldNickname);
+
         player.setNickname(newNickname);
         serverData.getPlayerMap().put(newNickname, player);
+
+        LOG.info("Set player info: " + newNickname);
     }
 
     @Override
@@ -76,7 +81,12 @@ public class GameService implements IGameService {
     }
 
     @Override
-    public void process(String playerID, Action action) throws ServiceException {
+    public void process(String playerID, GameAction action) throws ServiceException {
+        if (action != null) {
+            LOG.info("Process: " + playerID);
+            return;
+        }
+
         Player player = findPlayer(playerID);
         IGame game = player.getCurrentGame();
 
@@ -100,6 +110,8 @@ public class GameService implements IGameService {
             game.removePlayer(player);
             removeFromEverywhere(player);
         }
+
+        LOG.info("Disconnect player: " + playerID + " nickname: " + player.getNickname());
     }
 
     @Override

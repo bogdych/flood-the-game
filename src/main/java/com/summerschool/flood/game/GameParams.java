@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.util.Map;
 
 @Data
@@ -13,10 +12,12 @@ import java.util.Map;
 @NoArgsConstructor
 public class GameParams {
 
-    @JsonProperty("name")
+    @JsonProperty("gameName")
     private GameName gameName;
-    @JsonProperty("type")
+
+    @JsonProperty("gameType")
     private GameType gameType;
+
     private Map<String, Object> params;
 
 }

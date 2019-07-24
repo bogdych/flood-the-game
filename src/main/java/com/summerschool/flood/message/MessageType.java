@@ -9,16 +9,15 @@ public enum MessageType {
         ERROR,
 
         /** Actual player game step (fill with color, in out case) */
-        @JsonProperty("makeStep")
-        MAKE_STEP,
-
-        /** Sent when player firstly connected to the server (setup player info: name)*/
-        @JsonProperty("connect")
-        CONNECT,
+        @JsonProperty("makeAction")
+        MAKE_ACTION,
 
         /** Sent when player asks to find new game session */
         @JsonProperty("findGame")
         FIND_GAME,
+
+        @JsonProperty("setPlayerInfo")
+        SET_PLAYER_INFO,
 
         /** Get player info request */
         @JsonProperty("getPlayerInfo")
