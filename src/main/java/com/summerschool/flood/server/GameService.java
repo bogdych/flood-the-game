@@ -61,9 +61,9 @@ public class GameService implements IGameService {
 
                 Optional<IGame> game = serverData.getGames().stream()
                         .filter(g -> {
-                            if (g.matchType(params) && g.canAddPLayer()) {
+                            if (g.matchType(params) && g.canAddPlayer()) {
                                 synchronized (g) {
-                                    if (g.canAddPLayer()) {
+                                    if (g.canAddPlayer()) {
                                         g.addPlayer(player);
                                         return true;
                                     } else {
@@ -135,8 +135,8 @@ public class GameService implements IGameService {
                 synchronized (game) {
                     game.removePlayer(player);
                 }
-                removeFromEverywhere(player);
             }
+            removeFromEverywhere(player);
         }
 
         LOG.info("Disconnect player: " + playerID + " nickname: " + player.getNickname());

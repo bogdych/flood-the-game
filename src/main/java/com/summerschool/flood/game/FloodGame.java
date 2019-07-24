@@ -37,13 +37,13 @@ public class FloodGame implements IGame {
     }
 
     @Override
-    public boolean canAddPLayer() {
+    public boolean canAddPlayer() {
         return false;
     }
 
     @Override
-    public boolean addPlayer(Player player) {
-        return false;
+    public void addPlayer(Player player) {
+
     }
 
     @Override
