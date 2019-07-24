@@ -12,10 +12,10 @@ import java.util.Map;
 @NoArgsConstructor
 public class GameParams {
 
-    @JsonProperty("gameName")
+    @JsonProperty("name")
     private GameName gameName;
 
-    @JsonProperty("gameType")
+    @JsonProperty("type")
     private GameType gameType;
 
     private Map<String, Object> params;

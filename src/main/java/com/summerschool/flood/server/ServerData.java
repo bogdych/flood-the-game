@@ -24,6 +24,9 @@ public class ServerData {
     /** Mapping via player nickname for future reconnect feature */
     private final Map<String, Player> playerMap = new ConcurrentHashMap<>();
 
+    /** Map playerID and current active game session */
+    private final Map<String, IGame> playerIDGameMap = new ConcurrentHashMap<>();
+
     /** All active game sessions */
     private final List<IGame> games = new CopyOnWriteArrayList<>();
 

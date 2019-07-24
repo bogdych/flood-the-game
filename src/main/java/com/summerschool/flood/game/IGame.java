@@ -7,6 +7,10 @@ public interface IGame {
 
     void removePlayer(Player player);
 
+    boolean matchType(GameParams params);
+
+    boolean canAddPLayer();
+
     boolean addPlayer(Player player);
 
     Result makeAction(Player player, GameAction action);

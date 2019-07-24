@@ -32,6 +32,16 @@ public class FloodGame implements IGame {
     }
 
     @Override
+    public boolean matchType(GameParams params) {
+        return false;
+    }
+
+    @Override
+    public boolean canAddPLayer() {
+        return false;
+    }
+
+    @Override
     public boolean addPlayer(Player player) {
         return false;
     }
@@ -51,5 +61,6 @@ public class FloodGame implements IGame {
     public Serializable getGameStatus() {
         return null;
     }
+
 }
 

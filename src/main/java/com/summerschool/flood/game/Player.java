@@ -9,6 +9,5 @@ public class Player implements Serializable {
 
     String id;
     String nickname;
-    IGame currentGame = null;
 
 }
