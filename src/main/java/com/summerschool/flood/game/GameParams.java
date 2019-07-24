@@ -12,7 +12,7 @@ import java.util.Map;
 @NoArgsConstructor
 public class GameParams implements Serializable {
 
-    private String gameName;
+    private GameName gameName;
     private GameType gameType;
     private Map<String,Object> params;
 

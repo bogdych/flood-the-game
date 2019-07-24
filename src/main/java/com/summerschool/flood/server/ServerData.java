@@ -15,10 +15,16 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Component
 public class ServerData {
 
+    /** Connection session for WS game handler */
     private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
 
+    /** Mapping via playerID only */
     private final Map<String, Player> playerIDMap = new ConcurrentHashMap<>();
+
+    /** Mapping via player nickname for future reconnect feature */
     private final Map<String, Player> playerMap = new ConcurrentHashMap<>();
+
+    /** All active game sessions */
     private final List<IGame> games = new CopyOnWriteArrayList<>();
 
 }

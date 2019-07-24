@@ -20,6 +20,8 @@ import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import java.util.Map;
+
 @Data
 @Component
 public class WebSocketGameHandler extends TextWebSocketHandler {
@@ -32,7 +34,6 @@ public class WebSocketGameHandler extends TextWebSocketHandler {
     public WebSocketGameHandler(ServerData serverData, GameService service) {
         this.serverData = serverData;
         this.service = service;
-        mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
     }
 
     @Override
@@ -42,13 +43,13 @@ public class WebSocketGameHandler extends TextWebSocketHandler {
 
     @Override
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
-
         Message gameMessage = mapper.readValue((String) message.getPayload(), Message.class);
 
         if (gameMessage.getType() == MessageType.FIND_GAME) {
             // todo: payload info - find session via params (game params)
-            GameParams params = mapper.readValue((String) gameMessage.getPayload().get("gameParams"), GameParams.class);
-            service.findGame(session.getId(), params);
+            // service.findGame(session.getId(), params);
+
+            System.out.println(gameMessage.getPayload().get("gameParams").getClass());
         }
 
     }
@@ -58,6 +59,7 @@ public class WebSocketGameHandler extends TextWebSocketHandler {
         WebSocketSession sessionToClose = serverData.getSessions().remove(session.getId());
         if (sessionToClose != null) {
             sessionToClose.close(status);
+            service.disconnect(session.getId());
         }
     }
 }

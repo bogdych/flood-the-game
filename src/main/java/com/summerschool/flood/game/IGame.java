@@ -1,5 +1,6 @@
 package com.summerschool.flood.game;
 
+import java.io.Serializable;
 import java.util.List;
 
 public interface IGame {
@@ -11,5 +12,10 @@ public interface IGame {
     Result makeAction(Player player, Action action);
 
     List<Player> getPlayers();
+
+    Serializable getGameState();
+
+    Serializable getGameStatus();
+
 
 }

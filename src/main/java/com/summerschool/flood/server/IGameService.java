@@ -2,13 +2,20 @@ package com.summerschool.flood.server;
 
 import com.summerschool.flood.game.Action;
 import com.summerschool.flood.game.GameParams;
+import com.summerschool.flood.game.PlayerInfo;
 
 import java.io.Serializable;
 
 public interface IGameService {
 
+    /** Connect player - called first time, when connection is set up */
+    void connect(String playerID) throws ServiceException;
+
+    /** Setup player info [nickname, etc]*/
+    void setPlayerInfo(String playerID, PlayerInfo info) throws ServiceException;
+
     /** Finds game by specified player settings */
-    void findGame(String playerID, GameParams params);
+    void findGame(String playerID, GameParams params) throws ServiceException;
 
     /** Called when player wants to reconnect to his prev game session, after he was disconnected */
     boolean reconnect(String playerID, String playerNickname) throws ServiceException;

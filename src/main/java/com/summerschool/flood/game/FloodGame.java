@@ -2,6 +2,7 @@ package com.summerschool.flood.game;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -41,5 +42,14 @@ public class FloodGame implements IGame {
         return null;
     }
 
+    @Override
+    public Serializable getGameState() {
+        return null;
+    }
+
+    @Override
+    public Serializable getGameStatus() {
+        return null;
+    }
 }
 
