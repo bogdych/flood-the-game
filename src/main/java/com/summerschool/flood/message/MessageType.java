@@ -5,35 +5,35 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public enum MessageType {
 
         /** Sent when there is error on server side of in connection, message format */
-        @JsonProperty("Error")
+        @JsonProperty("error")
         ERROR,
 
         /** Actual player game step (fill with color, in out case) */
-        @JsonProperty("MakeStep")
+        @JsonProperty("makeStep")
         MAKE_STEP,
 
         /** Sent when player firstly connected to the server (setup player info: name)*/
-        @JsonProperty("Connect")
+        @JsonProperty("connect")
         CONNECT,
 
         /** Sent when player asks to find new game session */
-        @JsonProperty("FindGame")
+        @JsonProperty("findGame")
         FIND_GAME,
 
         /** Get player info request */
-        @JsonProperty("GetPlayerInfo")
+        @JsonProperty("getPlayerInfo")
         GET_PLAYER_INFO,
 
         /** Get game state request */
-        @JsonProperty("GetGameState")
+        @JsonProperty("getGameState")
         GET_GAME_STATE,
 
         /** Server response to player validate game step */
-        @JsonProperty("Response")
+        @JsonProperty("response")
         RESPONSE,
 
         /** Sent by sever when: someone left the game session, game ended: win, lost */
-        @JsonProperty("GameStatus")
+        @JsonProperty("gameStatus")
         GAME_STATUS
 
 }

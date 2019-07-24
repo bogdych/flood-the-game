@@ -12,7 +12,7 @@ import java.util.Map;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Message implements Serializable {
+public class Message {
 
     private MessageType type;
     private Map<String,String> payload = new HashMap<>();

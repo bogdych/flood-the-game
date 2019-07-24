@@ -47,7 +47,8 @@ public class WebSocketGameHandler extends TextWebSocketHandler {
 
         if (gameMessage.getType() == MessageType.FIND_GAME) {
             // todo: payload info - find session via params (game params)
-            // service.findGame(session.getId(), params);
+            GameParams gameParams = mapper.convertValue(gameMessage.getPayload(), GameParams.class);
+            service.findGame(session.getId(), gameParams);
 
             System.out.println(gameMessage.getPayload().get("gameParams").getClass());
         }

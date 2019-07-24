@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public enum  GameType {
 
-    @JsonProperty("Fast")
+    @JsonProperty("fast")
     FAST,
 
-    @JsonProperty("Standard")
+    @JsonProperty("standard")
     STANDARD
 
 }
