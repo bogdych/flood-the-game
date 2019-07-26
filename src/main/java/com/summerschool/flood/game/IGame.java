@@ -9,9 +9,9 @@ public interface IGame {
 
     boolean matchType(GameParams params);
 
-    boolean canAddPlayer();
+    boolean hasPlace();
 
-    void addPlayer(Player player);
+    boolean addPlayer(Player player);
 
     Result makeAction(Player player, GameAction action);
 
@@ -21,5 +21,6 @@ public interface IGame {
 
     Serializable getGameStatus();
 
+    boolean isReady();
 
 }

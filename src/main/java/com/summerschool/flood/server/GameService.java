@@ -1,19 +1,23 @@
 package com.summerschool.flood.server;
 
 import com.summerschool.flood.game.*;
+import lombok.Data;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.Map;
-import java.util.Optional;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
+@Data
 public class GameService implements IGameService {
 
     private final static Logger LOG = LoggerFactory.getLogger(GameService.class);
     private final ServiceData serviceData;
+
+    private final List<IGame> games = new CopyOnWriteArrayList<>();
 
     GameService(ServiceData serviceData) {
         this.serviceData = serviceData;
@@ -38,19 +42,16 @@ public class GameService implements IGameService {
     }
 
     @Override
-    public void findGame(String playerID, GameParams params) {
-        /** ? what about concurrent access to player ? */
-
+    public IGame findGame(String playerID, GameParams params) {
         Player player = findPlayer(playerID);
 
-        if (getPlayerGameNullable(playerID) == null) {
-            Optional<IGame> game = findAndAddIntoGame(playerID, player, params);
-
-            if (game.isPresent()) {
-                serviceData.getPlayerIDGameMap().put(playerID, game.get());
-            } else {
-                createGame(playerID, player, params);
-            }
+        if (player.getActiveGame() == null) {
+            IGame game = games.stream()
+                    .filter(g -> g.matchType(params) && g.addPlayer(player))
+                    .findFirst()
+                    .orElseGet(() -> createGame(player, params));
+            player.setActiveGame(game);
+            return game;
         } else {
             throw new ServiceException("Player has active game session " + playerID);
         }
@@ -111,11 +112,9 @@ public class GameService implements IGameService {
 
     private Player findPlayer(String playerID) {
         Player player = serviceData.getPlayerIDMap().get(playerID);
-
         if (player == null) {
             throw new ServiceException("Unconnected player access");
         }
-
         return player;
     }
 
@@ -140,44 +139,17 @@ public class GameService implements IGameService {
         return game;
     }
 
-    private void createGame(String playerID, Player player, GameParams params) {
+    private IGame createGame(Player player, GameParams params) {
         switch (params.getGameName()) {
             case FLOOD:
-                IGame gameSession = new FloodGame(params.getGameType(), 4);
-                gameSession.addPlayer(player);
-                IGame prevMapping = serviceData.getPlayerIDGameMap().putIfAbsent(playerID, gameSession);
-
-                /* It means, that player has no current active game session */
-                if (prevMapping == null) {
-                    serviceData.getGames().add(gameSession);
-                }
+                IGame game = new FloodGame(params.getGameType(), 4);
+                game.addPlayer(player);
+                games.add(game);
                 LOG.info("Created game session: " + player.getId());
-
-                break;
+                return game;
             default:
                 throw new ServiceException("Invalid game name");
         }
     }
-
-    private Optional<IGame> findAndAddIntoGame(String playerID, Player player, GameParams params) {
-        Map<String,IGame> gameMap = serviceData.getPlayerIDGameMap();
-
-        return serviceData.getGames().stream()
-                .filter(g -> {
-                    if (g.matchType(params) && g.canAddPlayer()) {
-                        synchronized (g) {
-                            if (g.canAddPlayer() && gameMap.putIfAbsent(playerID, g) == null) {
-                                g.addPlayer(player);
-                                return true;
-                            } else {
-                                return false;
-                            }
-                        }
-                    }
-                    return false;
-                })
-                .findFirst();
-    }
-
 
 }

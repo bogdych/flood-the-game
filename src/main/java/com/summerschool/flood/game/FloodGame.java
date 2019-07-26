@@ -5,7 +5,6 @@ import lombok.Data;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 @Data
 public class FloodGame implements IGame {
@@ -34,17 +33,25 @@ public class FloodGame implements IGame {
 
     @Override
     public boolean matchType(GameParams params) {
-        return false;
+        return true;
     }
 
     @Override
-    public boolean canAddPlayer() {
-        return false;
+    public boolean hasPlace() {
+        return players.size() < 4;
     }
 
     @Override
-    public void addPlayer(Player player) {
-
+    public boolean addPlayer(Player player) {
+        if (hasPlace()) {
+            synchronized (this) {
+                if (hasPlace()) {
+                    players.add(player);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Override
@@ -63,5 +70,9 @@ public class FloodGame implements IGame {
         return null;
     }
 
+    @Override
+    public boolean isReady() {
+        return players.size() == 4;
+    }
 }
 

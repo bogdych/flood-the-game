@@ -3,17 +3,13 @@ package com.summerschool.flood.handler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.summerschool.flood.game.GameAction;
-import com.summerschool.flood.game.GameParams;
-import com.summerschool.flood.game.PlayerInfo;
-import com.summerschool.flood.message.ErrorMessage;
+import com.summerschool.flood.error.ErrorDetails;
+import com.summerschool.flood.game.*;
 import com.summerschool.flood.message.Message;
 import com.summerschool.flood.message.MessageType;
 import com.summerschool.flood.server.GameService;
 import com.summerschool.flood.server.IGameService;
-import com.summerschool.flood.server.ServerData;
 
-import com.summerschool.flood.server.ServiceException;
 import lombok.Data;
 
 import org.slf4j.Logger;
@@ -26,83 +22,91 @@ import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 @Data
 @Component
 public class WebSocketGameHandler extends TextWebSocketHandler {
 
     private final static Logger LOG = LoggerFactory.getLogger(WebSocketGameHandler.class);
-    private final ServerData serverData;
     private final IGameService service;
     private final ObjectMapper mapper = new ObjectMapper();
+    private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
 
-    public WebSocketGameHandler(ServerData serverData, GameService service) {
-        this.serverData = serverData;
+
+    public WebSocketGameHandler(GameService service) {
         this.service = service;
     }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
-        serverData.getSessions().put(session.getId(), session);
+        sessions.put(session.getId(), session);
         service.connect(session.getId());
     }
 
     @Override
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
         String playerID = session.getId();
-        Message gameMessage = mapper.readValue((String) message.getPayload(), Message.class);
-        MessageType gameType = gameMessage.getType();
+        try {
+            Message gameMessage = mapper.readValue((String) message.getPayload(), Message.class);
+            MessageType gameType = gameMessage.getType();
 
-        switch (gameType) {
+            switch (gameType) {
 
-            case SET_PLAYER_INFO: {
-                try {
+                case SET_PLAYER_INFO: {
                     PlayerInfo playerInfo = mapper.convertValue(gameMessage.getPayload(), PlayerInfo.class);
                     service.setPlayerInfo(playerID, playerInfo);
-                } catch (IllegalArgumentException e) {
-                    sendError(session, "PlayerInfo: invalid format");
-                } catch (ServiceException e) {
-                    sendError(session, e.getMessage());
                 }
-            } break;
+                break;
 
-            case FIND_GAME: {
-                try {
+                case FIND_GAME: {
                     GameParams gameParams = mapper.convertValue(gameMessage.getPayload(), GameParams.class);
-                    service.findGame(playerID, gameParams);
-                } catch (IllegalArgumentException e) {
-                    sendError(session, "GameParams: invalid format");
-                } catch (ServiceException e) {
-                    sendError(session, e.getMessage());
+                    IGame game = service.findGame(playerID, gameParams);
+                    if (game.isReady()){
+                        for (Player player : game.getPlayers()){
+                            WebSocketSession playerSession = sessions.get(player.getId());
+                            playerSession.sendMessage(new TextMessage("ready")); // TODO add message start game message
+                        }
+                    }
                 }
-            } break;
+                break;
 
-            case MAKE_ACTION: {
-                try {
+                case MAKE_ACTION: {
                     GameAction gameAction = mapper.convertValue(gameMessage.getPayload(), GameAction.class);
                     service.process(playerID, gameAction);
-                } catch (IllegalArgumentException e) {
-                    sendError(session, "GameAction: invalid format");
-                } catch (ServiceException e) {
-                    sendError(session, e.getMessage());
                 }
-            } break;
+                break;
+            }
+        } catch (Exception e) {
+            String errorMessage = handleException(e);
+            session.sendMessage(new TextMessage(errorMessage));
         }
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        WebSocketSession sessionToClose = serverData.getSessions().remove(session.getId());
+        WebSocketSession sessionToClose = sessions.remove(session.getId());
         if (sessionToClose != null) {
             sessionToClose.close(status);
             service.disconnect(session.getId());
         }
     }
 
-    private void sendError(WebSocketSession session, String errorText) {
-        try {
-            session.sendMessage(new TextMessage(mapper.writeValueAsString(new ErrorMessage(errorText))));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    private String handleException(Throwable ex) throws JsonProcessingException {
+        LOG.error(ex.getMessage(), ex);
+        ErrorDetails errorDetails = new ErrorDetails(
+                getCurrentTimeStamp(),
+                ex.getMessage(), "Warning");
+
+        return mapper.writeValueAsString(errorDetails);
+    }
+
+    private String getCurrentTimeStamp() {
+        SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//dd/MM/yyyy
+        Date now = new Date();
+        return sdfDate.format(now);
     }
 }
