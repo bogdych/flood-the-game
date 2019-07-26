@@ -24,7 +24,7 @@
 ```
 ## Make game action (only for players with active game session)
 
-Note: non-exhaustive patter. Need meditation
+Note: non-exhaustive format. Need meditation
 
 ```json
 {

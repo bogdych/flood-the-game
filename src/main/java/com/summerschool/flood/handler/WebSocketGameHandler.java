@@ -70,7 +70,7 @@ public class WebSocketGameHandler extends TextWebSocketHandler {
                     GameParams gameParams = mapper.convertValue(gameMessage.getPayload(), GameParams.class);
                     service.findGame(playerID, gameParams);
                 } catch (IllegalArgumentException e) {
-                    sendError(session, "GameAction: invalid format");
+                    sendError(session, "GameParams: invalid format");
                 } catch (ServiceException e) {
                     sendError(session, e.getMessage());
                 }
