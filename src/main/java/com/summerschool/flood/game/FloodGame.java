@@ -3,13 +3,14 @@ package com.summerschool.flood.game;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Data
 public class FloodGame implements IGame {
 
-    private List<Player> players = new CopyOnWriteArrayList<>();
+    private List<Player> players = new ArrayList<>();
     private Field field;
     private int maxPlayersCount;
 

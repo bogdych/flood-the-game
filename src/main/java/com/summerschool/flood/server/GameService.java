@@ -6,23 +6,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
 public class GameService implements IGameService {
 
     private final static Logger LOG = LoggerFactory.getLogger(GameService.class);
-    private final ServerData serverData;
+    private final ServiceData serviceData;
 
-    GameService(ServerData serverData) {
-        this.serverData = serverData;
+    GameService(ServiceData serviceData) {
+        this.serviceData = serviceData;
     }
 
     @Override
     public void connect(String playerID) {
         Player player = new Player();
         player.setId(playerID);
-        serverData.getPlayerIDMap().put(playerID, player);
+        serviceData.getPlayerIDMap().put(playerID, player);
 
         LOG.info("Connect player: " + playerID);
     }
@@ -30,21 +31,8 @@ public class GameService implements IGameService {
     @Override
     public void setPlayerInfo(String playerID, PlayerInfo info) {
         Player player = findPlayer(playerID);
-
-        String oldNickname;
-        String newNickname;
-
-        synchronized (player) {
-            oldNickname = player.getNickname();
-            newNickname = info.getNickname();
-
-            if (oldNickname != null) serverData.getPlayerMap().remove(oldNickname);
-
-            player.setNickname(newNickname);
-
-            // todo: check nickname [must be unique]
-            serverData.getPlayerMap().put(newNickname, player);
-        }
+        String newNickname = info.getNickname();
+        player.setNickname(newNickname);
 
         LOG.info("Set player: " + playerID + " info: " + newNickname);
     }
@@ -55,44 +43,16 @@ public class GameService implements IGameService {
 
         Player player = findPlayer(playerID);
 
-        synchronized (player) {
+        if (getPlayerGameNullable(playerID) == null) {
+            Optional<IGame> game = findAndAddIntoGame(playerID, player, params);
 
-            if (getPlayerGameNullable(playerID) == null) {
-
-                Optional<IGame> game = serverData.getGames().stream()
-                        .filter(g -> {
-                            if (g.matchType(params) && g.canAddPlayer()) {
-                                synchronized (g) {
-                                    if (g.canAddPlayer()) {
-                                        g.addPlayer(player);
-                                        return true;
-                                    } else {
-                                        return false;
-                                    }
-                                }
-                            }
-                            return false;
-                        })
-                        .findFirst();
-
-                if (game.isPresent()) {
-                    serverData.getPlayerIDGameMap().put(playerID, game.get());
-                } else {
-                    switch (params.getGameName()) {
-                        case FLOOD:
-                            IGame gameSession = new FloodGame(params.getGameType(), 4);
-                            gameSession.addPlayer(player);
-                            serverData.getGames().add(gameSession);
-                            LOG.info("Created game session: " + playerID);
-                            break;
-                        default:
-                            throw new ServiceException("Invalid game name");
-                    }
-                }
-
+            if (game.isPresent()) {
+                serviceData.getPlayerIDGameMap().put(playerID, game.get());
             } else {
-                throw new ServiceException("Player has active game session " + playerID);
+                createGame(playerID, player, params);
             }
+        } else {
+            throw new ServiceException("Player has active game session " + playerID);
         }
     }
 
@@ -106,45 +66,37 @@ public class GameService implements IGameService {
         LOG.info("Process: " + playerID);
 
         Player player = findPlayer(playerID);
+        IGame game = getPlayerGame(playerID);
 
-        synchronized (player) {
-            IGame game = getPlayerGame(playerID);
-
-            synchronized (game) {
-                if (game != null) {
-
-                    Result result = game.makeAction(player, action);
-
-                    // todo: do something with result
-                } else {
-                    throw new ServiceException("Player " + playerID + " has no active game");
-                }
-            }
+        synchronized (game) {
+            Result result = game.makeAction(player, action);
+            // todo: do something with result
         }
 
+        LOG.info("Process player: " + playerID);
     }
 
     @Override
     public void disconnect(String playerID) throws ServiceException {
         // todo: add player in disconnect timeout list
         Player player = findPlayer(playerID);
+        IGame game = getPlayerGameNullable(playerID);
 
-        synchronized (player) {
-            IGame game = getPlayerGameNullable(playerID);
-            if (game != null) {
-                synchronized (game) {
-                    game.removePlayer(player);
-                }
+        if (game != null) {
+            synchronized (game) {
+                game.removePlayer(player);
+                // todo: if it was the last player in game: remove game from game list
             }
-            removeFromEverywhere(player);
         }
+
+        removeFromEverywhere(player);
 
         LOG.info("Disconnect player: " + playerID + " nickname: " + player.getNickname());
     }
 
     @Override
     public Serializable getPlayerInfo(String playerID) throws ServiceException {
-        return serverData.getPlayerIDMap().get(playerID);
+        return serviceData.getPlayerIDMap().get(playerID);
     }
 
     @Override
@@ -158,7 +110,7 @@ public class GameService implements IGameService {
     }
 
     private Player findPlayer(String playerID) {
-        Player player = serverData.getPlayerIDMap().get(playerID);
+        Player player = serviceData.getPlayerIDMap().get(playerID);
 
         if (player == null) {
             throw new ServiceException("Unconnected player access");
@@ -169,19 +121,17 @@ public class GameService implements IGameService {
 
     private void removeFromEverywhere(Player player) {
         String id = player.getId();
-        String nickname = player.getNickname();
 
-        serverData.getPlayerIDMap().remove(id);
-        serverData.getPlayerMap().remove(nickname);
-        serverData.getPlayerIDGameMap().remove(id);
+        serviceData.getPlayerIDMap().remove(id);
+        serviceData.getPlayerIDGameMap().remove(id);
     }
 
     private IGame getPlayerGameNullable(String playerID) {
-        return serverData.getPlayerIDGameMap().get(playerID);
+        return serviceData.getPlayerIDGameMap().get(playerID);
     }
 
     private IGame getPlayerGame(String playerID) {
-        IGame game = serverData.getPlayerIDGameMap().get(playerID);
+        IGame game = serviceData.getPlayerIDGameMap().get(playerID);
 
         if (game == null) {
             throw new ServiceException("No active session for player: " + playerID);
@@ -189,5 +139,45 @@ public class GameService implements IGameService {
 
         return game;
     }
+
+    private void createGame(String playerID, Player player, GameParams params) {
+        switch (params.getGameName()) {
+            case FLOOD:
+                IGame gameSession = new FloodGame(params.getGameType(), 4);
+                gameSession.addPlayer(player);
+                IGame prevMapping = serviceData.getPlayerIDGameMap().putIfAbsent(playerID, gameSession);
+
+                /* It means, that player has no current active game session */
+                if (prevMapping == null) {
+                    serviceData.getGames().add(gameSession);
+                }
+                LOG.info("Created game session: " + player.getId());
+
+                break;
+            default:
+                throw new ServiceException("Invalid game name");
+        }
+    }
+
+    private Optional<IGame> findAndAddIntoGame(String playerID, Player player, GameParams params) {
+        Map<String,IGame> gameMap = serviceData.getPlayerIDGameMap();
+
+        return serviceData.getGames().stream()
+                .filter(g -> {
+                    if (g.matchType(params) && g.canAddPlayer()) {
+                        synchronized (g) {
+                            if (g.canAddPlayer() && gameMap.putIfAbsent(playerID, g) == null) {
+                                g.addPlayer(player);
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        }
+                    }
+                    return false;
+                })
+                .findFirst();
+    }
+
 
 }
