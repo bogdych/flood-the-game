@@ -3,7 +3,6 @@ package com.summerschool.flood.handler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.summerschool.flood.error.ErrorDetails;
 import com.summerschool.flood.game.*;
 import com.summerschool.flood.message.Message;
 import com.summerschool.flood.message.MessageType;
@@ -24,8 +23,11 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.summerschool.flood.game.GameStatus.READY;
 
 @Data
 @Component
@@ -56,17 +58,11 @@ public class WebSocketGameHandler extends TextWebSocketHandler {
 
             switch (gameType) {
 
-                case SET_PLAYER_INFO: {
-                    PlayerInfo playerInfo = mapper.convertValue(gameMessage.getPayload(), PlayerInfo.class);
-                    service.setPlayerInfo(playerID, playerInfo);
-                }
-                break;
-
                 case FIND_GAME: {
                     GameParams gameParams = mapper.convertValue(gameMessage.getPayload(), GameParams.class);
                     IGame game = service.findGame(playerID, gameParams);
-                    if (game.isReady()){
-                        for (Player player : game.getPlayers()){
+                    if (game.getGameStatus() == READY) {
+                        for (Player player : game.getPlayers()) {
                             WebSocketSession playerSession = sessions.get(player.getId());
                             playerSession.sendMessage(new TextMessage("ready")); // TODO add message start game message
                         }
@@ -97,11 +93,11 @@ public class WebSocketGameHandler extends TextWebSocketHandler {
 
     private String handleException(Throwable ex) throws JsonProcessingException {
         LOG.error(ex.getMessage(), ex);
-        ErrorDetails errorDetails = new ErrorDetails(
-                getCurrentTimeStamp(),
-                ex.getMessage(), "Warning");
-
-        return mapper.writeValueAsString(errorDetails);
+        Map<String, Object> details = new HashMap<>();
+        details.put("time", getCurrentTimeStamp());
+        details.put("message", ex.getMessage());
+        Message message = new Message(MessageType.ERROR, details);
+        return mapper.writeValueAsString(message);
     }
 
     private String getCurrentTimeStamp() {

@@ -2,19 +2,23 @@ package com.summerschool.flood.game;
 
 import lombok.Data;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.summerschool.flood.game.GameStatus.FINISHED;
+import static com.summerschool.flood.game.GameStatus.READY;
 
 @Data
 public class FloodGame implements IGame {
 
     private List<Player> players = new ArrayList<>();
+    private long id;
     private Field field;
-    private int maxPlayersCount;
+    private int maxPlayers;
+    private GameStatus gameStatus;
 
     public FloodGame(GameType type, int maxPlayersCount) {
-        this.maxPlayersCount = maxPlayersCount;
+        this.maxPlayers = maxPlayersCount;
 
         switch (type) {
             case STANDARD:
@@ -28,7 +32,10 @@ public class FloodGame implements IGame {
 
     @Override
     public void removePlayer(Player player) {
-        // todo: remove player properly for game logic
+        players.remove(player);
+        if (players.size() == 0) {
+            gameStatus = FINISHED;
+        }
     }
 
     @Override
@@ -37,16 +44,14 @@ public class FloodGame implements IGame {
     }
 
     @Override
-    public boolean hasPlace() {
-        return players.size() < 4;
-    }
-
-    @Override
     public boolean addPlayer(Player player) {
-        if (hasPlace()) {
+        if (players.size() < maxPlayers) {
             synchronized (this) {
-                if (hasPlace()) {
+                if (players.size() < maxPlayers) {
                     players.add(player);
+                    if (players.size() == maxPlayers) {
+                        gameStatus = READY;
+                    }
                     return true;
                 }
             }
@@ -58,21 +63,6 @@ public class FloodGame implements IGame {
     public Result makeAction(Player player, GameAction action) {
         // todo: run game logic here
         return null;
-    }
-
-    @Override
-    public Serializable getGameState() {
-        return null;
-    }
-
-    @Override
-    public Serializable getGameStatus() {
-        return null;
-    }
-
-    @Override
-    public boolean isReady() {
-        return players.size() == 4;
     }
 }
 

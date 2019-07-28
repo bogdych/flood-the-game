@@ -1,15 +1,14 @@
 package com.summerschool.flood.game;
 
-import java.io.Serializable;
 import java.util.List;
 
 public interface IGame {
 
+    long getId();
+
     void removePlayer(Player player);
 
     boolean matchType(GameParams params);
-
-    boolean hasPlace();
 
     boolean addPlayer(Player player);
 
@@ -17,10 +16,5 @@ public interface IGame {
 
     List<Player> getPlayers();
 
-    Serializable getGameState();
-
-    Serializable getGameStatus();
-
-    boolean isReady();
-
+    GameStatus getGameStatus();
 }
