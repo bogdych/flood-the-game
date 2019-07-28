@@ -1,4 +1,7 @@
 package com.summerschool.flood.game;
 
-public class ActionType {
+public enum  ActionType {
+
+    MAKE_STEP,
+
 }
