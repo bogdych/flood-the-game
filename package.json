@@ -1,0 +1,34 @@
+{
+  "name": "flood-project",
+  "version": "1.0.0",
+  "description": "game project for education\r phaser3\r spring-boot",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --config webpack.prod.js",
+    "start": "webpack-dev-server --config webpack.dev.js",
+    "watch": "webpack -w -c webpack.dev.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://bogdych@bitbucket.org/decembrist/flood-project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/decembrist/flood-project#readme",
+  "dependencies": {
+    "phaser": "^3.18.1",
+    "webpack-merge": "^4.2.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.5.4",
+    "@babel/preset-env": "^7.5.4",
+    "babel-loader": "^8.0.6",
+    "copy-webpack-plugin": "^5.0.3",
+    "html-webpack-plugin": "^3.2.0",
+    "webpack": "^4.35.3",
+    "webpack-cli": "^3.3.5",
+    "webpack-dev-server": "^3.7.2"
+  }
+}

@@ -1,4 +1,4 @@
-package com.summerschool.flood.message;
+package com.summerschool.flood.game;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import lombok.AllArgsConstructor;
@@ -11,13 +11,13 @@ import java.util.Map;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Message {
+public class GameAction {
 
-    private MessageType type;
-    private Map<String,Object> payload = new HashMap<>();
+    private ActionType type;
+    private Map<String, String> payload = new HashMap<>();
 
     @JsonAnySetter
-    void setPayload(String key, String value) {
+    public void setPayload(String key, String value) {
         payload.put(key, value);
     }
 

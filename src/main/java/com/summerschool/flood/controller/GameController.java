@@ -1,9 +1,8 @@
 package com.summerschool.flood.controller;
 
-import com.summerschool.flood.game.Player;
-import com.summerschool.flood.server.ServerData;
+import com.summerschool.flood.game.IGame;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.summerschool.flood.server.GameService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,12 +11,15 @@ import java.util.List;
 @RestController
 public class GameController {
 
-    @Autowired
-    private ServerData handler;
+    private final GameService gameService;
 
-    @GetMapping("/players")
-    public List<Player> getPlayers() {
-        return handler.getPlayers();
+    public GameController(GameService gameService) {
+        this.gameService = gameService;
+    }
+
+    @GetMapping("/games")
+    public List<IGame> getGames() {
+        return gameService.getGames();
     }
 
 }

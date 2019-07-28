@@ -4,21 +4,28 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static com.summerschool.flood.game.GameStatus.FINISHED;
+import static com.summerschool.flood.game.GameStatus.READY;
 
-
+@Data
 public class FloodGame implements IGame {
 
-    private @Getter @Setter List<Player> players = new CopyOnWriteArrayList<>();
-    private @Getter Field field;
+    private List<Player> players = new ArrayList<>();
     private @Getter Map<Player, Cell> playersStartPosition = new ConcurrentHashMap<>();
     private @Getter int counter = 0;
-    private IFirstSearch firstSearch;
-    public FloodGame(GameType type) {
+    private long id;
+    private Field field;
+    private int maxPlayers;
+    private GameStatus gameStatus;
+
+    public FloodGame(GameType type, int maxPlayersCount) {
+        this.maxPlayers = maxPlayersCount;
 
         switch (type) {
             case STANDARD:
@@ -57,12 +64,32 @@ public class FloodGame implements IGame {
     }
 
     @Override
+    public boolean matchType(GameParams params) {
+        return true;
+    }
+
+    @Override
     public boolean addPlayer(Player player) {
+        if (players.size() < maxPlayers) {
+            synchronized (this) {
+                if (players.size() < maxPlayers) {
+                    players.add(player);
+                    if (players.size() == maxPlayers) {
+                        gameStatus = READY;
+                    }
+                    return true;
+                }
+            }
+        }
         return false;
     }
-    @Override
-    public void removePlayer(Player player){
 
+    @Override
+    public void removePlayer(Player player) {
+        players.remove(player);
+        if (players.size() == 0) {
+            gameStatus = FINISHED;
+        }
     }
 
     public void makeStep(Player player, int x, int y, Color color){
