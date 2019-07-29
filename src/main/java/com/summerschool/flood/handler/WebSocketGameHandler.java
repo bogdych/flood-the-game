@@ -4,8 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.summerschool.flood.game.*;
-import com.summerschool.flood.message.Message;
-import com.summerschool.flood.message.MessageType;
+import com.summerschool.flood.message.*;
 import com.summerschool.flood.server.GameService;
 import com.summerschool.flood.server.IGameService;
 
@@ -21,6 +20,7 @@ import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -49,6 +49,16 @@ public class WebSocketGameHandler extends TextWebSocketHandler {
         service.connect(session.getId());
     }
 
+    public void proccess(String playerId, FindGameMessage params) throws IOException {
+        IGame game = service.findGame(playerId, params);
+        if (game.getGameStatus() == READY) {
+            for (Player player : game.getPlayers()) {
+                WebSocketSession playerSession = sessions.get(player.getId());
+                playerSession.sendMessage(new TextMessage("ready")); // TODO add message start game message
+            }
+        }
+    }
+
     @Override
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
         String playerID = session.getId();
@@ -59,8 +69,7 @@ public class WebSocketGameHandler extends TextWebSocketHandler {
             switch (gameType) {
 
                 case FIND_GAME: {
-                    GameParams gameParams = mapper.convertValue(gameMessage.getPayload(), GameParams.class);
-                    IGame game = service.findGame(playerID, gameParams);
+                    IGame game = service.findGame(playerID, (FindGameMessage) gameMessage);
                     if (game.getGameStatus() == READY) {
                         for (Player player : game.getPlayers()) {
                             WebSocketSession playerSession = sessions.get(player.getId());
@@ -71,13 +80,14 @@ public class WebSocketGameHandler extends TextWebSocketHandler {
                 break;
 
                 case MAKE_ACTION: {
-                    GameAction gameAction = mapper.convertValue(gameMessage.getPayload(), GameAction.class);
-                    service.process(playerID, gameAction);
+                    service.process(playerID, (GameActionMessage) gameMessage);
                 }
                 break;
             }
         } catch (Exception e) {
-            String errorMessage = handleException(e);
+            LOG.error(e.getMessage(), e);
+            Message err = new ErrorMessage(e.getMessage());
+            String errorMessage = mapper.writeValueAsString(err);
             session.sendMessage(new TextMessage(errorMessage));
         }
     }
@@ -89,20 +99,5 @@ public class WebSocketGameHandler extends TextWebSocketHandler {
             sessionToClose.close(status);
             service.disconnect(session.getId());
         }
-    }
-
-    private String handleException(Throwable ex) throws JsonProcessingException {
-        LOG.error(ex.getMessage(), ex);
-        Map<String, Object> details = new HashMap<>();
-        details.put("time", getCurrentTimeStamp());
-        details.put("message", ex.getMessage());
-        Message message = new Message(MessageType.ERROR, details);
-        return mapper.writeValueAsString(message);
-    }
-
-    private String getCurrentTimeStamp() {
-        SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//dd/MM/yyyy
-        Date now = new Date();
-        return sdfDate.format(now);
     }
 }

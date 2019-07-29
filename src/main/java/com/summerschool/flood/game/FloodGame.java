@@ -1,9 +1,11 @@
 package com.summerschool.flood.game;
 
+import com.summerschool.flood.message.GameActionMessage;
 import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.summerschool.flood.game.GameStatus.FINISHED;
 import static com.summerschool.flood.game.GameStatus.READY;
@@ -39,7 +41,7 @@ public class FloodGame implements IGame {
     }
 
     @Override
-    public boolean matchType(GameParams params) {
+    public boolean matchType(Map<String, String> params) {
         return true;
     }
 
@@ -60,7 +62,7 @@ public class FloodGame implements IGame {
     }
 
     @Override
-    public Result makeAction(Player player, GameAction action) {
+    public Result makeAction(Player player, GameActionMessage action) {
         // todo: run game logic here
         return null;
     }

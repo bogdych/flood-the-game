@@ -1,6 +1,8 @@
 package com.summerschool.flood.server;
 
 import com.summerschool.flood.game.*;
+import com.summerschool.flood.message.GameActionMessage;
+import com.summerschool.flood.message.FindGameMessage;
 import lombok.Data;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
@@ -32,14 +34,14 @@ public class GameService implements IGameService {
     }
 
     @Override
-    public IGame findGame(String playerID, GameParams params) {
+    public IGame findGame(String playerID, FindGameMessage message) {
         Player player = findPlayer(playerID);
 
         if (player.getActiveGame() == null) {
             IGame game = games.stream()
-                    .filter(g -> g.matchType(params) && g.addPlayer(player))
+                    .filter(g -> g.matchType(message.getGameParams()) && g.addPlayer(player))
                     .findFirst()
-                    .orElseGet(() -> createGame(player, params));
+                    .orElse(createGame(player, message));
             player.setActiveGame(game);
             return game;
         } else {
@@ -48,7 +50,7 @@ public class GameService implements IGameService {
     }
 
     @Override
-    public void process(String playerID, GameAction action) throws ServiceException {
+    public void process(String playerID, GameActionMessage action) throws ServiceException {
         LOG.info("Process: " + playerID);
 
         Player player = findPlayer(playerID);
@@ -78,10 +80,10 @@ public class GameService implements IGameService {
         return player;
     }
 
-    private IGame createGame(Player player, GameParams params) {
-        switch (params.getGameName()) {
+    private IGame createGame(Player player, FindGameMessage message) {
+        switch (message.getName()) {
             case FLOOD:
-                IGame game = new FloodGame(params.getGameType(), 4);
+                IGame game = new FloodGame(message.getGameType(), 4);
                 game.addPlayer(player);
                 games.add(game);
                 LOG.info("Created game session: " + player.getId());

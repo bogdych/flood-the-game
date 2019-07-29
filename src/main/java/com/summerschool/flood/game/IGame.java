@@ -1,6 +1,9 @@
 package com.summerschool.flood.game;
 
+import com.summerschool.flood.message.GameActionMessage;
+
 import java.util.List;
+import java.util.Map;
 
 public interface IGame {
 
@@ -8,11 +11,11 @@ public interface IGame {
 
     void removePlayer(Player player);
 
-    boolean matchType(GameParams params);
+    boolean matchType(Map<String, String> params);
 
     boolean addPlayer(Player player);
 
-    Result makeAction(Player player, GameAction action);
+    Result makeAction(Player player, GameActionMessage action);
 
     List<Player> getPlayers();
 

@@ -33,6 +33,5 @@ public enum MessageType {
 
         /** Sent by sever when: someone left the game session, game ended: win, lost */
         @JsonProperty("gameStatus")
-        GAME_STATUS
-
+        GAME_STATUS;
 }
