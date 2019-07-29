@@ -38,7 +38,6 @@ public class WebSocketGameHandler extends TextWebSocketHandler {
     private final ObjectMapper mapper = new ObjectMapper();
     private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
 
-
     public WebSocketGameHandler(GameService service) {
         this.service = service;
     }
@@ -47,16 +46,6 @@ public class WebSocketGameHandler extends TextWebSocketHandler {
     public void afterConnectionEstablished(WebSocketSession session) {
         sessions.put(session.getId(), session);
         service.connect(session.getId());
-    }
-
-    public void proccess(String playerId, FindGameMessage params) throws IOException {
-        IGame game = service.findGame(playerId, params);
-        if (game.getGameStatus() == READY) {
-            for (Player player : game.getPlayers()) {
-                WebSocketSession playerSession = sessions.get(player.getId());
-                playerSession.sendMessage(new TextMessage("ready")); // TODO add message start game message
-            }
-        }
     }
 
     @Override
