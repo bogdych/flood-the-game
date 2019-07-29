@@ -29,7 +29,7 @@ public class Field {
     }
 
     public Boolean isInternalAt(int x, int y){
-        return 0 < x && x < cells.length &&
-               0 < y && y < cells[x].length;
+        return 0 <= x && x < cells.length &&
+               0 <= y && y < cells[x].length;
     }
 }

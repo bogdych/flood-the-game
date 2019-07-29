@@ -72,11 +72,22 @@ public class FloodGame implements IGame {
         counter = (counter + 1) % playersStartPosition.size();
     }
     public Boolean isValidMakeStep(Player player, int x, int y, Color color){
-        Cell tmpCell = playersStartPosition.get(counter);
+        Cell tmpCell = playersStartPosition.get(players.get(counter));
         return player == players.get(counter) &&
                 tmpCell.getX() == x && tmpCell.getY() == y &&
                 tmpCell.getColor() != color &&
                 field.isInternalAt(x, y);
+    }
+    public void setPlayersStartPosition(){
+        switch (players.size()){
+            case 4:
+                playersStartPosition = new ConcurrentHashMap<>();
+                playersStartPosition.put(players.get(0), field.getCells()[0][0]);
+                playersStartPosition.put(players.get(1), field.getCells()[field.getWidth() - 1][0]);
+                playersStartPosition.put(players.get(2), field.getCells()[field.getWidth() - 1][field.getHeight() - 1]);
+                playersStartPosition.put(players.get(3), field.getCells()[0][field.getHeight() - 1]);
+
+        }
     }
 }
 
