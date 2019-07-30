@@ -1,24 +1,29 @@
 package com.summerschool.flood.game;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
-
+import static com.summerschool.flood.game.GameStatus.FINISHED;
+import static com.summerschool.flood.game.GameStatus.READY;
 
 public class FloodGame implements IGame {
 
-    private @Getter @Setter List<Player> players = new CopyOnWriteArrayList<>();
+    private @Getter @Setter List<Player> players = new ArrayList<>();
     private @Getter Field field;
+    private @Getter @Setter long id;
     private @Getter Map<Player, Cell> playersStartPosition = new ConcurrentHashMap<>();
     private @Getter int counter = 0;
     private IFirstSearch firstSearch;
-    public FloodGame(GameType type) {
+    private @Getter @Setter int maxPlayers;
+    private @Getter @Setter GameStatus gameStatus;
+
+    public FloodGame(GameType type, int maxPlayersCount) {
+        this.maxPlayers = maxPlayersCount;
 
         switch (type) {
             case STANDARD:
@@ -32,40 +37,56 @@ public class FloodGame implements IGame {
     }
 
     @Override
-    public Result makeAction(Player player, Action action) {
-        switch (action.getType()){
-            case MAKE_STEP:
-                if(action.getParams().get("X1") instanceof Integer &&
-                        action.getParams().get("X2") instanceof Integer &&
-                        action.getParams().get("color") instanceof  Color) {
-
-                    if(isValidMakeStep(player, (Integer)action.getParams().get("X1"),
-                            (Integer) action.getParams().get("X1"),
-                            (Color) action.getParams().get("Color"))) {
-
-                        makeStep(player, (Integer) action.getParams().get("X1"),
-                                (Integer) action.getParams().get("X2"),
-                                (Color) action.getParams().get("Color"));
-                    }
-                }
-
-                break;
-            default:
-                return null;
+    public void removePlayer(Player player) {
+        players.remove(player);
+        if (players.size() == 0) {
+            gameStatus = FINISHED;
         }
-        return null;
+    }
+
+    @Override
+    public boolean matchType(GameParams params) {
+        return true;
     }
 
     @Override
     public boolean addPlayer(Player player) {
+        if (players.size() < maxPlayers) {
+            synchronized (this) {
+                if (players.size() < maxPlayers) {
+                    players.add(player);
+                    if (players.size() == maxPlayers) {
+                        gameStatus = READY;
+                    }
+                    return true;
+                }
+            }
+        }
         return false;
     }
-    @Override
-    public void removePlayer(Player player){
 
+    @Override
+    public Result makeAction(Player player, GameAction action) {
+        switch (action.getType()){
+            case MAKE_STEP:
+                    int x = Integer.parseInt(action.getPayload().get("X"));
+                    int y = Integer.parseInt(action.getPayload().get("Y"));
+                    Color color = Color.valueOf(action.getPayload().get("Color"));
+
+                    if(isValidMakeStep(player, x, y, color)) {
+                        makeStep(x, y, color);
+                        return new Result(ResultType.ACTION_PROCESSED);
+                    }
+                    else{
+                        return new Result(ResultType.INVALID_ACTION);
+                    }
+
+            default:
+                return null;
+        }
     }
 
-    public void makeStep(Player player, int x, int y, Color color){
+    public void makeStep(int x, int y, Color color){
         Cell tmpCell = new Cell(x, y);
         tmpCell.setColor(color);
         firstSearch.start(tmpCell);

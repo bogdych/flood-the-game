@@ -11,8 +11,7 @@ public class Field {
     private Cell[][] cells;
     private final int width;
     private final int height;
-    private List<Cell> startPositions;
-    private int counter = 0;
+
     public Field(int width, int height) {
         this.cells = new Cell[width][height];
         this.width = width;
