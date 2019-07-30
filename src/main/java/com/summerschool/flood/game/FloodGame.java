@@ -1,6 +1,5 @@
 package com.summerschool.flood.game;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.summerschool.flood.game.GameStatus.FINISHED;
 import static com.summerschool.flood.game.GameStatus.READY;
