@@ -71,25 +71,21 @@ public class FloodGame implements IGame {
     public Result makeAction(Player player, GameAction action) {
         switch (action.getType()){
             case MAKE_STEP:
-                if(action.getParams().get("X1") instanceof Integer &&
-                        action.getParams().get("X2") instanceof Integer &&
-                        action.getParams().get("color") instanceof  Color) {
+                    int x = Integer.parseInt(action.getPayload().get("X"));
+                    int y = Integer.parseInt(action.getPayload().get("Y"));
+                    Color color = Color.valueOf(action.getPayload().get("Color"));
 
-                    if(isValidMakeStep(player, (Integer)action.getParams().get("X1"),
-                            (Integer) action.getParams().get("X1"),
-                            (Color) action.getParams().get("Color"))) {
-
-                        makeStep(player, (Integer) action.getParams().get("X1"),
-                                (Integer) action.getParams().get("X2"),
-                                (Color) action.getParams().get("Color"));
+                    if(isValidMakeStep(player, x, y, color)) {
+                        makeStep(x, y, color);
+                        return new Result(ResultType.ACTION_PROCESSED);
                     }
-                }
+                    else{
+                        return new Result(ResultType.INVALID_ACTION);
+                    }
 
-                break;
             default:
                 return null;
         }
-        return null;
     }
 
     public void makeStep(int x, int y, Color color){

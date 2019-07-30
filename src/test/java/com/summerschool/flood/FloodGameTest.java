@@ -15,7 +15,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class FloodGameTest {
     @Test
     public void testValidMakeStep(){
-        FloodGame floodGame = new FloodGame(GameType.STANDARD);
+        FloodGame floodGame = new FloodGame(GameType.STANDARD, 4);
         floodGame.setPlayers(new CopyOnWriteArrayList<>(Arrays.asList(
                 new Player("0", "Zero", floodGame),
                 new Player("1", "First", floodGame),
@@ -27,27 +27,13 @@ public class FloodGameTest {
         int x = floodGame.getPlayersStartPosition().get(player).getX();
         int y = floodGame.getPlayersStartPosition().get(player).getY();
         Color color = floodGame.getField().getCells()[x][y].getColor();
-        Color nextColor = color;
-        assertEquals(false, floodGame.isValidMakeStep(player, x, y, nextColor));
-
         int k = ThreadLocalRandom.current().nextInt(Color.values().length);
-        nextColor = Color.values()[k];
+        Color nextColor = Color.values()[k];
+
         for (int i = 0; i < Color.values().length  && (nextColor == color || i == 0); i++)
             nextColor = Color.values()[(i + k) % Color.values().length];
 
         assertEquals(true, floodGame.isValidMakeStep(player, x, y, nextColor));
-
-
-        player = floodGame.getPlayers().get(1);
-        x = floodGame.getPlayersStartPosition().get(player).getX();
-        y = floodGame.getPlayersStartPosition().get(player).getY();
-        color = floodGame.getField().getCells()[x][y].getColor();
-        k = ThreadLocalRandom.current().nextInt(Color.values().length);
-        nextColor = Color.values()[k];
-        for (int i = 0; i < Color.values().length  && (nextColor == color || i == 0); i++)
-            nextColor = Color.values()[(i + k) % Color.values().length];
-        assertEquals(false, floodGame.isValidMakeStep(player, x, y, nextColor));
-
 
     }
 }

@@ -1,22 +1,18 @@
 package com.summerschool.flood.game;
 
-import lombok.NoArgsConstructor;
-
-@NoArgsConstructor
 public class DepthFirstSearch implements IFirstSearch {
     private Color startColor;
     private Field field;
+
     public DepthFirstSearch(Field field){
         this.field = field;
     }
-    /* O(|V| + |E|) */
     public void start(Cell cell){
         startColor = field.getCells()[cell.getX()][cell.getY()].getColor();
         runNext(cell);
     }
 
     private void runNext(Cell cell){
-        /*"used" is excess. Think, that startColor is enough*/
         if(!field.isInternalAt(cell.getX(), cell.getY()) ||
                 field.getCells()[cell.getX()][cell.getY()].getColor() != startColor)
             return;
