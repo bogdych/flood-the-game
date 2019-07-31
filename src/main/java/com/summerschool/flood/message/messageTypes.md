@@ -34,3 +34,19 @@ Note: non-exhaustive format. Need meditation
   }
 }
 ```
+{
+  "type": "findGame",
+  "payload": {
+      "type":"standard",
+      "params": {}
+  }
+}
+
+{
+  "type": "makeAction",
+  "payload": {
+      "x":1,
+      "y":2,
+      "type":"MAKE_STEP"
+  }
+}

@@ -1,9 +1,6 @@
-package com.summerschool.flood.game;
+package com.summerschool.flood.game.flood;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Data
 public class Field {

@@ -1,4 +1,6 @@
-package com.summerschool.flood.game;
+package com.summerschool.flood.game.flood;
+
+import com.summerschool.flood.game.IFirstSearch;
 
 public class DepthFirstSearch implements IFirstSearch {
     private Color startColor;

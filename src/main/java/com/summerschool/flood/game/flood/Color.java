@@ -1,4 +1,4 @@
-package com.summerschool.flood.game;
+package com.summerschool.flood.game.flood;
 
 public enum Color {
 

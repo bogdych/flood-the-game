@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         property = "type")
 @JsonSubTypes({
         @JsonSubTypes.Type(value = FindGameMessage.class, name = "findGame"),
-        @JsonSubTypes.Type(value = GameActionMessage.class, name = "makeAction")})
+        @JsonSubTypes.Type(value = MakeActionMessage.class, name = "makeAction")})
 @Data
 public abstract class Message {
 

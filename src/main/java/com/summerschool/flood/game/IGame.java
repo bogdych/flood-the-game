@@ -1,13 +1,13 @@
 package com.summerschool.flood.game;
 
-import com.summerschool.flood.message.GameActionMessage;
+import com.summerschool.flood.message.MakeActionMessage;
 
 import java.util.List;
 import java.util.Map;
 
 public interface IGame {
 
-    long getId();
+    String getId();
 
     void removePlayer(Player player);
 
@@ -15,9 +15,13 @@ public interface IGame {
 
     boolean addPlayer(Player player);
 
-    Result makeAction(Player player, GameActionMessage action);
+    void makeAction(Player player, MakeActionMessage action);
 
     List<Player> getPlayers();
 
-    GameStatus getGameStatus();
+    State getState();
+
+    boolean isReady();
+
+    boolean isFinished();
 }

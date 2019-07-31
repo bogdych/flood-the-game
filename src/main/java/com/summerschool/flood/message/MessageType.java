@@ -16,22 +16,9 @@ public enum MessageType {
         @JsonProperty("findGame")
         FIND_GAME,
 
-        @JsonProperty("setPlayerInfo")
-        SET_PLAYER_INFO,
+        @JsonProperty("gameReady")
+        GAME_READY,
 
-        /** Get player info request */
-        @JsonProperty("getPlayerInfo")
-        GET_PLAYER_INFO,
-
-        /** Get game state request */
-        @JsonProperty("getGameState")
-        GET_GAME_STATE,
-
-        /** Server response to player validate game step */
-        @JsonProperty("response")
-        RESPONSE,
-
-        /** Sent by sever when: someone left the game session, game ended: win, lost */
-        @JsonProperty("gameStatus")
-        GAME_STATUS;
+        @JsonProperty("turnEnd")
+        TURN_END,
 }
