@@ -1,14 +1,9 @@
 import Phaser from 'phaser';
+import Icon from './icon';
 
-var Flood = new Phaser.Class({
-
-    Extends: Phaser.Scene,
-
-    initialize:
-
-    function Flood ()
-    {
-        Phaser.Scene.call(this, { key: 'flood' });
+class Flood extends Phaser.Scene {
+    constructor() {
+        super();
 
         this.allowClick = true;
 
@@ -17,12 +12,12 @@ var Flood = new Phaser.Class({
         this.cursorTween;
         this.monsterTween;
 
-        this.icon1 = { shadow: null, monster: null };
-        this.icon2 = { shadow: null, monster: null };
-        this.icon3 = { shadow: null, monster: null };
-        this.icon4 = { shadow: null, monster: null };
-        this.icon5 = { shadow: null, monster: null };
-        this.icon6 = { shadow: null, monster: null };
+        this.icon1;
+        this.icon2;
+        this.icon3;
+        this.icon4;
+        this.icon5;
+        this.icon6;
 
         this.gridBG;
 
@@ -41,25 +36,31 @@ var Flood = new Phaser.Class({
         this.moves = 25;
 
         this.frames = [ 'blue', 'green', 'grey', 'purple', 'red', 'yellow' ];
-    },
+    }
 
-    preload: function ()
-    {
+    preload() {
         this.load.bitmapFont('atari', 'assets/fonts/bitmap/atari-smooth.png', 'assets/fonts/bitmap/atari-smooth.xml');
         this.load.atlas('flood', 'assets/games/flood/blobs.png', 'assets/games/flood/blobs.json');
-    },
+    }
 
-    create: function ()
-    {
+    create() {
         this.add.image(400, 300, 'flood', 'background');
         this.gridBG = this.add.image(400, 600 + 300, 'flood', 'grid');
 
+        this.icon1 = new Icon(this, 'grey', 16, 156);
+        this.icon2 = new Icon(this, 'red', 16, 312)
+        this.icon3 = new Icon(this, 'green', 16, 458)
+        this.icon4 = new Icon(this, 'yellow', 688, 156)
+        this.icon5 = new Icon(this, 'blue', 688, 312)
+        this.icon6 = new Icon(this, 'purple', 688, 458)
+        /*
         this.createIcon(this.icon1, 'grey', 16, 156);
         this.createIcon(this.icon2, 'red', 16, 312);
         this.createIcon(this.icon3, 'green', 16, 458);
         this.createIcon(this.icon4, 'yellow', 688, 156);
         this.createIcon(this.icon5, 'blue', 688, 312);
         this.createIcon(this.icon6, 'purple', 688, 458);
+        */
 
         this.cursor = this.add.image(16, 156, 'flood', 'cursor-over').setOrigin(0).setVisible(false);
 
@@ -116,10 +117,9 @@ var Flood = new Phaser.Class({
         this.instructions = this.add.image(400, 300, 'flood', 'instructions').setAlpha(0);
 
         this.revealGrid();
-    },
+    }
 
-    helpFlood: function ()
-    {
+    helpFlood() {
         for (var i = 0; i < 8; i++)
         {
             var x = Phaser.Math.Between(0, 13);
@@ -135,10 +135,9 @@ var Flood = new Phaser.Class({
 
             this.floodFill(oldColor, newColor, x, y)
         }
-    },
+    }
 
-    createArrow: function ()
-    {
+    createArrow() {
         this.arrow = this.add.image(109 - 24, 48, 'flood', 'arrow-white').setOrigin(0).setAlpha(0);
 
         this.tweens.add({
@@ -151,10 +150,9 @@ var Flood = new Phaser.Class({
             repeat: -1
 
         });
-    },
+    }
 
-    createIcon: function (icon, color, x, y)
-    {
+    createIcon(icon, color, x, y) {
         var sx = (x < 400) ? -200 : 1000;
 
         icon.monster = this.add.image(sx, y, 'flood', 'icon-' + color).setOrigin(0);
@@ -172,10 +170,9 @@ var Flood = new Phaser.Class({
         shadow.setInteractive();
 
         icon.shadow = shadow;
-    },
+    }
 
-    revealGrid: function ()
-    {
+    revealGrid() {
         this.tweens.add({
             targets: this.gridBG,
             y: 300,
@@ -288,10 +285,9 @@ var Flood = new Phaser.Class({
         });
 
         this.time.delayedCall(i, this.startInputEvents, [], this);
-    },
+    }
 
-    startInputEvents: function ()
-    {
+    startInputEvents() {
         this.input.on('gameobjectover', this.onIconOver, this);
         this.input.on('gameobjectout', this.onIconOut, this);
         this.input.on('gameobjectdown', this.onIconDown, this);
@@ -311,17 +307,15 @@ var Flood = new Phaser.Class({
             this.text2.setText(Phaser.Utils.String.Pad(this.moves, 2, '0', 1));
 
         }, this);
-    },
+    }
 
-    stopInputEvents: function ()
-    {
+    stopInputEvents() {
         this.input.off('gameobjectover', this.onIconOver);
         this.input.off('gameobjectout', this.onIconOut);
         this.input.off('gameobjectdown', this.onIconDown);
-    },
+    }
 
-    onIconOver: function (pointer, gameObject)
-    {
+    onIconOver(pointer, gameObject) {
         var icon = gameObject;
 
         var newColor = icon.getData('color');
@@ -362,10 +356,9 @@ var Flood = new Phaser.Class({
             duration: 300,
             ease: 'Power2'
         });
-    },
+    }
 
-    onIconOut: function (pointer, gameObject)
-    {
+    onIconOut(pointer, gameObject) {
         // console.log(this.monsterTween.targets[0].y);
 
         this.monsterTween.stop(0);
@@ -381,10 +374,9 @@ var Flood = new Phaser.Class({
         });
 
         this.arrow.setFrame('arrow-white');
-    },
+    }
 
-    onIconDown: function (pointer, gameObject)
-    {
+    onIconDown(pointer, gameObject) {
         if (!this.allowClick)
         {
             return;
@@ -429,10 +421,9 @@ var Flood = new Phaser.Class({
                 this.startFlow();
             }
         }
-    },
+    }
 
-    createEmitter: function (color)
-    {
+    createEmitter(color) {
         this.emitters[color] = this.particles.createEmitter({
             frame: color,
             lifespan: 1000,
@@ -443,10 +434,9 @@ var Flood = new Phaser.Class({
             blendMode: 'ADD',
             on: false
         });
-    },
+    }
 
-    startFlow: function ()
-    {
+    startFlow() {
         this.matched.sort(function (a, b) {
 
             var aDistance = Phaser.Math.Distance.Between(a.x, a.y, 166, 66);
@@ -497,10 +487,9 @@ var Flood = new Phaser.Class({
             }
 
         }, [], this);
-    },
+    }
 
-    checkWon: function ()
-    {
+    checkWon() {
         var topLeft = this.grid[0][0].getData('color');
 
         for (var x = 0; x < 14; x++)
@@ -515,10 +504,9 @@ var Flood = new Phaser.Class({
         }
 
         return true;
-    },
+    }
 
-    clearGrid: function ()
-    {
+    clearGrid() {
         //  Hide everything :)
 
         this.tweens.add({
@@ -563,10 +551,9 @@ var Flood = new Phaser.Class({
         }
 
         return i;
-    },
+    }
 
-    gameLost: function ()
-    {
+    gameLost() {
         this.stopInputEvents();
 
         this.text1.setText("Lost!");
@@ -585,10 +572,9 @@ var Flood = new Phaser.Class({
         });
 
         this.input.once('pointerdown', this.resetGame, this);
-    },
+    }
 
-    resetGame: function ()
-    {
+    resetGame() {
         this.text1.setText("Moves");
         this.text2.setText("00");
         this.text3.setVisible(false);
@@ -673,10 +659,9 @@ var Flood = new Phaser.Class({
         this.moves = 25;
 
         this.time.delayedCall(i, this.startInputEvents, [], this);
-    },
+    }
 
-    gameWon: function ()
-    {
+    gameWon() {
         this.stopInputEvents();
 
         this.text1.setText("Won!!");
@@ -700,10 +685,9 @@ var Flood = new Phaser.Class({
         });
 
         this.time.delayedCall(2000, this.boom, [], this);
-    },
+    }
 
-    boom: function ()
-    {
+    boom() {
         var color = Phaser.Math.RND.pick(this.frames);
 
         this.emitters[color].explode(8, Phaser.Math.Between(128, 672), Phaser.Math.Between(28, 572))
@@ -713,10 +697,9 @@ var Flood = new Phaser.Class({
         this.emitters[color].explode(8, Phaser.Math.Between(128, 672), Phaser.Math.Between(28, 572))
 
         this.time.delayedCall(100, this.boom, [], this);
-    },
+    }
 
-    floodFill: function (oldColor, newColor, x, y)
-    {
+    floodFill(oldColor, newColor, x, y) {
         if (oldColor === newColor || this.grid[x][y].getData('color') !== oldColor)
         {
             return;
@@ -751,7 +734,9 @@ var Flood = new Phaser.Class({
         }
     }
 
-});
+}
+
+const flood = new Flood();
 
 var config = {
     type: Phaser.WEBGL,
@@ -759,7 +744,7 @@ var config = {
     height: 600,
     pixelArt: true,
     parent: 'phaser-example',
-    scene: [ Flood ]
+    scene: [ flood ]
 };
 
 var game = new Phaser.Game(config);
