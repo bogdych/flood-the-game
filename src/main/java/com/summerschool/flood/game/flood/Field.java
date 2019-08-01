@@ -1,4 +1,4 @@
-package com.summerschool.flood.game;
+package com.summerschool.flood.game.flood;
 
 import lombok.Data;
 
@@ -6,9 +6,13 @@ import lombok.Data;
 public class Field {
 
     private Cell[][] cells;
+    private final int width;
+    private final int height;
 
     public Field(int width, int height) {
         this.cells = new Cell[width][height];
+        this.width = width;
+        this.height = height;
         fill(cells);
     }
 
@@ -20,4 +24,8 @@ public class Field {
         }
     }
 
+    public Boolean isInternalAt(int x, int y){
+        return 0 <= x && x < cells.length &&
+               0 <= y && y < cells[x].length;
+    }
 }

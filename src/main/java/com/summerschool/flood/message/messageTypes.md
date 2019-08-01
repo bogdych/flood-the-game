@@ -1,36 +1,98 @@
 # Message types/formats for client-server communication
 
-## Set player info
+## Sent from client to server
 
-```json
-{
-  "type": "setPlayerInfo",
-  "payload": {
-    "nickname": "<some nickname>"
-  }
-}
-```
-
-## Find new game session for player
+### Find new game session for player
 
 ```json
 {
   "type": "findGame",
-  "payload": {
-    "name": "<name of the game. Should be from GameName>",
-    "type": "<type of the game. Should be from GameType>"
-  }
+  "name": "flood",
+  "gameType":"standard",
 }
 ```
-## Make game action (only for players with active game session)
 
-Note: non-exhaustive format. Need meditation
+Note: game names and types are listed in the game.GameName and game.GameType enums
+
+### Make game action (only for players with active game session)
 
 ```json
 {
   "type": "makeAction",
-  "payload": {
-    "type": "<type of action. Should be from ActionType>",
+  "action": {
+      "x":1,
+      "y":2,
+      "color":"RED"
+  }
+}
+
+```
+
+Note: all the valid colors are listed in the game.flood.Color enum
+
+## Sent from server to client
+
+### Error message
+
+```json
+{
+  "type": "error",
+  "time": "YYYY-MM-DD HH:MM:SS",
+  "message": "Some very informative error text description" 
+}
+```
+
+### Game ready (sent, when game session got all the players and ready be begun)
+
+```json
+{
+  "type": "gameReady",
+  "state": {
+    
+  }
+}
+```
+
+### Game end (sent, when game session is finished)
+
+```json
+{
+  "type": "turnEnd",
+  "state": {
+  
+  }
+}
+```
+
+### State property format
+
+```json
+{
+  "state": {
+    "next": {
+      "id": "<Next turn action>",
+      "nickname": "<Player optional nickname, could be null>"
+    },
+    "field": {
+      "cells": [
+        [
+          {
+            "x": 0,
+            "y": 0,
+            "color": "<Some color, from color enum>"
+          },
+          ...
+          {
+            "x": width-1,
+            "y": height-1,
+            "color": "<Some color, from color enum>"
+          }
+        ]
+      ],
+      "width": 10,
+      "height": 10
+    },
+    "gameStatus": "<Current game status>"
   }
 }
 ```

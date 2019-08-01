@@ -1,6 +1,9 @@
 package com.summerschool.flood.server;
 
 import com.summerschool.flood.game.*;
+import com.summerschool.flood.game.flood.FloodGame;
+import com.summerschool.flood.message.FindGameMessage;
+import com.summerschool.flood.message.MakeActionMessage;
 import lombok.Data;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
@@ -11,18 +14,15 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static com.summerschool.flood.game.GameStatus.FINISHED;
-
 @Service
 @Data
-public class GameService implements IGameService {
+public class GameService {
 
     private final static Logger LOG = LoggerFactory.getLogger(GameService.class);
 
     private final List<IGame> games = new CopyOnWriteArrayList<>();
     private final Map<String, Player> players = new ConcurrentHashMap<>();
 
-    @Override
     public void connect(String playerID) {
         Player player = new Player();
         player.setId(playerID);
@@ -31,15 +31,14 @@ public class GameService implements IGameService {
         LOG.info("Connect player: " + playerID);
     }
 
-    @Override
-    public IGame findGame(String playerID, GameParams params) {
+    public IGame findGame(String playerID, FindGameMessage message) {
         Player player = findPlayer(playerID);
 
         if (player.getActiveGame() == null) {
             IGame game = games.stream()
-                    .filter(g -> g.matchType(params) && g.addPlayer(player))
+                    .filter(g -> g.matchType(message.getGameParams()) && g.addPlayer(player))
                     .findFirst()
-                    .orElseGet(() -> createGame(player, params));
+                    .orElse(createGame(player, message));
             player.setActiveGame(game);
             return game;
         } else {
@@ -47,27 +46,32 @@ public class GameService implements IGameService {
         }
     }
 
-    @Override
-    public void process(String playerID, GameAction action) throws ServiceException {
+    public IGame process(String playerID, MakeActionMessage action) throws ServiceException {
         LOG.info("Process: " + playerID);
 
         Player player = findPlayer(playerID);
         IGame game = player.getActiveGame();
-        Result result = game.makeAction(player, action);
-
         LOG.info("Process player: " + playerID);
+        game.makeAction(player, action);
+        return game;
     }
 
-    @Override
     public void disconnect(String playerID) throws ServiceException {
         Player player = findPlayer(playerID);
-        IGame game = player.getActiveGame();
-        game.removePlayer(player);
-        LOG.info("Disconnect player: " + playerID + " nickname: " + player.getNickname());
-        if (game.getGameStatus() == FINISHED) {
-            LOG.info("The game with id: {}, deleted.", game.getId());
-            games.remove(game);
+        if (player == null) {
+            LOG.info("Can't find player with id: {}", playerID);
+            return;
         }
+        IGame game = player.getActiveGame();
+        if (game != null) {
+            game.removePlayer(player);
+            if (game.isFinished()) {
+                LOG.info("The game with id: {}, deleted.", game.getId());
+                games.remove(game);
+            }
+        }
+        players.remove(playerID);
+        LOG.info("Disconnect player: " + playerID + " nickname: " + player.getNickname());
     }
 
     private Player findPlayer(String playerID) {
@@ -78,13 +82,12 @@ public class GameService implements IGameService {
         return player;
     }
 
-    private IGame createGame(Player player, GameParams params) {
-        switch (params.getGameName()) {
+    private IGame createGame(Player player, FindGameMessage message) {
+        switch (message.getName()) {
             case FLOOD:
-                IGame game = new FloodGame(params.getGameType(), 4);
+                IGame game = new FloodGame(message.getGameType(), 4);
                 game.addPlayer(player);
                 games.add(game);
-                LOG.info("Created game session: " + player.getId());
                 return game;
             default:
                 throw new ServiceException("Invalid game name");

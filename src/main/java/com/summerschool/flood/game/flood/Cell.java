@@ -1,4 +1,4 @@
-package com.summerschool.flood.game;
+package com.summerschool.flood.game.flood;
 
 import lombok.Data;
 
@@ -19,15 +19,4 @@ public class Cell {
         this.y = y;
         this.color = Color.values()[RANDOM.nextInt(COLORS_COUNT)];
     }
-
-    public enum Color {
-
-        RED,
-        GREEN,
-        BLUE,
-        ORANGE,
-        BROWN,
-
-    }
-
 }

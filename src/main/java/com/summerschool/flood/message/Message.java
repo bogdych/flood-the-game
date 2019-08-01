@@ -1,24 +1,19 @@
 package com.summerschool.flood.message;
 
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-import java.util.HashMap;
-import java.util.Map;
-
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
+        visible = true,
+        property = "type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = FindGameMessage.class, name = "findGame"),
+        @JsonSubTypes.Type(value = MakeActionMessage.class, name = "makeAction")})
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class Message {
+public abstract class Message {
 
-    private MessageType type;
-    private Map<String,Object> payload = new HashMap<>();
-
-    @JsonAnySetter
-    void setPayload(String key, String value) {
-        payload.put(key, value);
-    }
-
+    MessageType type;
 }

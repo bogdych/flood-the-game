@@ -9,7 +9,7 @@ public enum GameStatus {
     READY,
 
     /** Game in progress, players make an actions */
-    IN_PROGRESS,
+    ACTIVE,
 
     /** Game is finished, has a winner/or no winner */
     FINISHED

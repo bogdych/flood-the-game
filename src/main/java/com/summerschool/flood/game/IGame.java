@@ -1,20 +1,27 @@
 package com.summerschool.flood.game;
 
+import com.summerschool.flood.message.MakeActionMessage;
+
 import java.util.List;
+import java.util.Map;
 
 public interface IGame {
 
-    long getId();
+    String getId();
 
     void removePlayer(Player player);
 
-    boolean matchType(GameParams params);
+    boolean matchType(Map<String, String> params);
 
     boolean addPlayer(Player player);
 
-    Result makeAction(Player player, GameAction action);
+    void makeAction(Player player, MakeActionMessage action);
 
     List<Player> getPlayers();
 
-    GameStatus getGameStatus();
+    GameState getState();
+
+    boolean isReady();
+
+    boolean isFinished();
 }
