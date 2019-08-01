@@ -1,6 +1,6 @@
 function WebSocketService(){
     this.socket;
-    this.url = 'ws://localhost:8080/game';
+    this.url = 'ws://localhost:8060/game';
     this.callbackOnOpen;
     this.onOpen = function(callback){
         this.socket.addEventListener('open', (event) => {

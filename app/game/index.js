@@ -12,8 +12,9 @@ var config = {
 var game = new Phaser.Game(config);
 
 
-var socket = new WebSocketService();
-var onOpen = function() {
+let socket = new WebSocketService();
+let onOpen = function() {
     console.log("connected")
 }
 socket.onOpen(onOpen);
+socket.init();
