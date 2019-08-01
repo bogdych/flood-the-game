@@ -70,12 +70,19 @@ Note: property nickname could be null
 Note: property next could be null (depends on the game status)
 Note: property winner could be null (depends on the game status)
 
+Note: cell - next player position of the action
+
 ```json
 {
   "state": {
     "next": {
       "id": "<Next turn action>",
       "nickname": "<Player optional nickname, could be null>"
+    },
+    "cell": {
+      "x": <coordinate>
+      "y": <coordinate>,
+      "color": "<Some color, from color enum>"
     },
     "winner": {
       "id": "<winner id>",

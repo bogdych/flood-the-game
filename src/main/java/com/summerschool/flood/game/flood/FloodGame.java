@@ -40,8 +40,7 @@ public class FloodGame implements IGame {
         this.firstSearch = new DepthFirstSearch(field);
         this.id = UUID.randomUUID().toString();
 
-        LOG.info("Created game session UUID: {}", id);
-        LOG.info("Generate field: \n{}", this.state.getField().getPrettyView());
+        LOG.info("Created game session UUID: {}\nGenerate field: \n{}", id, state.getField().getPrettyView());
     }
 
     private Field createField(GameType type) {
@@ -91,6 +90,7 @@ public class FloodGame implements IGame {
         synchronized (this) {
             if (isValidAction(player, action)) {
                 makeStep(action);
+                LOG.info("Created game session UUID: {}\nChange field: \n{}", id, state.getField().getPrettyView());
             } else {
                 throw new ServiceException("Wrong action");
             }
@@ -113,24 +113,30 @@ public class FloodGame implements IGame {
         firstSearch.start(tmpCell);
 
         if (state.getField().isFilledByOneColor()) {
-            state.setNext(null);
             state.setWinner(this.state.getNext());
+            state.setNext(null);
+            state.setCell(null);
             state.setGameStatus(FINISHED);
         } else {
-            int index = players.indexOf(this.state.getNext());
-            state.setNext(this.players.get((index + 1) % players.size()));
+            int index = players.indexOf(state.getNext());
+            Player next = players.get((index + 1) % players.size());
+            state.setNext(next);
+            state.setCell(playersStartPosition.get(next));
         }
     }
 
     public void setPlayersStartPosition() {
-        Field field = this.state.getField();
+        Field field = state.getField();
         Player player = players.get(ThreadLocalRandom.current().nextInt(players.size()));
-        this.state.setNext(player);
+
         playersStartPosition = new ConcurrentHashMap<>();
         playersStartPosition.put(players.get(0), field.getCells()[0][0]);
-        playersStartPosition.put(players.get(1), field.getCells()[field.getWidth() - 1][0]);
-        playersStartPosition.put(players.get(2), field.getCells()[field.getWidth() - 1][field.getHeight() - 1]);
-        playersStartPosition.put(players.get(3), field.getCells()[0][field.getHeight() - 1]);
+        //playersStartPosition.put(players.get(1), field.getCells()[field.getWidth() - 1][0]);
+        //playersStartPosition.put(players.get(2), field.getCells()[field.getWidth() - 1][field.getHeight() - 1]);
+        //playersStartPosition.put(players.get(3), field.getCells()[0][field.getHeight() - 1]);
+
+        state.setNext(player);
+        state.setCell(playersStartPosition.get(player));
     }
 
     @Override
@@ -148,6 +154,7 @@ public class FloodGame implements IGame {
         private Player next;
         private Player winner;
         private Field field;
+        private Cell cell;
         private GameStatus gameStatus = NOT_READY;
 
         FloodState(Field field) {
