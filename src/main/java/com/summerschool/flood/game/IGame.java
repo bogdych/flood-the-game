@@ -1,5 +1,6 @@
 package com.summerschool.flood.game;
 
+import com.summerschool.flood.message.FindGameMessage;
 import com.summerschool.flood.message.MakeActionMessage;
 
 import java.util.List;
@@ -13,7 +14,7 @@ public interface IGame {
 
     void removeAllPlayers();
 
-    boolean matchType(Map<String, String> params);
+    boolean matchType(FindGameMessage findGame);
 
     boolean addPlayer(Player player);
 

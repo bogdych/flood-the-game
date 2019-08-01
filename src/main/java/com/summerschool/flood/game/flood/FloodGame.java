@@ -2,6 +2,7 @@ package com.summerschool.flood.game.flood;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.summerschool.flood.game.*;
+import com.summerschool.flood.message.FindGameMessage;
 import com.summerschool.flood.message.MakeActionMessage;
 import com.summerschool.flood.server.GameService;
 import com.summerschool.flood.server.ServiceException;
@@ -30,10 +31,12 @@ public class FloodGame implements IGame {
     private IFirstSearch firstSearch;
     private FloodState state;
     private String id;
+    private GameType type;
 
     private int maxPlayers;
 
     public FloodGame(GameType type, int maxPlayersCount) {
+        this.type = type;
         this.maxPlayers = maxPlayersCount;
         Field field = createField(type);
         this.state = new FloodState(field);
@@ -72,8 +75,9 @@ public class FloodGame implements IGame {
     }
 
     @Override
-    public boolean matchType(Map<String, String> params) {
-        return true;
+    public boolean matchType(FindGameMessage findGame) {
+        return findGame.getName() == GameName.FLOOD &&
+               findGame.getGameType() == type;
     }
 
     @Override

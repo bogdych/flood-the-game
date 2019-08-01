@@ -36,7 +36,7 @@ public class GameService {
 
         if (player.getActiveGame() == null) {
             IGame game = games.stream()
-                    .filter(g -> g.matchType(message.getGameParams()) && g.addPlayer(player))
+                    .filter(g -> g.matchType(message) && g.addPlayer(player))
                     .findFirst()
                     .orElse(createGame(player, message));
             player.setActiveGame(game);
@@ -96,7 +96,7 @@ public class GameService {
     private IGame createGame(Player player, FindGameMessage message) {
         switch (message.getName()) {
             case FLOOD:
-                IGame game = new FloodGame(message.getGameType(), 1);
+                IGame game = new FloodGame(message.getGameType(), 4);
                 game.addPlayer(player);
                 games.add(game);
                 return game;
