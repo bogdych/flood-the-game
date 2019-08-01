@@ -69,26 +69,23 @@ public class GameService {
 
     public void disconnect(String playerID) throws ServiceException {
         Player player = findPlayer(playerID);
-        if (player == null) {
-            LOG.info("Can't find player with id: {}", playerID);
-            return;
-        }
+
         IGame game = player.getActiveGame();
         if (game != null) {
             game.removePlayer(player);
             if (game.isFinished()) {
                 LOG.info("Deleted the game with id: {}", game.getId());
-                games.remove(game);
+                finishGame(game);
             }
         }
         players.remove(playerID);
-        LOG.info("Disconnect player: " + playerID + " nickname: " + player.getNickname());
+        LOG.info("Disconnect player: {} nickname: {}", player.getId(), player.getNickname());
     }
 
     private Player findPlayer(String playerID) {
         Player player = players.get(playerID);
         if (player == null) {
-            throw new ServiceException("Unconnected player access");
+            throw new ServiceException("Unconnected player access with id" + playerID);
         }
         return player;
     }

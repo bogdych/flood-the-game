@@ -61,8 +61,13 @@ public class FloodGame implements IGame {
     public synchronized void removePlayer(Player player) {
         players.remove(player);
         player.setActiveGame(null);
+
         if (players.size() == 0) {
-            this.state.setGameStatus(FINISHED);
+            state.setGameStatus(FINISHED);
+        } else if (players.size() == 1) {
+            chaneStateToFinish(players.get(0));
+        } else if (state.getNext().equals(player)) {
+            changeStateToNext();
         }
     }
 
@@ -125,16 +130,25 @@ public class FloodGame implements IGame {
         firstSearch.start(action.getX(), action.getY(), action.getColor());
 
         if (state.getField().isFilledByOneColor()) {
-            state.setWinner(this.state.getNext());
-            state.setNext(null);
-            state.setCell(null);
-            state.setGameStatus(FINISHED);
+            chaneStateToFinish(this.state.getNext());
         } else {
-            int index = players.indexOf(state.getNext());
-            Player next = players.get((index + 1) % players.size());
-            state.setNext(next);
-            state.setCell(playersStartPosition.get(next));
+            changeStateToNext();
         }
+    }
+
+
+    private void changeStateToNext() {
+        int index = players.indexOf(state.getNext());
+        Player next = players.get((index + 1) % players.size());
+        state.setNext(next);
+        state.setCell(playersStartPosition.get(next));
+    }
+
+    private void chaneStateToFinish(Player winner) {
+        state.setWinner(winner);
+        state.setNext(null);
+        state.setCell(null);
+        state.setGameStatus(FINISHED);
     }
 
     public void setPlayersStartPosition() {
