@@ -11,6 +11,8 @@ public interface IGame {
 
     void removePlayer(Player player);
 
+    void removeAllPlayers();
+
     boolean matchType(Map<String, String> params);
 
     boolean addPlayer(Player player);

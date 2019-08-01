@@ -66,6 +66,10 @@ public class WebSocketGameHandler extends TextWebSocketHandler {
                     IGame game = service.process(playerID, (MakeActionMessage) gameMessage);
                     String turnEndMessage = mapper.writeValueAsString(new GameStateMessage(game.getState(), MessageType.GAME_STATE));
                     sendToAll(game, turnEndMessage);
+
+                    if (game.isFinished()) {
+                        service.finishGame(game);
+                    }
                 }
                 break;
             }

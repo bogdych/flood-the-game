@@ -57,9 +57,18 @@ public class FloodGame implements IGame {
     @Override
     public synchronized void removePlayer(Player player) {
         players.remove(player);
+        player.setActiveGame(null);
         if (players.size() == 0) {
             this.state.setGameStatus(FINISHED);
         }
+    }
+
+    @Override
+    public synchronized void removeAllPlayers() {
+        for (Player player : players) {
+            player.setActiveGame(null);
+        }
+        players.clear();
     }
 
     @Override
@@ -129,10 +138,17 @@ public class FloodGame implements IGame {
         Player player = players.get(ThreadLocalRandom.current().nextInt(players.size()));
 
         playersStartPosition = new ConcurrentHashMap<>();
-        playersStartPosition.put(players.get(0), field.getCells()[0][0]);
-        //playersStartPosition.put(players.get(1), field.getCells()[field.getWidth() - 1][0]);
-        //playersStartPosition.put(players.get(2), field.getCells()[field.getWidth() - 1][field.getHeight() - 1]);
-        //playersStartPosition.put(players.get(3), field.getCells()[0][field.getHeight() - 1]);
+
+        switch (maxPlayers) {
+            case 4:
+                playersStartPosition.put(players.get(3), field.getCells()[0][field.getHeight() - 1]);
+                playersStartPosition.put(players.get(2), field.getCells()[field.getWidth() - 1][field.getHeight() - 1]);
+            case 2:
+                playersStartPosition.put(players.get(1), field.getCells()[field.getWidth() - 1][0]);
+            case 1:
+                playersStartPosition.put(players.get(0), field.getCells()[0][0]);
+                break;
+        }
 
         state.setNext(player);
         state.setCell(playersStartPosition.get(player));

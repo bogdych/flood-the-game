@@ -47,18 +47,24 @@ public class GameService {
     }
 
     public IGame process(String playerID, MakeActionMessage action) throws ServiceException {
-        LOG.info("Process: " + playerID);
-
         Player player = findPlayer(playerID);
         IGame game = player.getActiveGame();
-        LOG.info("Process player: " + playerID);
-        game.makeAction(player, action);
 
-        if (game.isFinished()) {
-            games.remove(game);
+        if (game != null) {
+            game.makeAction(player, action);
+            LOG.info("Player: {} made action", playerID);
+        } else {
+            throw new ServiceException("Player: " + playerID + " has no active game session");
         }
 
         return game;
+    }
+
+    public void finishGame(IGame game) {
+        games.remove(game);
+        game.removeAllPlayers();
+
+        LOG.info("Finish game session: {}", game.getId());
     }
 
     public void disconnect(String playerID) throws ServiceException {
