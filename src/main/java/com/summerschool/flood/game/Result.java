@@ -6,5 +6,7 @@ import lombok.Data;
 public class Result {
 
     private final ResultType type;
+    private final Player nextPlayer;
+    private final Field field;
 
 }
