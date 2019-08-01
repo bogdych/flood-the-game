@@ -41,6 +41,7 @@ public class FloodGame implements IGame {
         this.id = UUID.randomUUID().toString();
 
         LOG.info("Created game session UUID: {}", id);
+        LOG.info("Generate field: \n{}", this.state.getField().getPrettyView());
     }
 
     private Field createField(GameType type) {
@@ -50,12 +51,12 @@ public class FloodGame implements IGame {
             case FAST:
                 return new Field(5, 5);
             default:
-                throw new IllegalArgumentException("Unknown game type = " + type);
+                throw new IllegalArgumentException("Unknown game type: " + type);
         }
     }
 
     @Override
-    public void removePlayer(Player player) {
+    public synchronized void removePlayer(Player player) {
         players.remove(player);
         if (players.size() == 0) {
             this.state.setGameStatus(FINISHED);
@@ -110,8 +111,15 @@ public class FloodGame implements IGame {
         Cell tmpCell = new Cell(action.getX(), action.getY());
         tmpCell.setColor(action.getColor());
         firstSearch.start(tmpCell);
-        int index = players.indexOf(this.state.getNext());
-        state.setNext(this.players.get((index + 1) % players.size()));
+
+        if (state.getField().isFilledByOneColor()) {
+            state.setNext(null);
+            state.setWinner(this.state.getNext());
+            state.setGameStatus(FINISHED);
+        } else {
+            int index = players.indexOf(this.state.getNext());
+            state.setNext(this.players.get((index + 1) % players.size()));
+        }
     }
 
     public void setPlayersStartPosition() {
@@ -138,6 +146,7 @@ public class FloodGame implements IGame {
     @Data
     public class FloodState implements GameState {
         private Player next;
+        private Player winner;
         private Field field;
         private GameStatus gameStatus = NOT_READY;
 

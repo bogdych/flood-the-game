@@ -66,7 +66,7 @@ public class GameService {
         if (game != null) {
             game.removePlayer(player);
             if (game.isFinished()) {
-                LOG.info("The game with id: {}, deleted.", game.getId());
+                LOG.info("Deleted the game with id: {}", game.getId());
                 games.remove(game);
             }
         }

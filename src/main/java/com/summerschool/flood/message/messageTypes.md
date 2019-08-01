@@ -66,12 +66,20 @@ Note: all the valid colors are listed in the game.flood.Color enum
 
 ### State property format
 
+Note: property nickname could be null
+Note: property next could be null (depends on the game status)
+Note: property winner could be null (depends on the game status)
+
 ```json
 {
   "state": {
     "next": {
       "id": "<Next turn action>",
       "nickname": "<Player optional nickname, could be null>"
+    },
+    "winner": {
+      "id": "<winner id>",
+      "nickname": "<Winner optional nickname, could be null>"
     },
     "field": {
       "cells": [

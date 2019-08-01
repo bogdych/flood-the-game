@@ -24,8 +24,35 @@ public class Field {
         }
     }
 
+    /** @return True, whether the field is filled only by single color */
+    public Boolean isFilledByOneColor() {
+        Color color = cells[0][0].getColor();
+        for (int x = 0; x < cells.length; x++) {
+            for (int y = 0; y < cells[x].length; y++) {
+                if (cells[x][y].getColor() != color) return false;
+            }
+        }
+
+        return true;
+    }
+
     public Boolean isInternalAt(int x, int y){
         return 0 <= x && x < cells.length &&
                0 <= y && y < cells[x].length;
     }
+
+    /** @return Pretty printed quad field [for debug only] */
+    public String getPrettyView() {
+        StringBuilder builder = new StringBuilder();
+
+        for (int x = 0; x < cells.length; x++) {
+            for (int y = 0; y < cells[x].length; y++) {
+                builder.append(cells[x][y].getColor().toString().charAt(0));
+            }
+            builder.append('\n');
+        }
+
+        return builder.toString();
+    }
+
 }
