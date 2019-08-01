@@ -24,7 +24,6 @@ import static com.summerschool.flood.game.GameStatus.*;
 public class FloodGame implements IGame {
 
     private final static Logger LOG = LoggerFactory.getLogger(FloodGame.class);
-
     private static ObjectMapper mapper = new ObjectMapper();
     private List<Player> players = new ArrayList<>();
     private Map<Player, Cell> playersStartPosition = new ConcurrentHashMap<>();
@@ -107,7 +106,7 @@ public class FloodGame implements IGame {
                 field.isInternalAt(action.getX(), action.getY());
     }
 
-    public void makeStep(FloodAction action) {
+    private void makeStep(FloodAction action) {
         Cell tmpCell = new Cell(action.getX(), action.getY());
         tmpCell.setColor(action.getColor());
         firstSearch.start(tmpCell);
@@ -142,7 +141,7 @@ public class FloodGame implements IGame {
         private Field field;
         private GameStatus gameStatus = NOT_READY;
 
-        public FloodState(Field field) {
+        FloodState(Field field) {
             this.field = field;
         }
     }
