@@ -4,17 +4,27 @@
 
 ### Find new game session for player
 
+After connection established and if player has no active game you can ask for new game 
+session for player. Send desired game type and options and server will: add to existing 
+game session or create new empty game session and add player to that.
+
+When game get all players, player will receive message with game state and its status READY.
+After that players could make the actions.
+
 ```json
 {
   "type": "findGame",
   "name": "flood",
-  "gameType":"standard",
+  "gameType":"standard"
 }
 ```
 
 Note: game names and types are listed in the game.GameName and game.GameType enums
 
 ### Make game action (only for players with active game session)
+
+To make a valid action player must satisfy his turn and specify valid (x,y) position and color.
+Server validates action and process it. Otherwise player receive error message if action is invalid.
 
 ```json
 {
@@ -34,6 +44,9 @@ Note: all the valid colors are listed in the game.flood.Color enum
 
 ### Error message
 
+Server send error messages in this format. 
+There could be some useful info for player.
+
 ```json
 {
   "type": "error",
@@ -43,6 +56,12 @@ Note: all the valid colors are listed in the game.flood.Color enum
 ```
 
 ### Game ready (sent, when game session got all the players and ready be begun)
+
+Server send this message to the all players in current game session after game got READY. 
+This message contains game state, which defines next player turn, winner, next player 
+position on the field, current color and all the field data with its properties.
+
+Possible state's status: READY. 
 
 ```json
 {
@@ -54,6 +73,14 @@ Note: all the valid colors are listed in the game.flood.Color enum
 ```
 
 ### Game state (sent, when game in progress)
+
+Server send this message to the all players in current game session after each valid action. 
+Contains all the game state data, needed to make next action.
+
+Possible state's status: READY, FINISHED. 
+
+After game finished all the players from that game are removed and marked as players, which
+do not have active game. Therefore these players can request server to find new game.
 
 ```json
 {

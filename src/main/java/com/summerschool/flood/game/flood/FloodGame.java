@@ -82,7 +82,8 @@ public class FloodGame implements IGame {
     @Override
     public boolean matchType(FindGameMessage findGame) {
         return findGame.getName() == GameName.FLOOD &&
-               findGame.getGameType() == type;
+               findGame.getGameType() == type &&
+               state.getGameStatus() == NOT_READY;
     }
 
     @Override
