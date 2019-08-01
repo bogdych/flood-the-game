@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import WebSocketService from 'WebService';
+import {WebSocketService} from './WebSocketService';
 var Flood = new Phaser.Class({
 
     Extends: Phaser.Scene,
