@@ -90,7 +90,7 @@ public class FloodGame implements IGame {
         synchronized (this) {
             if (isValidAction(player, action)) {
                 makeStep(action);
-                LOG.info("Created game session UUID: {}\nChange field: \n{}", id, state.getField().getPrettyView());
+                LOG.info("Game session UUID: {}\nChange field: \n{}", id, state.getField().getPrettyView());
             } else {
                 throw new ServiceException("Wrong action");
             }
@@ -104,13 +104,12 @@ public class FloodGame implements IGame {
         return player.equals(this.state.getNext()) &&
                 tmpCell.getX() == action.getX() && tmpCell.getY() == action.getY() &&
                 tmpCell.getColor() != action.getColor() &&
-                field.isInternalAt(action.getX(), action.getY());
+                field.isInternalAt(action.getX(), action.getY()) &&
+                this.state.getGameStatus() == READY;
     }
 
     private void makeStep(FloodAction action) {
-        Cell tmpCell = new Cell(action.getX(), action.getY());
-        tmpCell.setColor(action.getColor());
-        firstSearch.start(tmpCell);
+        firstSearch.start(action.getX(), action.getY(), action.getColor());
 
         if (state.getField().isFilledByOneColor()) {
             state.setWinner(this.state.getNext());

@@ -16,9 +16,13 @@ public enum MessageType {
         @JsonProperty("findGame")
         FIND_GAME,
 
+        /** Sent when game session ready to be begun (has all the players) */
         @JsonProperty("gameReady")
         GAME_READY,
 
-        @JsonProperty("turnEnd")
-        TURN_END,
+        /** Server send this message in time of active game session */
+        @JsonProperty("gameState")
+        GAME_STATE,
+
+
 }

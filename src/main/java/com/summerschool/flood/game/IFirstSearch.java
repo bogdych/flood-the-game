@@ -1,7 +1,7 @@
 package com.summerschool.flood.game;
 
-import com.summerschool.flood.game.flood.Cell;
+import com.summerschool.flood.game.flood.Color;
 
 public interface IFirstSearch {
-    void start(Cell cell);
+    void start(int x, int y, Color color);
 }

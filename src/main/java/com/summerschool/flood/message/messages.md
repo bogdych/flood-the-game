@@ -22,7 +22,7 @@ Note: game names and types are listed in the game.GameName and game.GameType enu
   "action": {
       "x":1,
       "y":2,
-      "color":"RED"
+      "color":"red"
   }
 }
 
@@ -53,11 +53,11 @@ Note: all the valid colors are listed in the game.flood.Color enum
 }
 ```
 
-### Game end (sent, when game session is finished)
+### Game state (sent, when game in progress)
 
 ```json
 {
-  "type": "turnEnd",
+  "type": "gameState",
   "state": {
   
   }

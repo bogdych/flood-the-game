@@ -3,52 +3,37 @@ package com.summerschool.flood.game.flood;
 import com.summerschool.flood.game.IFirstSearch;
 
 public class DepthFirstSearch implements IFirstSearch {
+
     private Color startColor;
+    private Color fillColor;
     private Field field;
 
     public DepthFirstSearch(Field field){
         this.field = field;
     }
-    public void start(Cell cell){
-        startColor = field.getCells()[cell.getX()][cell.getY()].getColor();
-        runNext(cell);
+
+    public void start(int x, int y, Color color) {
+        startColor = field.getCells()[x][y].getColor();
+        fillColor = color;
+        runNext(x, y);
     }
 
-    private void runNext(Cell cell){
-        if(!field.isInternalAt(cell.getX(), cell.getY()) ||
-                field.getCells()[cell.getX()][cell.getY()].getColor() != startColor)
+    /**
+     * Recursive fill of the game field with chosen color from specified point
+     * @param x X coordinate of the cell to be filled
+     * @param y Y coordinate of the cell to be filled
+     */
+    private void runNext(int x, int y) {
+        if(!field.isInternalAt(x, y) ||
+            field.getCells()[x][y].getColor() != startColor)
             return;
-        field.getCells()[cell.getX()][cell.getY()].setColor(cell.getColor());
 
+        field.getCells()[x][y].setColor(fillColor);
 
-        if(checkLeft(cell))
-            runNext(field.getCells()[cell.getX() - 1][cell.getY()]);
-
-        if(checkUp(cell))
-            runNext(field.getCells()[cell.getX()][cell.getY() + 1]);
-
-        if(checkRight(cell))
-            runNext(field.getCells()[cell.getX() + 1][cell.getY()]);
-
-        if(checkDown(cell))
-            runNext(field.getCells()[cell.getX()][cell.getY() - 1]);
+        runNext(x - 1, y);
+        runNext(x + 1, y);
+        runNext(x, y - 1);
+        runNext(x, y + 1);
     }
 
-
-    private Boolean checkLeft(Cell cell){
-        return field.isInternalAt(cell.getX() - 1, cell.getY()) &&
-                field.getCells()[cell.getX() - 1][cell.getY()].getColor() == startColor;
-    }
-    private Boolean checkRight(Cell cell){
-        return field.isInternalAt(cell.getX() + 1, cell.getY()) &&
-                field.getCells()[cell.getX() + 1][cell.getY()].getColor() == startColor;
-    }
-    private Boolean checkUp(Cell cell){
-        return field.isInternalAt(cell.getX(), cell.getY() + 1) &&
-                field.getCells()[cell.getX()][cell.getY() + 1].getColor() == startColor;
-    }
-    private Boolean checkDown(Cell cell){
-        return field.isInternalAt(cell.getX(), cell.getY() - 1) &&
-                field.getCells()[cell.getX()][cell.getY() - 1].getColor() == startColor;
-    }
 }

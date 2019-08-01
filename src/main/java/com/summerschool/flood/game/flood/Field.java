@@ -1,5 +1,6 @@
 package com.summerschool.flood.game.flood;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 @Data
@@ -25,6 +26,7 @@ public class Field {
     }
 
     /** @return True, whether the field is filled only by single color */
+    @JsonIgnore
     public Boolean isFilledByOneColor() {
         Color color = cells[0][0].getColor();
         for (int x = 0; x < cells.length; x++) {
@@ -36,12 +38,15 @@ public class Field {
         return true;
     }
 
+
+    @JsonIgnore
     public Boolean isInternalAt(int x, int y){
         return 0 <= x && x < cells.length &&
                0 <= y && y < cells[x].length;
     }
 
     /** @return Pretty printed quad field [for debug only] */
+    @JsonIgnore
     public String getPrettyView() {
         StringBuilder builder = new StringBuilder();
 

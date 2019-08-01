@@ -53,6 +53,11 @@ public class GameService {
         IGame game = player.getActiveGame();
         LOG.info("Process player: " + playerID);
         game.makeAction(player, action);
+
+        if (game.isFinished()) {
+            games.remove(game);
+        }
+
         return game;
     }
 
