@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.summerschool.flood.game.*;
 import com.summerschool.flood.message.FindGameMessage;
 import com.summerschool.flood.message.MakeActionMessage;
-import com.summerschool.flood.server.GameService;
 import com.summerschool.flood.server.ServiceException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -69,14 +68,6 @@ public class FloodGame implements IGame {
         } else if (state.getNext().equals(player)) {
             changeStateToNext();
         }
-    }
-
-    @Override
-    public synchronized void removeAllPlayers() {
-        for (Player player : players) {
-            player.setActiveGame(null);
-        }
-        players.clear();
     }
 
     @Override

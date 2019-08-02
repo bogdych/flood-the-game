@@ -62,7 +62,6 @@ public class GameService {
 
     public void finishGame(IGame game) {
         games.remove(game);
-        game.removeAllPlayers();
 
         LOG.info("Finish game session: {}", game.getId());
     }

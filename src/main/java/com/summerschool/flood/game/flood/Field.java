@@ -27,7 +27,7 @@ public class Field {
 
     /** @return True, whether the field is filled only by single color */
     @JsonIgnore
-    public Boolean isFilledByOneColor() {
+    public boolean isFilledByOneColor() {
         Color color = cells[0][0].getColor();
         for (int x = 0; x < cells.length; x++) {
             for (int y = 0; y < cells[x].length; y++) {
@@ -40,7 +40,7 @@ public class Field {
 
 
     @JsonIgnore
-    public Boolean isInternalAt(int x, int y){
+    public boolean isInternalAt(int x, int y){
         return 0 <= x && x < cells.length &&
                0 <= y && y < cells[x].length;
     }
