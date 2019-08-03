@@ -152,26 +152,6 @@ class Flood extends Phaser.Scene {
         });
     }
 
-    createIcon(icon, color, x, y) {
-        var sx = (x < 400) ? -200 : 1000;
-
-        icon.monster = this.add.image(sx, y, 'flood', 'icon-' + color).setOrigin(0);
-
-        var shadow = this.add.image(sx, y, 'flood', 'shadow');
-
-        shadow.setData('color', this.frames.indexOf(color));
-
-        shadow.setData('x', x);
-
-        shadow.setData('monster', icon.monster);
-
-        shadow.setOrigin(0);
-
-        shadow.setInteractive();
-
-        icon.shadow = shadow;
-    }
-
     revealGrid() {
         this.tweens.add({
             targets: this.gridBG,

@@ -1,5 +1,4 @@
-export default class Icon {
-    
+export default class Icon {    
     constructor (scene, color, x, y) {
         let sx = (x < 400) ? -200 : 1000;
 
@@ -19,10 +18,4 @@ export default class Icon {
 
         this.shadow = shadow;
     }
-    
-    /*
-    constructor() {
-        this.shadow = null
-        this.monster = null
-    }*/
 }
