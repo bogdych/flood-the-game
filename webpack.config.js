@@ -8,7 +8,7 @@ module.exports = {
       { test: /\.js$/, exclude: /node_modules/, loader: "babel-loader" }
     ]
   },
-  entry: './app/game/flood.js',
+  entry: './app/game/index.js',
   output: {
     filename: 'main.js',
     path: __dirname + "/src/main/resources/static"

@@ -1,3 +1,5 @@
+//This class is responsible for interacting with the monster
+
 export default class Icon {    
     constructor (scene, color, x, y) {
         let sx = (x < 400) ? -200 : 1000;

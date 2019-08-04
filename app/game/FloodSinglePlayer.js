@@ -1,9 +1,9 @@
 import Phaser from 'phaser';
-import Icon from './icon';
+import Icon from './Icon';
 
-class Flood extends Phaser.Scene {
+export default class FloodSinglePlayer extends Phaser.Scene {
     constructor() {
-        super();
+        super({ key: 'FloodSinglePlayer' })
 
         this.allowClick = true;
 
@@ -11,13 +11,6 @@ class Flood extends Phaser.Scene {
         this.cursor;
         this.cursorTween;
         this.monsterTween;
-
-        this.icon1;
-        this.icon2;
-        this.icon3;
-        this.icon4;
-        this.icon5;
-        this.icon6;
 
         this.gridBG;
 
@@ -707,16 +700,3 @@ class Flood extends Phaser.Scene {
     }
 
 }
-
-const flood = new Flood();
-
-var config = {
-    type: Phaser.WEBGL,
-    width: 800,
-    height: 600,
-    pixelArt: true,
-    parent: 'phaser-example',
-    scene: [ flood ]
-};
-
-var game = new Phaser.Game(config);
