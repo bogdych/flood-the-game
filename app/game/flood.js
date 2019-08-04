@@ -53,14 +53,6 @@ class Flood extends Phaser.Scene {
         this.icon4 = new Icon(this, 'yellow', 688, 156)
         this.icon5 = new Icon(this, 'blue', 688, 312)
         this.icon6 = new Icon(this, 'purple', 688, 458)
-        /*
-        this.createIcon(this.icon1, 'grey', 16, 156);
-        this.createIcon(this.icon2, 'red', 16, 312);
-        this.createIcon(this.icon3, 'green', 16, 458);
-        this.createIcon(this.icon4, 'yellow', 688, 156);
-        this.createIcon(this.icon5, 'blue', 688, 312);
-        this.createIcon(this.icon6, 'purple', 688, 458);
-        */
 
         this.cursor = this.add.image(16, 156, 'flood', 'cursor-over').setOrigin(0).setVisible(false);
 
