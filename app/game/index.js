@@ -1,4 +1,4 @@
-import FloodSinglePlayer from './FloodSinglePlayer';
+import FloodSinglePlayer from './flood-single-player';
 
 var config = {
     type: Phaser.WEBGL,

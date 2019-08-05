@@ -7,18 +7,6 @@ export default class FloodSinglePlayer extends Phaser.Scene {
 
         this.allowClick = true;
 
-        this.arrow;
-        this.cursor;
-        this.cursorTween;
-        this.monsterTween;
-
-        this.gridBG;
-
-        this.instructions;
-        this.text1;
-        this.text2;
-        this.text3;
-
         this.currentColor = '';
 
         this.emitters = {};
@@ -327,7 +315,7 @@ export default class FloodSinglePlayer extends Phaser.Scene {
         // console.log(this.monsterTween.targets[0].y);
 
         this.monsterTween.stop(0);
-		
+
 		gameObject.getData('monster').setY(gameObject.y);
 
         // console.log(this.monsterTween.targets[0].y);
@@ -432,7 +420,7 @@ export default class FloodSinglePlayer extends Phaser.Scene {
                 block.setFrame(blockColor);
 
                 emitter.explode(6, block.x, block.y);
-                
+
             }, [ block, blockColor, emitter ]);
 
             t += inc;
