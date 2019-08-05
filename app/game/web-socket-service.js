@@ -2,7 +2,6 @@ export default class WebSocketService{
     constructor() {
         this.socket;
         this.url = 'ws://localhost:8060/game';
-        this.socket = new WebSocket(this.url);
         this.callbackOnOpen = () => {console.log("Connected")};
         this.callbackOnMessage = (data) => {console.log("Message from server", event.data)};
         this.callbackOnClose = () => {console.log("Closed")};
@@ -19,8 +18,6 @@ export default class WebSocketService{
             callback = this.callbackOnOpen; }
         else {
             this.callbackOnOpen = callback;}
-
-        this.socket.onopen = (event) => { callback(); };
     };
 
     onClose(callback) {
@@ -28,13 +25,11 @@ export default class WebSocketService{
             callback = this.callbackOnClose; }
         else{
             this.callbackOnClose = callback};
-        this.socket.onclose = (event) => { callback() };
     };
     onMessage(callback) {
         if(!callback){
             callback = this.callbackOnMessage; }
         else{
             this.callbackOnMessage = callback;}
-        this.socket.onmessage = (event) => { callback(event.data); };
     };
 }
