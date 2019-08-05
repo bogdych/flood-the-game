@@ -1,4 +1,5 @@
 import FloodSinglePlayer from './flood-single-player';
+import WebSocketService from './web-socket-service';
 
 var config = {
     type: Phaser.WEBGL,
