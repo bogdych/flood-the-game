@@ -760,10 +760,11 @@ var config = {
     height: 600,
     pixelArt: true,
     parent: 'phaser-example',
-    scene: [ Flood ]
+    scene: [ FloodSinglePlayer ]
 };
 
 var game = new Phaser.Game(config);
+
 let socket = new WebSocketService();
 let onopen = function(){
     console.log("connected")
