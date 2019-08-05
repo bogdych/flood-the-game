@@ -1,10 +1,11 @@
 import WebSocketService from './web-socket-service';
+import MyTurn from './my-turn';
 
 export default class MultiplayerService{
     constructor(){
         this.socket = new WebSocketService();
-        this.socket.onOpen(() => {console.log("connected") });
-        this.socket.onMessage((str) => {this.lastMessage = str});
+        this.socket.onOpen(() => console.log("connected") );
+        this.socket.onMessage((str) => this.lastMessage = str);
         this.init();
         this.id = this.lastMessage.substring(7, this.lastMessage.length - 1);
     }
@@ -23,6 +24,7 @@ export default class MultiplayerService{
                 break;
             case "gameReady":
                 console.log("GameFound");
+                this.myTurn = new MyTurn()
                 break;
                 
         }
