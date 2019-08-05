@@ -11,8 +11,8 @@ export default class WebSocketService{
     init() {
         if(!this.socket){ this.socket = new WebSocket(this.url)}
         this.socket.onopen =(event) => { this.callbackOnOpen();}
-        this.socket.onclose = (event) => {this.callbackOnClose(event.data);}
-        this.socket.onmessage = (event) => {this.callbackOnMessage();}
+        this.socket.onclose = (event) => { this.callbackOnClose(event.data); }
+        this.socket.onmessage = (event) => { this.callbackOnMessage(); }
     };
     onOpen(callback) {
         if(!callback){
@@ -20,7 +20,7 @@ export default class WebSocketService{
         else {
             this.callbackOnOpen = callback;}
 
-        this.socket.onopen = (event) => {callback();};
+        this.socket.onopen = (event) => { callback(); };
     };
 
     onClose(callback) {
