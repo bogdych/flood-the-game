@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import WebSocketService from "./web-socket-service";
 
 var Flood = new Phaser.Class({
 
@@ -763,3 +764,9 @@ var config = {
 };
 
 var game = new Phaser.Game(config);
+let socket = new WebSocketService();
+let onopen = function(){
+    console.log("connected")
+};
+socket.onOpen(onopen);
+socket.init();
