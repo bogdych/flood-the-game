@@ -5,7 +5,7 @@ export default class MultiplayerService{
         this.socket = new WebSocketService();
         this.socket.onOpen(() => {console.log("connected") });
         this.socket.onMessage((str) => {this.lastMessage = str});
-        this.socket.onClose();
+        this.init();
         this.id = this.lastMessage.substring(7, this.lastMessage.length - 1);
     }
     findGame(){
@@ -22,7 +22,7 @@ export default class MultiplayerService{
                 alert("Error");
                 break;
             case "gameReady":
-                alert("GameFound");
+                console.log("GameFound");
                 break;
                 
         }
