@@ -1,5 +1,5 @@
 export default class WebSocketService{
-    static URL = "ws://localhost:8060/game";
+    static get URL() { return "ws://localhost:8060/game";}
 
     constructor() {
         this.callbackOnOpen = () => console.log("Connected");
@@ -8,7 +8,7 @@ export default class WebSocketService{
     };
     init() {
         if(!this.socket){
-            this.socket = new WebSocket(URL);
+            this.socket = new WebSocket(WebSocketService.URL);
             this.socket.onopen =(event) => this.callbackOnOpen();
             this.socket.onclose = (event) => this.callbackOnClose(event.data);
             this.socket.onmessage = (event) => this.callbackOnMessage();
