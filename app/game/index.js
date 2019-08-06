@@ -1,4 +1,6 @@
+import MainMenu from './main-menu';
 import FloodSinglePlayer from './flood-single-player';
+import FloodMultiPlayer from './flood-multi-player';
 import WebSocketService from "./web-socket-service";
 
 
@@ -8,7 +10,7 @@ var config = {
     height: 600,
     pixelArt: true,
     parent: 'phaser-example',
-    scene: [ FloodSinglePlayer ]
+    scene: [ MainMenu, FloodMultiPlayer, FloodSinglePlayer ]
 };
 
 var game = new Phaser.Game(config);
