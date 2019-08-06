@@ -1,13 +1,36 @@
 import WebSocketService from './web-socket-service';
-import MyTurn from './my-turn';
+import PlayerData from './player-data';
 
 export default class MultiplayerService{
     constructor(){
+        this.playerData = new PlayerData();
         this.socket = new WebSocketService();
-        this.socket.onMessage((str) => this.lastMessage = str);
+        this.socket.onMessage((data) => this.onMessage(data));
         this.socket.init();
-        this.idWithBranch = this.lastMessage.substring(6, this.lastMessage.length - 1);
-        this.idWithBranch = this.idWithBranch.substring(1, this.idWithBranch.length - 1);
+    }
+    onMessage(data){
+        let msg = JSON.parse(data);
+
+        if(type in msg){
+            switch(msg.type){
+                case "error":
+                    alert("Error");
+                    break;
+                case "gameReady":
+                    console.log("GameFound");
+                    this.playerData.isMyTurn = (msg.state.next.id === this.id);
+                    break;
+                default:
+                    alert("Unexpected message type response from server");
+                    break;
+            }
+        } else{
+            if(id in msg){
+                this.id = msg.id;
+            } else{
+                alert("Unexpected response from server");
+            }
+        }
     }
     findGame(){
         let msgToServer = {
@@ -16,17 +39,6 @@ export default class MultiplayerService{
             gameType:"standard"
         };
         this.socket.send(JSON.stringify(msgToServer));
-        let msgFromServer = JSON.parse(this.lastMessage);
 
-        switch(msgFromServer.type){
-            case "error":
-                alert("Error");
-                break;
-            case "gameReady":
-                console.log("GameFound");
-                this.myTurn = new MyTurn(msgFromServer.state.next.id === this.idWithBranch);
-                break;
-                
-        }
     }
 }
