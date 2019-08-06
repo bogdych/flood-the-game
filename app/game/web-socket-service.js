@@ -25,4 +25,5 @@ export default class WebSocketService{
         this.callbackOnMessage = callback;
     };
     send(data) {this.socket.send(data);}
+
 }
