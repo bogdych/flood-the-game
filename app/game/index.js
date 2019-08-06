@@ -1,5 +1,5 @@
 import FloodSinglePlayer from './flood-single-player';
-import WebSocketService from './web-socket-service';
+import MultiplayerService from './multi-player-service';
 
 var config = {
     type: Phaser.WEBGL,
@@ -12,9 +12,5 @@ var config = {
 
 var game = new Phaser.Game(config);
 
+let mpService = new MultiplayerService();
 
-var socket = new WebSocketService();
-var onOpen = function() {
-    console.log("connected");
-}
-socket.onOpen(onOpen);
