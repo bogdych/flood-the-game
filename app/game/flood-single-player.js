@@ -3,7 +3,7 @@ import Icon from './Icon';
 
 export default class FloodSinglePlayer extends Phaser.Scene {
     constructor() {
-        super({ key: 'FloodSinglePlayer' })
+        super({ key: 'FloodSinglePlayer' });
 
         this.allowClick = true;
 
@@ -29,11 +29,11 @@ export default class FloodSinglePlayer extends Phaser.Scene {
         this.gridBG = this.add.image(400, 600 + 300, 'flood', 'grid');
 
         this.icon1 = new Icon(this, 'grey', 16, 156);
-        this.icon2 = new Icon(this, 'red', 16, 312)
-        this.icon3 = new Icon(this, 'green', 16, 458)
-        this.icon4 = new Icon(this, 'yellow', 688, 156)
-        this.icon5 = new Icon(this, 'blue', 688, 312)
-        this.icon6 = new Icon(this, 'purple', 688, 458)
+        this.icon2 = new Icon(this, 'red', 16, 312);
+        this.icon3 = new Icon(this, 'green', 16, 458);
+        this.icon4 = new Icon(this, 'yellow', 688, 156);
+        this.icon5 = new Icon(this, 'blue', 688, 312);
+        this.icon6 = new Icon(this, 'purple', 688, 458);
 
         this.cursor = this.add.image(16, 156, 'flood', 'cursor-over').setOrigin(0).setVisible(false);
 
@@ -41,17 +41,17 @@ export default class FloodSinglePlayer extends Phaser.Scene {
 
         this.grid = [];
 
-        for (var x = 0; x < 14; x++)
+        for (let x = 0; x < 14; x++)
         {
             this.grid[x] = [];
 
-            for (var y = 0; y < 14; y++)
+            for (let y = 0; y < 14; y++)
             {
-                var sx = 166 + (x * 36);
-                var sy = 66 + (y * 36);
-                var color = Phaser.Math.Between(0, 5);
+                let sx = 166 + (x * 36);
+                let sy = 66 + (y * 36);
+                let color = Phaser.Math.Between(0, 5);
 
-                var block = this.add.image(sx, -600 + sy, 'flood', this.frames[color]);
+                let block = this.add.image(sx, -600 + sy, 'flood', this.frames[color]);
 
                 block.setData('oldColor', color);
                 block.setData('color', color);
@@ -65,9 +65,9 @@ export default class FloodSinglePlayer extends Phaser.Scene {
         //  Do a few floods just to make it a little easier starting off
         this.helpFlood();
 
-        for (var i = 0; i < this.matched.length; i++)
+        for (let i = 0; i < this.matched.length; i++)
         {
-            var block = this.matched[i];
+            let block = this.matched[i];
 
             block.setFrame(this.frames[block.getData('color')]);
         }
@@ -76,7 +76,7 @@ export default class FloodSinglePlayer extends Phaser.Scene {
 
         this.particles = this.add.particles('flood');
 
-        for (var i = 0; i < this.frames.length; i++)
+        for (let i = 0; i < this.frames.length; i++)
         {
             this.createEmitter(this.frames[i]);
         }
@@ -93,13 +93,13 @@ export default class FloodSinglePlayer extends Phaser.Scene {
     }
 
     helpFlood() {
-        for (var i = 0; i < 8; i++)
+        for (let i = 0; i < 8; i++)
         {
-            var x = Phaser.Math.Between(0, 13);
-            var y = Phaser.Math.Between(0, 13);
+            let x = Phaser.Math.Between(0, 13);
+            let y = Phaser.Math.Between(0, 13);
 
-            var oldColor = this.grid[x][y].getData('color');
-            var newColor = oldColor + 1;
+            let oldColor = this.grid[x][y].getData('color');
+            let newColor = oldColor + 1;
 
             if (newColor === 6)
             {
@@ -132,13 +132,13 @@ export default class FloodSinglePlayer extends Phaser.Scene {
             ease: 'Power3'
         });
 
-        var i = 800;
+        let i = 800;
 
-        for (var y = 13; y >= 0; y--)
+        for (let y = 13; y >= 0; y--)
         {
-            for (var x = 0; x < 14; x++)
+            for (let x = 0; x < 14; x++)
             {
-                var block = this.grid[x][y];
+                let block = this.grid[x][y];
 
                 this.tweens.add({
 
@@ -216,7 +216,7 @@ export default class FloodSinglePlayer extends Phaser.Scene {
 
         i += 500;
 
-        var movesTween = this.tweens.addCounter({
+        let movesTween = this.tweens.addCounter({
             from: 0,
             to: 25,
             ease: 'Power1',
@@ -269,9 +269,9 @@ export default class FloodSinglePlayer extends Phaser.Scene {
     }
 
     onIconOver(pointer, gameObject) {
-        var icon = gameObject;
+        let icon = gameObject;
 
-        var newColor = icon.getData('color');
+        let newColor = icon.getData('color');
 
         //  Valid color?
         if (newColor !== this.currentColor)
@@ -297,7 +297,7 @@ export default class FloodSinglePlayer extends Phaser.Scene {
         this.arrow.setFrame('arrow-' + this.frames[newColor]);
 
         //  Jiggle the monster :)
-        var monster = icon.getData('monster');
+        let monster = icon.getData('monster');
 
         this.children.bringToTop(monster);
 
@@ -335,9 +335,9 @@ export default class FloodSinglePlayer extends Phaser.Scene {
             return;
         }
 
-        var icon = gameObject;
+        let icon = gameObject;
 
-        var newColor = icon.getData('color');
+        let newColor = icon.getData('color');
 
         //  Valid color?
         if (newColor === this.currentColor)
@@ -345,7 +345,7 @@ export default class FloodSinglePlayer extends Phaser.Scene {
             return;
         }
 
-        var oldColor = this.grid[0][0].getData('color');
+        let oldColor = this.grid[0][0].getData('color');
 
         // console.log('starting flood from', oldColor, this.frames[oldColor], 'to', newColor, this.frames[newColor]);
 
@@ -392,8 +392,8 @@ export default class FloodSinglePlayer extends Phaser.Scene {
     startFlow() {
         this.matched.sort(function (a, b) {
 
-            var aDistance = Phaser.Math.Distance.Between(a.x, a.y, 166, 66);
-            var bDistance = Phaser.Math.Distance.Between(b.x, b.y, 166, 66);
+            let aDistance = Phaser.Math.Distance.Between(a.x, a.y, 166, 66);
+            let bDistance = Phaser.Math.Distance.Between(b.x, b.y, 166, 66);
 
             return aDistance - bDistance;
 
@@ -401,19 +401,19 @@ export default class FloodSinglePlayer extends Phaser.Scene {
 
         //  Swap the sprites
 
-        var t = 0;
-        var inc = (this.matched.length > 98) ? 6 : 12;
+        let t = 0;
+        let inc = (this.matched.length > 98) ? 6 : 12;
 
         this.allowClick = false;
 
-        for (var i = 0; i < this.matched.length; i++)
+        for (let i = 0; i < this.matched.length; i++)
         {
-            var block = this.matched[i];
+            let block = this.matched[i];
 
-            var blockColor = this.frames[block.getData('color')];
-            var oldBlockColor = this.frames[block.getData('oldColor')];
+            let blockColor = this.frames[block.getData('color')];
+            let oldBlockColor = this.frames[block.getData('oldColor')];
 
-            var emitter = this.emitters[oldBlockColor];
+            let emitter = this.emitters[oldBlockColor];
 
             this.time.delayedCall(t, function (block, blockColor) {
 
@@ -443,11 +443,11 @@ export default class FloodSinglePlayer extends Phaser.Scene {
     }
 
     checkWon() {
-        var topLeft = this.grid[0][0].getData('color');
+        let topLeft = this.grid[0][0].getData('color');
 
-        for (var x = 0; x < 14; x++)
+        for (let x = 0; x < 14; x++)
         {
-            for (var y = 0; y < 14; y++)
+            for (let y = 0; y < 14; y++)
             {
                 if (this.grid[x][y].getData('color') !== topLeft)
                 {
@@ -478,13 +478,13 @@ export default class FloodSinglePlayer extends Phaser.Scene {
             delay: 500
         });
 
-        var i = 500;
+        let i = 500;
 
-        for (var y = 13; y >= 0; y--)
+        for (let y = 13; y >= 0; y--)
         {
-            for (var x = 0; x < 14; x++)
+            for (let x = 0; x < 14; x++)
             {
-                var block = this.grid[x][y];
+                let block = this.grid[x][y];
 
                 this.tweens.add({
 
@@ -512,7 +512,7 @@ export default class FloodSinglePlayer extends Phaser.Scene {
         this.text1.setText("Lost!");
         this.text2.setText(':(');
 
-        var i = this.clearGrid();
+        let i = this.clearGrid();
 
         this.text3.setAlpha(0);
         this.text3.setVisible(true);
@@ -552,16 +552,16 @@ export default class FloodSinglePlayer extends Phaser.Scene {
             delay: 500
         });
 
-        var i = 500;
+        let i = 500;
 
-        for (var y = 13; y >= 0; y--)
+        for (let y = 13; y >= 0; y--)
         {
-            for (var x = 0; x < 14; x++)
+            for (let x = 0; x < 14; x++)
             {
-                var block = this.grid[x][y];
+                let block = this.grid[x][y];
 
                 //  Set a new color
-                var color = Phaser.Math.Between(0, 5);
+                let color = Phaser.Math.Between(0, 5);
 
                 block.setFrame(this.frames[color]);
 
@@ -588,16 +588,16 @@ export default class FloodSinglePlayer extends Phaser.Scene {
         //  Do a few floods just to make it a little easier starting off
         this.helpFlood();
 
-        for (var i = 0; i < this.matched.length; i++)
+        for (let i = 0; i < this.matched.length; i++)
         {
-            var block = this.matched[i];
+            let block = this.matched[i];
 
             block.setFrame(this.frames[block.getData('color')]);
         }
 
         this.currentColor = this.grid[0][0].getData('color');
 
-        var movesTween = this.tweens.addCounter({
+        let movesTween = this.tweens.addCounter({
             from: 0,
             to: 25,
             ease: 'Power1',
@@ -620,11 +620,11 @@ export default class FloodSinglePlayer extends Phaser.Scene {
         this.text1.setText("Won!!");
         this.text2.setText(':)');
 
-        var i = this.clearGrid();
+        let i = this.clearGrid();
 
         //  Put the winning monster in the middle
 
-        var monster = this.add.image(400, 300, 'flood', 'icon-' + this.frames[this.currentColor]);
+        let monster = this.add.image(400, 300, 'flood', 'icon-' + this.frames[this.currentColor]);
 
         monster.setScale(0);
 
@@ -641,7 +641,7 @@ export default class FloodSinglePlayer extends Phaser.Scene {
     }
 
     boom() {
-        var color = Phaser.Math.RND.pick(this.frames);
+        let color = Phaser.Math.RND.pick(this.frames);
 
         this.emitters[color].explode(8, Phaser.Math.Between(128, 672), Phaser.Math.Between(28, 572))
 
@@ -653,36 +653,30 @@ export default class FloodSinglePlayer extends Phaser.Scene {
     }
 
     floodFill(oldColor, newColor, x, y) {
-        if (oldColor === newColor || this.grid[x][y].getData('color') !== oldColor)
-        {
+        if (oldColor === newColor || this.grid[x][y].getData('color') !== oldColor) {
             return;
         }
 
         this.grid[x][y].setData('oldColor', oldColor);
         this.grid[x][y].setData('color', newColor);
 
-        if (this.matched.indexOf(this.grid[x][y]) === -1)
-        {
+        if (this.matched.indexOf(this.grid[x][y]) === -1) {
             this.matched.push(this.grid[x][y]);
         }
 
-        if (x > 0)
-        {
+        if (x > 0) {
             this.floodFill(oldColor, newColor, x - 1, y);
         }
 
-        if (x < 13)
-        {
+        if (x < 13) {
             this.floodFill(oldColor, newColor, x + 1, y);
         }
 
-        if (y > 0)
-        {
+        if (y > 0) {
             this.floodFill(oldColor, newColor, x, y - 1);
         }
 
-        if (y < 13)
-        {
+        if (y < 13) {
             this.floodFill(oldColor, newColor, x, y + 1);
         }
     }
