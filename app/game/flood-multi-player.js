@@ -3,7 +3,7 @@ import Icon from './Icon';
 
 export default class FloodMultiPlayer extends Phaser.Scene {
     constructor() {
-        super({ key: 'FloodMultiPlayer'})
+        super({ key: 'FloodMultiPlayer'});
 
         this.allowClick = true;
 
@@ -13,7 +13,6 @@ export default class FloodMultiPlayer extends Phaser.Scene {
 
         this.grid = [];
         this.matched = [];
-        this.trueValues = [];
 
         this.moves = 25;
 
@@ -46,42 +45,32 @@ export default class FloodMultiPlayer extends Phaser.Scene {
         // Choosing corner
         this.input.keyboard.on('keydown_Q', () => {
             this.playersCorner = 1;
-            this.text4.setText(this.playersCorner)
+            this.text4.setText(this.playersCorner);
             this.currentColor = this.grid[0][0].getData('color');
-            console.log(this.currentColor);
         });
         this.input.keyboard.on('keydown_W', () => {
             this.playersCorner = 2;
-            this.text4.setText(this.playersCorner)
+            this.text4.setText(this.playersCorner);
             this.currentColor = this.grid[13][0].getData('color');
-            console.log(this.currentColor);            
         });
         this.input.keyboard.on('keydown_E', () => {
             this.playersCorner = 3;
-            this.text4.setText(this.playersCorner)
+            this.text4.setText(this.playersCorner);
             this.currentColor = this.grid[0][13].getData('color');
-            console.log(this.currentColor);
         });
         this.input.keyboard.on('keydown_R', () => {
             this.playersCorner = 4;
-            this.text4.setText(this.playersCorner)
+            this.text4.setText(this.playersCorner);
             this.currentColor = this.grid[13][13].getData('color');
-            console.log(this.currentColor);
         });
 
-        // Update trueValues
-
-        this.input.keyboard.on('keydown_F', this.updateTrueValues, this)
-
         //  The game is played in a 14x14 grid with 6 different colors
-
         this.grid = [];
         this.trueValues = [];
 
         for (let x = 0; x < 14; x++)
         {
             this.grid[x] = [];
-            this.trueValues[x] = [];
 
             for (let y = 0; y < 14; y++)
             {
@@ -97,8 +86,6 @@ export default class FloodMultiPlayer extends Phaser.Scene {
                 block.setData('y', sy);
 
                 this.grid[x][y] = block;
-
-                this.trueValues[x][y] = this.add.bitmapText(sx, sy, 'atari', this.getLetter(block), 20).setAlpha(0);
             }
         }
 
@@ -126,24 +113,10 @@ export default class FloodMultiPlayer extends Phaser.Scene {
         this.text1 = this.add.bitmapText(684, 30, 'atari', 'Moves', 20).setAlpha(0);
         this.text2 = this.add.bitmapText(694, 60, 'atari', '00', 40).setAlpha(0);
         this.text3 = this.add.bitmapText(180, 200, 'atari', 'So close!\n\nClick to\ntry again', 48).setAlpha(0);
-        this.text4 = this.add.bitmapText(16, 16, 'atari', this.playersCorner, 40).setAlpha(0).setOrigin(0)
+        this.text4 = this.add.bitmapText(16, 16, 'atari', this.playersCorner, 40).setAlpha(0).setOrigin(0);
         this.text5 = this.add.bitmapText(0, 0, 'atari', 'b', 20).setAlpha(0);
 
-        //this.instructions = this.add.image(400, 300, 'flood', 'instructions').setAlpha(0);
-
         this.revealGrid();
-    }
-
-    updateTrueValues() {
-        for (let x = 0; x < 14; x++) {
-            for (let y = 0; y < 14; y++) {
-                this.trueValues[x][y].setText(this.getLetter(this.grid[x][y]))
-            }
-        }
-    }
-
-    getLetter(block) {
-        return block.color == 2 ? 'c' : this.frames[block.getData('color')][0]
     }
 
     helpFlood() {
@@ -300,23 +273,17 @@ export default class FloodMultiPlayer extends Phaser.Scene {
         i += 0;
 
         this.tweens.add({
-            targets: [ /*this.instructions,*/ this.arrow ],
+            targets: [ this.arrow ],
             alpha: 1,
             ease: 'Power3',
             delay: i
         });
 
         this.time.delayedCall(i, this.startInputEvents, [], this);
+        this.time.delayedCall(i, this.debugBinds, [], this);
     }
 
-    startInputEvents() {
-        this.input.on('gameobjectover', this.onIconOver, this);
-        this.input.on('gameobjectout', this.onIconOut, this);
-        this.input.on('gameobjectdown', this.onIconDown, this);
-        this.updateTrueValues();
-
-        //  Cheat mode :)
-
+    debugBinds() {
         this.input.keyboard.on('keydown_M', function () {
 
             this.moves++;
@@ -330,6 +297,12 @@ export default class FloodMultiPlayer extends Phaser.Scene {
             this.text2.setText(Phaser.Utils.String.Pad(this.moves, 2, '0', 1));
 
         }, this);
+    }
+
+    startInputEvents() {
+        this.input.on('gameobjectover', this.onIconOver, this);
+        this.input.on('gameobjectout', this.onIconOut, this);
+        this.input.on('gameobjectdown', this.onIconDown, this);
     }
 
     stopInputEvents() {
@@ -382,13 +355,9 @@ export default class FloodMultiPlayer extends Phaser.Scene {
     }
 
     onIconOut(pointer, gameObject) {
-        // console.log(this.monsterTween.targets[0].y);
-
         this.monsterTween.stop(0);
 
 		gameObject.getData('monster').setY(gameObject.y);
-
-        // console.log(this.monsterTween.targets[0].y);
 
         this.cursorTween = this.tweens.add({
             targets: this.cursor,
@@ -415,7 +384,7 @@ export default class FloodMultiPlayer extends Phaser.Scene {
             return;
         }
         
-        let oldColor
+        let oldColor;
         switch (this.playersCorner) {
             case 1:
                 oldColor = this.grid[0][0].getData('color');
@@ -433,10 +402,6 @@ export default class FloodMultiPlayer extends Phaser.Scene {
                 console.log('Error at onIconDown');                
         }
 
-        //let oldColor = this.grid[0][0].getData('color');
-
-        // console.log('starting flood from', oldColor, this.frames[oldColor], 'to', newColor, this.frames[newColor]);
-
         if (oldColor !== newColor)
         {
             this.currentColor = newColor;
@@ -449,7 +414,6 @@ export default class FloodMultiPlayer extends Phaser.Scene {
             }
 
             this.cursor.setVisible(false);
-            // this.instructions.setVisible(false);
 
             this.moves--;
 
@@ -492,7 +456,7 @@ export default class FloodMultiPlayer extends Phaser.Scene {
         //  Swap the sprites
 
         let t = 0;
-        let inc = 2 //(this.matched.length > 98) ? 6 : 12;
+        let inc = 2; //(this.matched.length > 98) ? 6 : 12;
 
         this.allowClick = false;
 
