@@ -66,7 +66,6 @@ export default class FloodMultiPlayer extends Phaser.Scene {
 
         //  The game is played in a 14x14 grid with 6 different colors
         this.grid = [];
-        this.trueValues = [];
 
         for (let x = 0; x < 14; x++)
         {
@@ -114,7 +113,6 @@ export default class FloodMultiPlayer extends Phaser.Scene {
         this.text2 = this.add.bitmapText(694, 60, 'atari', '00', 40).setAlpha(0);
         this.text3 = this.add.bitmapText(180, 200, 'atari', 'So close!\n\nClick to\ntry again', 48).setAlpha(0);
         this.text4 = this.add.bitmapText(16, 16, 'atari', this.playersCorner, 40).setAlpha(0).setOrigin(0);
-        this.text5 = this.add.bitmapText(0, 0, 'atari', 'b', 20).setAlpha(0);
 
         this.revealGrid();
     }
@@ -177,14 +175,6 @@ export default class FloodMultiPlayer extends Phaser.Scene {
                     duration: 800,
                     delay: i
 
-                });
-                
-                let txt = this.trueValues[x][y];
-                this.tweens.add({
-                    targets: txt,
-                    alpha: 1,
-                    ease: 'Power3',
-                    delay: i
                 });
 
                 i += 1;
@@ -426,8 +416,6 @@ export default class FloodMultiPlayer extends Phaser.Scene {
                 this.startFlow();
             }
         }
-
-        this.updateTrueValues();
     }
 
     createEmitter(color) {
