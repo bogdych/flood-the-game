@@ -43,7 +43,7 @@ export default class FloodMultiPlayer extends Phaser.Scene {
         this.cursor = this.add.image(16, 156, 'flood', 'cursor-over').setOrigin(0).setVisible(false);
 
 
-        // Chosing corner
+        // Choosing corner
         this.input.keyboard.on('keydown_Q', () => {
             this.playersCorner = 1;
             this.text4.setText(this.playersCorner)
@@ -313,6 +313,7 @@ export default class FloodMultiPlayer extends Phaser.Scene {
         this.input.on('gameobjectover', this.onIconOver, this);
         this.input.on('gameobjectout', this.onIconOut, this);
         this.input.on('gameobjectdown', this.onIconDown, this);
+        this.updateTrueValues();
 
         //  Cheat mode :)
 
@@ -413,8 +414,26 @@ export default class FloodMultiPlayer extends Phaser.Scene {
         {
             return;
         }
+        
+        let oldColor
+        switch (this.playersCorner) {
+            case 1:
+                oldColor = this.grid[0][0].getData('color');
+                break;
+            case 2:
+                oldColor = this.grid[13][0].getData('color');
+                break;
+            case 3:
+                oldColor = this.grid[0][13].getData('color');
+                break;
+            case 4:
+                oldColor = this.grid[13][13].getData('color');
+                break;
+            default: 
+                console.log('Error at onIconDown');                
+        }
 
-        let oldColor = this.grid[0][0].getData('color');
+        //let oldColor = this.grid[0][0].getData('color');
 
         // console.log('starting flood from', oldColor, this.frames[oldColor], 'to', newColor, this.frames[newColor]);
 
@@ -443,6 +462,8 @@ export default class FloodMultiPlayer extends Phaser.Scene {
                 this.startFlow();
             }
         }
+
+        this.updateTrueValues();
     }
 
     createEmitter(color) {
