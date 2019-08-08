@@ -7,10 +7,8 @@ export default class MultiplayerService{
         this.socket = new WebSocketService();
         this.socket.onMessage((event) => this.onMessage(event.data));
         this.socket.init();
-
     }
-    //TODO: should I each case delegate a corresponding method ( gameReady() )?
-    //Нужно ли вынести все case в отдельные методы?
+
     onMessage(data){
         let msg = JSON.parse(data);
         if("type" in msg){
