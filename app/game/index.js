@@ -15,7 +15,3 @@ var config = {
 };
 
 var game = new Phaser.Game(config);
-
-let mpService = new MultiplayerService();
-
-mpService.findGame();
