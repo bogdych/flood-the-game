@@ -13,11 +13,10 @@ export default class MultiplayerService{
         if("type" in msg){
             switch(msg.type){
                 case "error":
-                    alert("Error");
+                    this.onError();
                     break;
                 case "gameReady":
-                    console.log("GameFound");
-                    this.playerData.isMyTurn = (msg.state.next.id === this.id);
+                    this.onGameReady(msg);
                     break;
                 default:
                     alert("Unexpected message type response from server");
@@ -25,19 +24,39 @@ export default class MultiplayerService{
             }
         } else{
             if("id" in msg){
-                this.id = msg.id;
-                console.log("id player set" + this.id);
+                this.playerData = new PlayerData(msg.id);
+                console.log("id player set " + this.playerData.id);
+                if(this.msgTo !== undefined){ this.findGame(this.msgTo); }
             } else{
                 alert("Unexpected response from server");
             }
         }
     }
-    findGame(){
-        let msgToServer = {
+    onError(){
+        alert("Error");
+    }
+    onGameReady(msg){
+        console.log("GameFound");
+        this.playerData.isMyTurn = msg.state.next.id === this.playerData.id;
+    }
+    findGame(msgToServer){
+        switch (this.socket.socket.readyState) {
+            case WebSocket.OPEN:
+                this.socket.send(JSON.stringify(msgToServer));
+                console.log(JSON.stringify(msgToServer));
+                break;
+            case WebSocket.CONNECTING:
+                this.msgTo = msgToServer;
+                break;
+            default:
+                this.onError();
+        }
+    }
+    findGameFloodStandart(){
+        this.findGame({
             type: "findGame",
             name: "flood",
             gameType:"standard"
-        };
-        this.socket.send(JSON.stringify(msgToServer));
+        } )
     }
 }
