@@ -3,7 +3,6 @@ import PlayerData from './player-data';
 
 export default class MultiplayerService{
     constructor(){
-        this.playerData = new PlayerData();
         this.socket = new WebSocketService();
         this.socket.onMessage((event) => this.onMessage(event.data));
         this.socket.init();

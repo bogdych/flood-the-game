@@ -1,6 +1,10 @@
 export default class PlayerData{
-    constructor(bool){
-        if(bool === undefined){ this.isMyTurn = false; }
-        else{ this.isMyTurn = bool; }
+    constructor(id, bool){
+        if(!bool){
+            this.isMyTurn = false;
+        } else{
+            this.isMyTurn = bool;
+        }
+        this.id = id;
     }
 }
