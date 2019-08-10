@@ -3,7 +3,7 @@ export default class WebSocketService{
 
     constructor() {
         this.callbackOnOpen = () => console.log("Connected");
-        this.callbackOnMessage = (data) => console.log("Message from server", event.data);
+        this.callbackOnMessage = (event) => console.log("Message from server", event.data);
         this.callbackOnClose = () => console.log("Closed");
     };
     init() {
@@ -11,7 +11,7 @@ export default class WebSocketService{
             this.socket = new WebSocket(WebSocketService.URL);
             this.socket.onopen =(event) => this.callbackOnOpen();
             this.socket.onclose = (event) => this.callbackOnClose(event.data);
-            this.socket.onmessage = (event) => this.callbackOnMessage();
+            this.socket.onmessage = (event) => this.callbackOnMessage(event);
         }
     };
     onOpen(callback) {
@@ -25,4 +25,5 @@ export default class WebSocketService{
         this.callbackOnMessage = callback;
     };
     send(data) {this.socket.send(data);}
+
 }
