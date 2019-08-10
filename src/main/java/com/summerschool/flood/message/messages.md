@@ -42,6 +42,24 @@ Note: all the valid colors are listed in the game.flood.Color enum
 
 ## Sent from server to client
 
+### On connection
+
+After connection established and new player added into internal game service,
+server sends message with player id and nickname to the client.
+Note: nickname field could be null.
+
+An example of message data.
+
+```json
+{
+  "type":"playerInfo",
+  "player": {
+      "id":"3730b279-161c-50de-b0d2-7ad352032cb8",
+      "nickname":null,
+  },
+}
+```
+
 ### Error message
 
 Server send error messages in this format. 

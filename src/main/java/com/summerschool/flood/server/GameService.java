@@ -23,12 +23,14 @@ public class GameService {
     private final List<IGame> games = new CopyOnWriteArrayList<>();
     private final Map<String, Player> players = new ConcurrentHashMap<>();
 
-    public void connect(String playerID) {
+    public Player connect(String playerID) {
         Player player = new Player();
         player.setId(playerID);
         players.put(playerID, player);
 
         LOG.info("Connect player: " + playerID);
+
+        return player;
     }
 
     public IGame findGame(String playerID, FindGameMessage message) {

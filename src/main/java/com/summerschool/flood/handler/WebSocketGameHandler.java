@@ -38,8 +38,9 @@ public class WebSocketGameHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws IOException {
         sessions.put(session.getId(), session);
-        service.connect(session.getId());
-        session.sendMessage(new TextMessage(String.format("{\"id\":\"%s\"}", session.getId())));
+        Player player = service.connect(session.getId());
+        String message = mapper.writeValueAsString(new PlayerMessage(player));
+        session.sendMessage(new TextMessage(message));
     }
 
     @Override
