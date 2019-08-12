@@ -129,14 +129,13 @@ do not have active game. Therefore these players can request server to find new 
 This section describes state property format, which contains all
 the data about current game state: players, field, next, winner, etc.
 
-Property 'positions' describes all the current players positions. 
-The next player position could be easily found from this list of data. 
+Property 'positions' describes all the current players positions. Maps
+players id to theirs cells. The next player position could be easily 
+found from this list of data. 
 
 Note: property nickname could be null
 Note: property next could be null (depends on the game status)
 Note: property winner could be null (depends on the game status)
-
-Note: cell - next player position of the action
 
 ```json
 {
@@ -145,25 +144,19 @@ Note: cell - next player position of the action
       "id": "<Next turn action>",
       "nickname": "<Player optional nickname, could be null>"
     },
-    "positions": [
-          {
-            "id": "d6c40fbf-b3f6-cf8f-3744-a5203ad92d4d",
-            "cell": {
-              "x": 0,
-              "y": 0,
-              "color": "green"
-            }
+    "positions": {
+          "070d40ed-9d7d-6efb-e420-d8e0a6e6fa20": {
+            "x": 0,
+            "y": 0,
+            "color": "blue"
           },
           ...
-          {
-            "id": "d6c40facc-b3f6-c48f-3700-a5203ad45d4d",
-            "cell": {
-              "x": N,
-              "y": N,
-              "color": "green"
-            }
+          "123f40ef-1d9f-3adc-e333-cca0a0e6fa19": {
+            "x": N,
+            "y": N,
+            "color": "red"
           }
-        ],
+    },
     "winner": {
       "id": "<winner id>",
       "nickname": "<Winner optional nickname, could be null>"
