@@ -24,5 +24,9 @@ public enum MessageType {
         @JsonProperty("gameState")
         GAME_STATE,
 
+        /** Player info sent on connection established */
+        @JsonProperty("playerInfo")
+        PLAYER_INFO,
+
 
 }

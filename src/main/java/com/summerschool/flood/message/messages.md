@@ -42,6 +42,24 @@ Note: all the valid colors are listed in the game.flood.Color enum
 
 ## Sent from server to client
 
+### On connection
+
+After connection established and new player added into internal game service,
+server sends message with player id and nickname to the client.
+Note: nickname field could be null.
+
+An example of message data.
+
+```json
+{
+  "type":"playerInfo",
+  "player": {
+      "id":"3730b279-161c-50de-b0d2-7ad352032cb8",
+      "nickname":null
+  }
+}
+```
+
 ### Error message
 
 Server send error messages in this format. 
@@ -67,7 +85,7 @@ Possible state's status: READY.
 {
   "type": "gameReady",
   "state": {
-    
+      /** State foramt section */
   }
 }
 ```
@@ -86,12 +104,15 @@ do not have active game. Therefore these players can request server to find new 
 {
   "type": "gameState",
   "state": {
-  
+      /** State foramt section */
   }
 }
 ```
 
-### State property format
+### State property format (For game flood)
+
+Property 'positions' describes all the current players positions. 
+The next player position could be easily found from this list of data. 
 
 Note: property nickname could be null
 Note: property next could be null (depends on the game status)
@@ -106,11 +127,25 @@ Note: cell - next player position of the action
       "id": "<Next turn action>",
       "nickname": "<Player optional nickname, could be null>"
     },
-    "cell": {
-      "x": <coordinate>
-      "y": <coordinate>,
-      "color": "<Some color, from color enum>"
-    },
+    "positions": [
+          {
+            "id": "d6c40fbf-b3f6-cf8f-3744-a5203ad92d4d",
+            "cell": {
+              "x": 0,
+              "y": 0,
+              "color": "green"
+            }
+          },
+          ...
+          {
+            "id": "d6c40facc-b3f6-c48f-3700-a5203ad45d4d",
+            "cell": {
+              "x": N,
+              "y": N,
+              "color": "green"
+            }
+          }
+        ],
     "winner": {
       "id": "<winner id>",
       "nickname": "<Winner optional nickname, could be null>"
