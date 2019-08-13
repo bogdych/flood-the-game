@@ -12,33 +12,43 @@ export default class MultiplayerService {
 		let msg = JSON.parse(data);
 		if ("type" in msg) {
 			switch (msg.type) {
+				case "playerInfo":
+					this.onPlayerInfo(msg);
+					break;
 				case "error":
-					this.onError();
+					this.onServerError(msg);
 					break;
 				case "gameReady":
 					this.onGameReady(msg);
+					break;
+				case "gameState":
+					this.onGameState(msg);
 					break;
 				default:
 					alert("Unexpected message type response from server");
 					break;
 			}
 		} else {
-			if ("id" in msg) {
-				this.playerData = new PlayerData(msg.id);
-				console.log("id player set " + this.playerData.id);
-				if (this.msgTo) {
-					this.findGame(this.msgTo);
-				}
-			} else {
-				alert("Unexpected response from server");
-			}
+			alert("Unexpected response from server");
 		}
 	}
 
-	onError() {
+	onPlayerInfo(msg){
+		this.playerData = new PlayerData(msg.player.id, msg.player.nickname);
+		console.log("id player set " + this.playerData.id);
+		if (this.msgTo) {
+			this.findGame(this.msgTo);
+		}
+	}
+	onServerError(msg){
+		console.log(JSON.stringify(msg));
+	}
+	onClientError() {
 		alert("Error");
 	}
-
+	onGameState(msg){
+		console.log("Got gameState");
+	}
 	onGameReady(msg) {
 		console.log("GameFound");
 		this.playerData.isMyTurn = msg.state.next.id === this.playerData.id;
@@ -54,7 +64,7 @@ export default class MultiplayerService {
 				this.msgTo = msgToServer;
 				break;
 			default:
-				this.onError();
+				this.onClientError();
 		}
 	}
 
