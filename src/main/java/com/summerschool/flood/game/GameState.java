@@ -4,6 +4,7 @@ import com.summerschool.flood.game.flood.Cell;
 import com.summerschool.flood.game.flood.Field;
 
 import java.util.List;
+import java.util.Map;
 
 public interface GameState {
 
@@ -20,6 +21,6 @@ public interface GameState {
     Field getField();
 
     /** @return Players current positions on the field */
-    List<PlayerPosition> getPositions();
+    Map<Player, Cell> getPositions();
 
 }

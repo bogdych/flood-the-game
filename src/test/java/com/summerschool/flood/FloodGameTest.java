@@ -25,8 +25,8 @@ public class FloodGameTest {
         floodGame.setPlayersStartPosition();
 
         Player player = floodGame.getState().getNext();
-        int x = floodGame.getPlayersStartPosition().get(player).getX();
-        int y = floodGame.getPlayersStartPosition().get(player).getY();
+        int x = floodGame.getState().getPositions().get(player).getX();
+        int y = floodGame.getState().getPositions().get(player).getY();
         Color color = floodGame.getState().getField().getCells()[x][y].getColor();
         int k = ThreadLocalRandom.current().nextInt(Color.values().length);
         Color nextColor = Color.values()[k];
