@@ -2,9 +2,12 @@ import WebSocketService from './web-socket-service';
 import PlayerData from './player-data';
 
 export default class MultiplayerService {
-	constructor() {
+	constructor(callbackOnOpen) {
 		this.socket = new WebSocketService();
 		this.socket.onMessage((event) => this.onMessage(event.data));
+		if(callbackOnOpen) {
+			this.socket.onOpen(callbackOnOpen);
+		}
 		this.socket.init();
 	}
 
@@ -48,10 +51,12 @@ export default class MultiplayerService {
 	}
 	onGameState(msg){
 		console.log("Got gameState");
+		this.state = msg.state;
 	}
 	onGameReady(msg) {
 		console.log("GameFound");
 		this.playerData.isMyTurn = msg.state.next.id === this.playerData.id;
+		this.state = msg.state;
 	}
 
 	findGame(msgToServer) {

@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
-import Icon from './Icon';
+import Icon from "./icon";
+import MultiplayerService from './multi-player-service';
 
 export default class FloodMultiPlayer extends Phaser.Scene {
     constructor() {
@@ -31,7 +32,7 @@ export default class FloodMultiPlayer extends Phaser.Scene {
     create() {
         this.add.image(400, 300, 'flood', 'background');
         this.gridBG = this.add.image(400, 600 + 300, 'flood', 'grid');
-        
+
         this.icon[0] = new Icon(this, 'grey', 16, 156);
         this.icon[1] = new Icon(this, 'red', 16, 312);
         this.icon[2] = new Icon(this, 'green', 16, 458);
@@ -386,7 +387,7 @@ export default class FloodMultiPlayer extends Phaser.Scene {
         {
             return;
         }
-        
+
         let oldColor;
         switch (this.playersCorner) {
             case 1:
@@ -401,8 +402,8 @@ export default class FloodMultiPlayer extends Phaser.Scene {
             case 4:
                 oldColor = this.grid[13][13].getData('color');
                 break;
-            default: 
-                console.log('Error at onIconDown');                
+            default:
+                console.log('Error at onIconDown');
         }
 
         if (oldColor !== newColor)
@@ -560,7 +561,7 @@ export default class FloodMultiPlayer extends Phaser.Scene {
 
         return i;
     }
-    
+
     gameLost() {
         this.stopInputEvents();
 
@@ -709,7 +710,7 @@ export default class FloodMultiPlayer extends Phaser.Scene {
 
     floodFillFromCorner(oldColor, newColor) {
         switch (this.playersCorner) {
-            case 1: 
+            case 1:
                 this.floodFill(oldColor, newColor, 0, 0);
                 break;
             case 2:
@@ -717,7 +718,7 @@ export default class FloodMultiPlayer extends Phaser.Scene {
                 break;
             case 3:
                 this.floodFill(oldColor, newColor, 0, 13);
-                break;            
+                break;
             case 4:
                 this.floodFill(oldColor, newColor, 13, 13);
                 break;
