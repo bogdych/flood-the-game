@@ -7,5 +7,8 @@ export default class PlayerData{
         }
         this.id = id;
         this.nickname = nickname;
+        this.position;
+        this.currentColor;
     }
+
 }
