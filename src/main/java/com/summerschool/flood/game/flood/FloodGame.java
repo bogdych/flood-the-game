@@ -49,7 +49,7 @@ public class FloodGame implements IGame {
     private Field createField(GameType type) {
         switch (type) {
             case STANDARD:
-                return new Field(10, 10);
+                return new Field(14, 14);
             case FAST:
                 return new Field(5, 5);
             default:

@@ -10,10 +10,10 @@ public enum Color {
     GREEN,
     @JsonProperty("blue")
     BLUE,
-    @JsonProperty("orange")
-    ORANGE,
-    @JsonProperty("violet")
-    VIOLET,
+    @JsonProperty("grey")
+    GREY,
+    @JsonProperty("purple")
+    PURPLE,
     @JsonProperty("yellow")
     YELLOW
 
