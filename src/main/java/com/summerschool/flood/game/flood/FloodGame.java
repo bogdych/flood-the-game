@@ -11,11 +11,7 @@ import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -174,7 +170,7 @@ public class FloodGame implements IGame {
         private Player next;
         private Player winner;
         private Field field;
-        private Map<Player, Cell> positions = new ConcurrentHashMap<>();
+        private Map<Player, Cell> positions = new HashMap<>();
         private GameStatus gameStatus = NOT_READY;
 
         FloodState(Field field) {
