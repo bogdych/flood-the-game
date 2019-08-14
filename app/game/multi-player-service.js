@@ -39,9 +39,6 @@ export default class MultiplayerService {
 	onPlayerInfo(msg){
 		this.playerData = new PlayerData(msg.player.id, msg.player.nickname);
 		console.log("id player set " + this.playerData.id);
-		if (this.msgTo) {
-			this.findGame(this.msgTo);
-		}
 	}
 	onServerError(msg){
 		console.log(JSON.stringify(msg));
