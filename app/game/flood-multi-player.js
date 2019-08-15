@@ -22,12 +22,12 @@ export default class FloodMultiPlayer extends Phaser.Scene {
 
         this.playersCorner = 1;
     }
-
+    
     preload() {
         this.load.bitmapFont('atari', 'assets/fonts/bitmap/atari-smooth.png', 'assets/fonts/bitmap/atari-smooth.xml');
         this.load.atlas('flood', 'assets/games/flood/blobs.png', 'assets/games/flood/blobs.json');
     }
-
+    
     create() {
         this.add.image(400, 300, 'flood', 'background');
         this.gridBG = this.add.image(400, 600 + 300, 'flood', 'grid');
@@ -38,85 +38,113 @@ export default class FloodMultiPlayer extends Phaser.Scene {
         this.icon[3] = new Icon(this, 'yellow', 688, 156);
         this.icon[4] = new Icon(this, 'blue', 688, 312);
         this.icon[5] = new Icon(this, 'purple', 688, 458);
-
+        
         this.cursor = this.add.image(16, 156, 'flood', 'cursor-over').setOrigin(0).setVisible(false);
+        
+        this.text1 = this.add.bitmapText(684, 30, 'atari', 'Moves', 20).setAlpha(0);
+        this.text2 = this.add.bitmapText(694, 60, 'atari', '00', 40).setAlpha(0);
+        this.text3 = this.add.bitmapText(180, 200, 'atari', 'So close!\n\nClick to\ntry again', 48).setAlpha(0);
 
+        // Creating arrow
+        this.arrow = this.add.image(85, 48, 'flood', 'arrow-white').setOrigin(0).setAlpha(0);
+        let getArrowTween = () => this.tweens.add({
+            targets: this.arrow,
+            x: this.playersCorner % 2 == 0 ? '-=24' : '+=24',
+            ease: 'Sine.easeInOut',
+            duration: 900,
+            yoyo: true,
+            repeat: -1
+        });
+        this.arrow.move = getArrowTween();
 
         // Choosing corner
         this.input.keyboard.on('keydown_Q', () => {
-            this.playersCorner = 1;
-            this.text4.setText(this.playersCorner);
-            this.currentColor = this.grid[0][0].getData('color');
+            if (this.playersCorner != 1) {
+                this.arrow.move.remove();
+                this.playersCorner = 1;
+                this.currentColor = this.grid[0][0].getData('color');
+                this.arrow.setPosition(85, 48);
+                this.arrow.flipX = false;
+                this.arrow.move = getArrowTween();
+            }
         });
         this.input.keyboard.on('keydown_W', () => {
-            this.playersCorner = 2;
-            this.text4.setText(this.playersCorner);
-            this.currentColor = this.grid[13][0].getData('color');
+            if (this.playersCorner != 2) {
+                this.arrow.move.stop();
+                this.playersCorner = 2;
+                this.currentColor = this.grid[13][0].getData('color');
+                this.arrow.setPosition(671, 48);
+                this.arrow.flipX = true;
+                this.arrow.move = getArrowTween();
+            }
         });
         this.input.keyboard.on('keydown_E', () => {
-            this.playersCorner = 3;
-            this.text4.setText(this.playersCorner);
-            this.currentColor = this.grid[0][13].getData('color');
+            if (this.playersCorner != 3) {
+                this.arrow.move.stop();
+                this.playersCorner = 3;
+                this.currentColor = this.grid[0][13].getData('color');
+                this.arrow.setPosition(85, 516);
+                this.arrow.flipX = false;
+                this.arrow.move = getArrowTween();
+            }
         });
         this.input.keyboard.on('keydown_R', () => {
-            this.playersCorner = 4;
-            this.text4.setText(this.playersCorner);
-            this.currentColor = this.grid[13][13].getData('color');
+            if (this.playersCorner != 4) {
+                this.arrow.move.stop();
+                this.playersCorner = 4;
+                this.currentColor = this.grid[13][13].getData('color');
+                this.arrow.setPosition(671, 516);
+                this.arrow.flipX = true;
+                this.arrow.move = getArrowTween();
+            }
         });
-
+        
         //  The game is played in a 14x14 grid with 6 different colors
         this.grid = [];
-
+        
         for (let x = 0; x < 14; x++)
         {
             this.grid[x] = [];
-
+            
             for (let y = 0; y < 14; y++)
             {
                 let sx = 166 + (x * 36);
                 let sy = 66 + (y * 36);
                 let color = Phaser.Math.Between(0, 5);
-
+                
                 let block = this.add.image(sx, -600 + sy, 'flood', this.frames[color]);
-
+                
                 block.setData('oldColor', color);
                 block.setData('color', color);
                 block.setData('x', sx);
                 block.setData('y', sy);
-
+                
                 this.grid[x][y] = block;
             }
         }
-
+        
         //  Do a few floods just to make it a little easier starting off
         this.helpFlood();
-
+        
         for (let i = 0; i < this.matched.length; i++)
         {
             let block = this.matched[i];
-
+            
             block.setFrame(this.frames[block.getData('color')]);
         }
-
+        
         this.currentColor = this.grid[0][0].getData('color');
-
+        
         this.particles = this.add.particles('flood');
-
+        
         for (let i = 0; i < this.frames.length; i++)
         {
             this.createEmitter(this.frames[i]);
         }
 
-        this.createArrow();
-
-        this.text1 = this.add.bitmapText(684, 30, 'atari', 'Moves', 20).setAlpha(0);
-        this.text2 = this.add.bitmapText(694, 60, 'atari', '00', 40).setAlpha(0);
-        this.text3 = this.add.bitmapText(180, 200, 'atari', 'So close!\n\nClick to\ntry again', 48).setAlpha(0);
-        this.text4 = this.add.bitmapText(16, 16, 'atari', this.playersCorner, 40).setAlpha(0).setOrigin(0);
-
         this.revealGrid();
     }
-
+    
     helpFlood() {
         for (let i = 0; i < 8; i++)
         {
@@ -133,21 +161,6 @@ export default class FloodMultiPlayer extends Phaser.Scene {
 
             this.floodFill(oldColor, newColor, x, y)
         }
-    }
-
-    createArrow() {
-        this.arrow = this.add.image(109 - 24, 48, 'flood', 'arrow-white').setOrigin(0).setAlpha(0);
-
-        this.tweens.add({
-
-            targets: this.arrow,
-            x: '+=24',
-            ease: 'Sine.easeInOut',
-            duration: 900,
-            yoyo: true,
-            repeat: -1
-
-        });
     }
 
     revealGrid() {
