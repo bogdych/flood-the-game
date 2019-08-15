@@ -13,6 +13,7 @@ export default class MultiplayerService {
 
 	onMessage(data) {
 		let msg = JSON.parse(data);
+		console.log(data);
 		if ("type" in msg) {
 			switch (msg.type) {
 				case "playerInfo":
@@ -36,17 +37,19 @@ export default class MultiplayerService {
 		}
 	}
 
-	onPlayerInfo(msg){
+	onPlayerInfo(msg) {
 		this.playerData = new PlayerData(msg.player.id, msg.player.nickname);
 		console.log("id player set " + this.playerData.id);
+		if(this.msgTo)
+			this.findGame(this.msgTo);
 	}
-	onServerError(msg){
+	onServerError(msg) {
 		console.log(JSON.stringify(msg));
 	}
 	onClientError() {
 		alert("Error");
 	}
-	onGameState(msg){
+	onGameState(msg) {
 		console.log("Got gameState");
 		this.state = msg.state;
 	}
