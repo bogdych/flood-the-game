@@ -11,11 +11,7 @@ import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -27,7 +23,6 @@ public class FloodGame implements IGame {
     private final static Logger LOG = LoggerFactory.getLogger(FloodGame.class);
     private static ObjectMapper mapper = new ObjectMapper();
     private List<Player> players = new CopyOnWriteArrayList<>();
-    private Map<Player, Cell> playersStartPosition = new ConcurrentHashMap<>();
     private IFirstSearch firstSearch;
     private FloodState state;
     private String id;
@@ -111,7 +106,7 @@ public class FloodGame implements IGame {
     public boolean isValidAction(Player player, FloodAction action) {
         Field field = this.state.getField();
 
-        Cell tmpCell = playersStartPosition.get(this.state.getNext());
+        Cell tmpCell = state.getPositions().get(this.state.getNext());
         return player.equals(this.state.getNext()) &&
                 tmpCell.getX() == action.getX() && tmpCell.getY() == action.getY() &&
                 tmpCell.getColor() != action.getColor() &&
@@ -134,13 +129,11 @@ public class FloodGame implements IGame {
         int index = players.indexOf(state.getNext());
         Player next = players.get((index + 1) % players.size());
         state.setNext(next);
-        state.recomputePositions(playersStartPosition);
     }
 
     private void changeStateToFinish(Player winner) {
         state.setWinner(winner);
         state.setNext(null);
-        state.recomputePositions(playersStartPosition);
         state.setGameStatus(FINISHED);
     }
 
@@ -148,21 +141,18 @@ public class FloodGame implements IGame {
         Field field = state.getField();
         Player player = players.get(ThreadLocalRandom.current().nextInt(players.size()));
 
-        playersStartPosition = new ConcurrentHashMap<>();
-
         switch (maxPlayers) {
             case 4:
-                playersStartPosition.put(players.get(3), field.getCells()[0][field.getHeight() - 1]);
-                playersStartPosition.put(players.get(2), field.getCells()[field.getWidth() - 1][field.getHeight() - 1]);
+                state.getPositions().put(players.get(3), field.getCells()[0][field.getHeight() - 1]);
+                state.getPositions().put(players.get(2), field.getCells()[field.getWidth() - 1][field.getHeight() - 1]);
             case 2:
-                playersStartPosition.put(players.get(1), field.getCells()[field.getWidth() - 1][0]);
+                state.getPositions().put(players.get(1), field.getCells()[field.getWidth() - 1][0]);
             case 1:
-                playersStartPosition.put(players.get(0), field.getCells()[0][0]);
+                state.getPositions().put(players.get(0), field.getCells()[0][0]);
                 break;
         }
 
         state.setNext(player);
-        state.recomputePositions(playersStartPosition);
     }
 
     @Override
@@ -180,20 +170,12 @@ public class FloodGame implements IGame {
         private Player next;
         private Player winner;
         private Field field;
-        private List<PlayerPosition> positions = new ArrayList<>();
+        private Map<Player, Cell> positions = new HashMap<>();
         private GameStatus gameStatus = NOT_READY;
 
         FloodState(Field field) {
             this.field = field;
         }
-
-        void recomputePositions(Map<Player, Cell> positions) {
-            this.positions.clear();
-            for (Map.Entry<Player, Cell> position : positions.entrySet()) {
-                this.positions.add(new PlayerPosition(position.getKey(), position.getValue()));
-            }
-        }
-
     }
 
     @Data
