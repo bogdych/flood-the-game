@@ -13,5 +13,3 @@ var config = {
 };
 
 var game = new Phaser.Game(config);
-var mpService = new MultiplayerService();
-mpService.findFloodGameStandard();

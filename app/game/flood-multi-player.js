@@ -33,19 +33,118 @@ export default class FloodMultiPlayer extends Phaser.Scene {
         this.add.image(400, 300, 'flood', 'background');
         this.gridBG = this.add.image(400, 600 + 300, 'flood', 'grid');
 
+        this.mpService = new MultiplayerService(() => {
+            this.mpService.findFloodGameStandard();
+            this.messege = this.add.text(300, 300, 'Search game', {fill: '#000000', fontSize: '20px'});
+        });
+
+        this.mpService.onGameReady = (msg) => {
+            console.log("Game found");
+            this.mpService.playerData.isMyTurn = msg.state.next.id === this.mpService.playerData.id;
+            console.log(JSON.stringify(msg));
+            this.messege.destroy();
+
+            this.messege = this.add.text(300, 300, 'Game found!', {fill: '#000000', fontSize: '20px'});
+            setTimeout(() => this.messege.destroy(), 2000);
+
+            this.mpService.state = msg.state;
+
+            this.createAfterGameSearch();
+        };
+
+
+    }
+
+    createAfterGameSearch() {
         this.icon[0] = new Icon(this, 'grey', 16, 156);
         this.icon[1] = new Icon(this, 'red', 16, 312);
         this.icon[2] = new Icon(this, 'green', 16, 458);
         this.icon[3] = new Icon(this, 'yellow', 688, 156);
         this.icon[4] = new Icon(this, 'blue', 688, 312);
         this.icon[5] = new Icon(this, 'purple', 688, 458);
-        
+
         this.cursor = this.add.image(16, 156, 'flood', 'cursor-over').setOrigin(0).setVisible(false);
-        
+
         this.text1 = this.add.bitmapText(684, 30, 'atari', 'Moves', 20).setAlpha(0);
         this.text2 = this.add.bitmapText(694, 60, 'atari', '00', 40).setAlpha(0);
         this.text3 = this.add.bitmapText(180, 200, 'atari', 'So close!\n\nClick to\ntry again', 48).setAlpha(0);
 
+        this.createGrid();
+        this.createArrow();
+
+        for (let i = 0; i < this.matched.length; i++)
+        {
+            let block = this.matched[i];
+
+            block.setFrame(this.frames[block.getData('color')]);
+        }
+
+        this.particles = this.add.particles('flood');
+
+        for (let i = 0; i < this.frames.length; i++)
+        {
+            this.createEmitter(this.frames[i]);
+        }
+
+        this.revealGrid();
+    }
+
+    createGrid() {
+        //  The game is played in a 14x14 grid with 6 different colors
+
+        this.grid = [];
+        let state =  this.mpService.state;
+
+        for (let x = 0; x < state.field.width; x++)
+        {
+            this.grid[x] = [];
+
+            for (let y = 0; y < state.field.height; y++)
+            {
+                let sx = 166 + (x * 36);
+                let sy = 66 + (y * 36);
+                let color = state.field.cells[x * state.field.height + y];
+
+                let block = this.add.image(sx, -600 + sy, 'flood', this.frames[color]);
+
+                block.setData('oldColor', color);
+                block.setData('color', color);
+                block.setData('x', sx);
+                block.setData('y', sy);
+
+                this.grid[x][y] = block;
+            }
+        }
+
+
+        this.mpService.playerData.position = state.positions[this.mpService.playerData.id];
+        this.currentColor = state.positions[state.next.id].color;
+
+        switch (this.mpService.playerData.position.x) {
+            case 0:
+                switch (this.mpService.playerData.position.y) {
+                    case 0:
+                        this.playersCorner = 1;
+                        break;
+                    case state.field.height - 1:
+                        this.playersCorner = 3;
+                        break;
+                }
+                break;
+            case state.field.width - 1:
+                switch (this.mpService.playerData.position.y) {
+                    case 0:
+                        this.playersCorner = 2;
+                        break;
+                    case state.field.height - 1:
+                        this.playersCorner =4;
+                        break;
+                }
+                break;
+        }
+    }
+
+    createArrow() {
         // Creating arrow
         this.arrow = this.add.image(85, 48, 'flood', 'arrow-white').setOrigin(0).setAlpha(0);
         let getArrowTween = () => this.tweens.add({
@@ -99,69 +198,6 @@ export default class FloodMultiPlayer extends Phaser.Scene {
                 this.arrow.move = getArrowTween();
             }
         });
-        
-        //  The game is played in a 14x14 grid with 6 different colors
-        this.grid = [];
-        
-        for (let x = 0; x < 14; x++)
-        {
-            this.grid[x] = [];
-            
-            for (let y = 0; y < 14; y++)
-            {
-                let sx = 166 + (x * 36);
-                let sy = 66 + (y * 36);
-                let color = Phaser.Math.Between(0, 5);
-                
-                let block = this.add.image(sx, -600 + sy, 'flood', this.frames[color]);
-                
-                block.setData('oldColor', color);
-                block.setData('color', color);
-                block.setData('x', sx);
-                block.setData('y', sy);
-                
-                this.grid[x][y] = block;
-            }
-        }
-        
-        //  Do a few floods just to make it a little easier starting off
-        this.helpFlood();
-        
-        for (let i = 0; i < this.matched.length; i++)
-        {
-            let block = this.matched[i];
-            
-            block.setFrame(this.frames[block.getData('color')]);
-        }
-        
-        this.currentColor = this.grid[0][0].getData('color');
-        
-        this.particles = this.add.particles('flood');
-        
-        for (let i = 0; i < this.frames.length; i++)
-        {
-            this.createEmitter(this.frames[i]);
-        }
-
-        this.revealGrid();
-    }
-    
-    helpFlood() {
-        for (let i = 0; i < 8; i++)
-        {
-            let x = Phaser.Math.Between(0, 13);
-            let y = Phaser.Math.Between(0, 13);
-
-            let oldColor = this.grid[x][y].getData('color');
-            let newColor = oldColor + 1;
-
-            if (newColor === 6)
-            {
-                newColor = 0;
-            }
-
-            this.floodFill(oldColor, newColor, x, y)
-        }
     }
 
     revealGrid() {
