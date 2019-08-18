@@ -1,7 +1,6 @@
 import MainMenu from './main-menu';
 import FloodSinglePlayer from './flood-single-player';
 import FloodMultiPlayer from './flood-multi-player';
-import MultiplayerService from './multi-player-service';
 
 var config = {
     type: Phaser.WEBGL,
