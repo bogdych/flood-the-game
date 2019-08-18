@@ -69,8 +69,8 @@ export default class FloodMultiPlayer extends Phaser.Scene {
         this.text2 = this.add.bitmapText(694, 60, 'atari', '00', 40).setAlpha(0);
         this.text3 = this.add.bitmapText(180, 200, 'atari', 'So close!\n\nClick to\ntry again', 48).setAlpha(0);
 
-        this.createGrid();
         this.createArrow();
+        this.createGrid();
 
         for (let i = 0; i < this.matched.length; i++)
         {
