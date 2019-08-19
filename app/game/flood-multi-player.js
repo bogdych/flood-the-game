@@ -47,15 +47,13 @@ export default class FloodMultiPlayer extends Phaser.Scene {
             this.messege = this.add.text(300, 300, 'Game found!', {fill: '#000000', fontSize: '20px'});
             setTimeout(() => this.messege.destroy(), 2000);
 
-            this.mpService.state = msg.state;
-
-            this.createAfterGameSearch();
+            this.createAfterGameSearch(msg.state);
         };
 
 
     }
 
-    createAfterGameSearch() {
+    createAfterGameSearch(state) {
         this.icon[0] = new Icon(this, 'grey', 16, 156);
         this.icon[1] = new Icon(this, 'red', 16, 312);
         this.icon[2] = new Icon(this, 'green', 16, 458);
@@ -69,8 +67,8 @@ export default class FloodMultiPlayer extends Phaser.Scene {
         this.text2 = this.add.bitmapText(694, 60, 'atari', '00', 40).setAlpha(0);
         this.text3 = this.add.bitmapText(180, 200, 'atari', 'So close!\n\nClick to\ntry again', 48).setAlpha(0);
 
+        this.createGrid(state);
         this.createArrow();
-        this.createGrid();
 
         for (let i = 0; i < this.matched.length; i++)
         {
@@ -89,11 +87,10 @@ export default class FloodMultiPlayer extends Phaser.Scene {
         this.revealGrid();
     }
 
-    createGrid() {
+    createGrid(state) {
         //  The game is played in a 14x14 grid with 6 different colors
 
         this.grid = [];
-        let state =  this.mpService.state;
 
         for (let x = 0; x < state.field.width; x++)
         {
@@ -103,9 +100,9 @@ export default class FloodMultiPlayer extends Phaser.Scene {
             {
                 let sx = 166 + (x * 36);
                 let sy = 66 + (y * 36);
-                let color = state.field.cells[x * state.field.height + y];
+                let color = state.field.cells[x][y].color;
 
-                let block = this.add.image(sx, -600 + sy, 'flood', this.frames[color]);
+                let block = this.add.image(sx, -600 + sy, 'flood', this.frames[this.frames.indexOf(color, 0)]);
 
                 block.setData('oldColor', color);
                 block.setData('color', color);
