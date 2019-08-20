@@ -2,6 +2,8 @@ import WebSocketService from './web-socket-service';
 import PlayerData from './player-data';
 
 export default class MultiplayerService {
+    //parameter - callback function, which will be called after connection established.
+	//expects, that it will call findFloodGameStandard
 	constructor(callbackOnOpen) {
 		this.socket = new WebSocketService();
 		this.socket.onMessage((event) => this.onMessage(event.data));

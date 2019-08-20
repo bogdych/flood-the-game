@@ -100,9 +100,9 @@ export default class FloodMultiPlayer extends Phaser.Scene {
             {
                 let sx = 166 + (x * 36);
                 let sy = 66 + (y * 36);
-                let color = state.field.cells[x][y].color;
+                let color = this.frames.indexOf(state.field.cells[x][y].color);
 
-                let block = this.add.image(sx, -600 + sy, 'flood', this.frames[this.frames.indexOf(color, 0)]);
+                let block = this.add.image(sx, -600 + sy, 'flood', this.frames[color]);
 
                 block.setData('oldColor', color);
                 block.setData('color', color);
@@ -115,7 +115,7 @@ export default class FloodMultiPlayer extends Phaser.Scene {
 
 
         this.mpService.playerData.position = state.positions[this.mpService.playerData.id];
-        this.currentColor = state.positions[state.next.id].color;
+        this.currentColor = this.frames.indexOf(state.positions[state.next.id].color);
 
         switch (this.mpService.playerData.position.x) {
             case 0:
