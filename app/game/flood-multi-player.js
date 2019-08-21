@@ -1,14 +1,14 @@
 import Phaser from 'phaser';
 import Icon from "./icon";
 import MultiplayerService from './multi-player-service';
-
+import {valueOfColor, colorOfIndex, COLORS} from './colors';
 export default class FloodMultiPlayer extends Phaser.Scene {
     constructor() {
         super({ key: 'FloodMultiPlayer'});
 
         this.allowClick = true;
 
-        this.currentColor = '';
+        this.currentColor = -1;
 
         this.emitters = {};
 
@@ -17,13 +17,11 @@ export default class FloodMultiPlayer extends Phaser.Scene {
 
         this.moves = 25;
 
-        this.frames = [ 'blue', 'green', 'grey', 'purple', 'red', 'yellow' ];
-
         this.icon = [];
 
         this.playersCorner = 1;
     }
-    
+
     preload() {
         this.load.bitmapFont('atari', 'assets/fonts/bitmap/atari-smooth.png', 'assets/fonts/bitmap/atari-smooth.xml');
         this.load.atlas('flood', 'assets/games/flood/blobs.png', 'assets/games/flood/blobs.json');
@@ -47,9 +45,14 @@ export default class FloodMultiPlayer extends Phaser.Scene {
             this.messege = this.add.text(300, 300, 'Game found!', {fill: '#000000', fontSize: '20px'});
             setTimeout(() => this.messege.destroy(), 2000);
 
+            this.mpService.nextPlayerId = msg.state.next.id;
             this.createAfterGameSearch(msg.state);
         };
 
+        this.mpService.onServerError = (msg) => {
+            this.stopInputEvents();
+            console.log(msg);
+        }
 
     }
 
@@ -63,6 +66,9 @@ export default class FloodMultiPlayer extends Phaser.Scene {
 
         this.cursor = this.add.image(16, 156, 'flood', 'cursor-over').setOrigin(0).setVisible(false);
 
+        this.width = state.field.width;
+        this.height = state.field.height;
+
         this.text1 = this.add.bitmapText(684, 30, 'atari', 'Moves', 20).setAlpha(0);
         this.text2 = this.add.bitmapText(694, 60, 'atari', '00', 40).setAlpha(0);
         this.text3 = this.add.bitmapText(180, 200, 'atari', 'So close!\n\nClick to\ntry again', 48).setAlpha(0);
@@ -70,18 +76,20 @@ export default class FloodMultiPlayer extends Phaser.Scene {
         this.createGrid(state);
         this.createArrow();
 
+        this.allowClick = this.mpService.playerData.isMyTurn;
+
         for (let i = 0; i < this.matched.length; i++)
         {
             let block = this.matched[i];
 
-            block.setFrame(this.frames[block.getData('color')]);
+            block.setFrame(colorOfIndex(block.getData('color')));
         }
 
         this.particles = this.add.particles('flood');
 
-        for (let i = 0; i < this.frames.length; i++)
+        for (let i = 0; i < 6; i++)
         {
-            this.createEmitter(this.frames[i]);
+            this.createEmitter(colorOfIndex(i));
         }
 
         this.revealGrid();
@@ -100,12 +108,12 @@ export default class FloodMultiPlayer extends Phaser.Scene {
             {
                 let sx = 166 + (x * 36);
                 let sy = 66 + (y * 36);
-                let color = this.frames.indexOf(state.field.cells[x][y].color);
+                let color = state.field.cells[x][y].color;
 
-                let block = this.add.image(sx, -600 + sy, 'flood', this.frames[color]);
+                let block = this.add.image(sx, -600 + sy, 'flood', color);
 
-                block.setData('oldColor', color);
-                block.setData('color', color);
+                block.setData('oldColor', valueOfColor(color));
+                block.setData('color', valueOfColor(color));
                 block.setData('x', sx);
                 block.setData('y', sy);
 
@@ -115,7 +123,7 @@ export default class FloodMultiPlayer extends Phaser.Scene {
 
 
         this.mpService.playerData.position = state.positions[this.mpService.playerData.id];
-        this.currentColor = this.frames.indexOf(state.positions[state.next.id].color);
+        this.currentColor = valueOfColor(state.positions[state.next.id].color);
 
         switch (this.mpService.playerData.position.x) {
             case 0:
@@ -374,7 +382,7 @@ export default class FloodMultiPlayer extends Phaser.Scene {
         this.cursor.setVisible(true);
 
         //  Change arrow color
-        this.arrow.setFrame('arrow-' + this.frames[newColor]);
+        this.arrow.setFrame('arrow-' + colorOfIndex(newColor));
 
         //  Jiggle the monster :)
         let monster = icon.getData('monster');
@@ -456,10 +464,14 @@ export default class FloodMultiPlayer extends Phaser.Scene {
 
             this.text2.setText(Phaser.Utils.String.Pad(this.moves, 2, '0', 1));
 
+
+
             this.floodFillFromCorner(oldColor, newColor);
 
             if (this.matched.length > 0)
             {
+                this.allowClick = false;
+
                 this.startFlow();
             }
         }
@@ -493,14 +505,12 @@ export default class FloodMultiPlayer extends Phaser.Scene {
         let t = 0;
         let inc = 2; //(this.matched.length > 98) ? 6 : 12;
 
-        this.allowClick = false;
-
         for (let i = 0; i < this.matched.length; i++)
         {
             let block = this.matched[i];
 
-            let blockColor = this.frames[block.getData('color')];
-            let oldBlockColor = this.frames[block.getData('oldColor')];
+            let blockColor = colorOfIndex(block.getData('color'));
+            let oldBlockColor = colorOfIndex(block.getData('oldColor'));
 
             let emitter = this.emitters[oldBlockColor];
 
@@ -652,7 +662,7 @@ export default class FloodMultiPlayer extends Phaser.Scene {
                 //  Set a new color
                 let color = Phaser.Math.Between(0, 5);
 
-                block.setFrame(this.frames[color]);
+                block.setFrame(colorOfIndex(color));
 
                 block.setData('oldColor', color);
                 block.setData('color', color);
@@ -674,14 +684,11 @@ export default class FloodMultiPlayer extends Phaser.Scene {
             }
         }
 
-        //  Do a few floods just to make it a little easier starting off
-        this.helpFlood();
-
         for (let i = 0; i < this.matched.length; i++)
         {
             let block = this.matched[i];
 
-            block.setFrame(this.frames[block.getData('color')]);
+            block.setFrame(colorOfIndex(block.getData('color')));
         }
 
         this.currentColor = this.grid[0][0].getData('color');
@@ -713,7 +720,7 @@ export default class FloodMultiPlayer extends Phaser.Scene {
 
         //  Put the winning monster in the middle
 
-        let monster = this.add.image(400, 300, 'flood', 'icon-' + this.frames[this.currentColor]);
+        let monster = this.add.image(400, 300, 'flood', 'icon-' + colorOfIndex(this.currentColor));
 
         monster.setScale(0);
 
@@ -730,34 +737,32 @@ export default class FloodMultiPlayer extends Phaser.Scene {
     }
 
     boom() {
-        let color = Phaser.Math.RND.pick(this.frames);
+        let color = colorOfIndex(Phaser.Math.Between(0, 5));
 
         this.emitters[color].explode(8, Phaser.Math.Between(128, 672), Phaser.Math.Between(28, 572))
 
-        color = Phaser.Math.RND.pick(this.frames);
+        color = colorOfIndex(Phaser.Math.Between(0, 5));
 
         this.emitters[color].explode(8, Phaser.Math.Between(128, 672), Phaser.Math.Between(28, 572))
 
         this.time.delayedCall(100, this.boom, [], this);
     }
-
-    floodFillFromCorner(oldColor, newColor) {
+    fromCornerToCoords() {
         switch (this.playersCorner) {
             case 1:
-                this.floodFill(oldColor, newColor, 0, 0);
-                break;
+                return {x: 0, y: 0};
             case 2:
-                this.floodFill(oldColor, newColor, 13, 0);
-                break;
+                return {x: 13, y: 0};
             case 3:
-                this.floodFill(oldColor, newColor, 0, 13);
-                break;
+                return {x: 0, y: 13};
             case 4:
-                this.floodFill(oldColor, newColor, 13, 13);
-                break;
+                return {x: 13, y: 13};
             default:
                 console.log("How did you just do this?! o_0")
         }
+    }
+    floodFillFromCorner(oldColor, newColor) {
+        this.floodFill(oldColor, newColor, this.fromCornerToCoords().x, this.fromCornerToCoords().y);
     }
 
     floodFill(oldColor, newColor, x, y) {

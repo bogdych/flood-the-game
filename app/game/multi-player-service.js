@@ -11,6 +11,7 @@ export default class MultiplayerService {
 			this.socket.onOpen(callbackOnOpen);
 		}
 		this.socket.init();
+		this.nextPlayer;
 	}
 
 	onMessage(data) {

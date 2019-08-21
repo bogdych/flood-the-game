@@ -1,3 +1,4 @@
+import {valueOfColor, COLORS} from './colors.js';
 /**
  * This class is responsible for interacting with the monster
  */
@@ -9,7 +10,7 @@ export default class Icon {
 
         let shadow = scene.add.image(sx, y, 'flood', 'shadow');
 
-        shadow.setData('color', scene.frames.indexOf(color));
+        shadow.setData('color', valueOfColor(color));
 
         shadow.setData('x', x);
 
