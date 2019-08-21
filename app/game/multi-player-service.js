@@ -2,16 +2,17 @@ import WebSocketService from './web-socket-service';
 import PlayerData from './player-data';
 
 export default class MultiplayerService {
-    //parameter - callback function, which will be called after connection established.
-	//expects, that it will call findFloodGameStandard
+	/**
+	 * @param callbackOnOpen	callback function, which will be called after connection established.
+	 * expects, that it will call findFloodGameStandard
+	 */
 	constructor(callbackOnOpen) {
 		this.socket = new WebSocketService();
 		this.socket.onMessage((event) => this.onMessage(event.data));
-		if(callbackOnOpen) {
+		if (callbackOnOpen) {
 			this.socket.onOpen(callbackOnOpen);
 		}
 		this.socket.init();
-		this.nextPlayer;
 	}
 
 	onMessage(data) {
@@ -44,16 +45,20 @@ export default class MultiplayerService {
 		this.playerData = new PlayerData(msg.player.id, msg.player.nickname);
 		console.log("id player set " + this.playerData.id);
 	}
+
 	onServerError(msg) {
 		console.log(JSON.stringify(msg));
 	}
+
 	onClientError() {
 		alert("Error");
 	}
+
 	onGameState(msg) {
 		console.log("Got gameState");
 		this.state = msg.state;
 	}
+
 	onGameReady(msg) {
 		console.log("GameFound");
 		this.playerData.isMyTurn = msg.state.next.id === this.playerData.id;
@@ -61,16 +66,11 @@ export default class MultiplayerService {
 	}
 
 	findGame(msgToServer) {
-		switch (this.socket.socket.readyState) {
-			case WebSocket.OPEN:
-				this.socket.send(JSON.stringify(msgToServer));
-				console.log(JSON.stringify(msgToServer));
-				break;
-			case WebSocket.CONNECTING:
-				this.msgTo = msgToServer;
-				break;
-			default:
-				this.onClientError();
+		if (this.socket.socket.readyState === WebSocket.OPEN) {
+			this.socket.send(JSON.stringify(msgToServer));
+			console.log(JSON.stringify(msgToServer));
+		} else {
+			this.onClientError();
 		}
 	}
 
