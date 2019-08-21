@@ -214,6 +214,6 @@ Note: case-sensitive
 * red 
 * green
 * blue
-* orange
-* violet
+* grey
+* purple
 * yellow
