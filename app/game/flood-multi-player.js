@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import Icon from "./icon";
 import MultiplayerService from './multi-player-service';
 import {valueOfColor, colorOfIndex, COLORS} from './colors';
+
 export default class FloodMultiPlayer extends Phaser.Scene {
     constructor() {
         super({ key: 'FloodMultiPlayer'});
@@ -48,7 +49,11 @@ export default class FloodMultiPlayer extends Phaser.Scene {
             this.mpService.nextPlayerId = msg.state.next.id;
             this.createAfterGameSearch(msg.state);
         };
-
+		
+		this.mpService.onGameState = (msg) => {
+			this.refresh(msg.state);
+		}
+		
         this.mpService.onServerError = (msg) => {
             this.stopInputEvents();
             console.log(msg);
@@ -75,6 +80,12 @@ export default class FloodMultiPlayer extends Phaser.Scene {
 
         this.createGrid(state);
         this.createArrow();
+		
+		this.mpService.playerData.position = state.positions[this.mpService.playerData.id];
+        this.currentColor = valueOfColor(state.positions[state.next.id].color);
+		
+		this.mpService.playerData.corner = this.getCorner(this.mpService.playerData.position.x, this.mpService.playerData.position.y);
+		this.playersCorner = this.mpService.playerData.corner;
 
         this.allowClick = this.mpService.playerData.isMyTurn;
 
@@ -120,35 +131,34 @@ export default class FloodMultiPlayer extends Phaser.Scene {
                 this.grid[x][y] = block;
             }
         }
-
-
-        this.mpService.playerData.position = state.positions[this.mpService.playerData.id];
-        this.currentColor = valueOfColor(state.positions[state.next.id].color);
-
-        switch (this.mpService.playerData.position.x) {
-            case 0:
-                switch (this.mpService.playerData.position.y) {
-                    case 0:
-                        this.playersCorner = 1;
-                        break;
-                    case state.field.height - 1:
-                        this.playersCorner = 3;
-                        break;
-                }
-                break;
-            case state.field.width - 1:
-                switch (this.mpService.playerData.position.y) {
-                    case 0:
-                        this.playersCorner = 2;
-                        break;
-                    case state.field.height - 1:
-                        this.playersCorner =4;
-                        break;
-                }
-                break;
-        }
+        
     }
-
+	
+	
+	getCorner(x, y) {
+		switch (x) {
+            case 0:
+                switch (y) {
+                    case 0:
+                        return 1;
+                    case this.height - 1:
+                        return 3;
+                }
+                break;
+            case this.width - 1:
+                switch (y) {
+                    case 0:
+                        return 2;
+                    case this.height - 1:
+                        return 4;
+                }
+                break;
+				default: 
+					console.log("Wrong! (${x},${y}) corner");
+        }
+	}
+	
+	
     createArrow() {
         // Creating arrow
         this.arrow = this.add.image(85, 48, 'flood', 'arrow-white').setOrigin(0).setAlpha(0);
@@ -327,7 +337,57 @@ export default class FloodMultiPlayer extends Phaser.Scene {
         this.time.delayedCall(i, this.startInputEvents, [], this);
         this.time.delayedCall(i, this.debugBinds, [], this);
     }
+	
+	refresh(state) {
+		this.allowClick = false;
+		
+		if (!this.mpService.playerData.isMyTurn){
+			this.playersCorner = this.getCorner(state.positions[this.mpService.nextPlayerId].x, state.positions[this.mpService.nextPlayerId].y);
+			
+			let oldColor = this.grid[this.getCoords(this.playersCorner).x][this.getCoords(this.playersCorner).y].getData('color');
+			let newColor = valueOfColor(state.positions[this.mpService.nextPlayerId].color);
+			
+			if (oldColor !== newColor) {
+				this.currentColor = newColor;
 
+				this.matched = [];
+
+				if (this.monsterTween)
+				{
+					this.monsterTween.stop(0);
+				}
+
+				this.cursor.setVisible(false);
+
+				this.moves--;
+
+				this.text2.setText(Phaser.Utils.String.Pad(this.moves, 2, '0', 1));
+
+
+
+				this.floodFillFromCorner(oldColor, newColor);
+
+				if (this.matched.length > 0)
+				{
+
+					this.startFlow();
+				}
+			}
+		
+		}
+		
+		this.mpService.playerData.isMyTurn = state.next.id === this.mpService.playerData.id;
+		
+		this.mpService.nextPlayerId = state.next.id;
+		
+		this.playersCorner = this.getCorner(state.positions[this.mpService.nextPlayerId].x, state.positions[this.mpService.nextPlayerId].y);
+		
+		this.currentColor = valueOfColor(state.positions[this.mpService.playerData.id].color);
+		
+		this.allowClick = this.mpService.playerData.isMyTurn;
+
+	}
+	
     debugBinds() {
         this.input.keyboard.on('keydown_M', function () {
 
@@ -465,13 +525,20 @@ export default class FloodMultiPlayer extends Phaser.Scene {
             this.text2.setText(Phaser.Utils.String.Pad(this.moves, 2, '0', 1));
 
 
-
+			this.mpService.socket.send(JSON.stringify({
+				type: "makeAction",
+				action: {
+					x: this.getCoords(this.playersCorner).x.toString(),
+					y: this.getCoords(this.playersCorner).y.toString(),
+					color: colorOfIndex(newColor)
+			}
+            }));
             this.floodFillFromCorner(oldColor, newColor);
 
             if (this.matched.length > 0)
             {
                 this.allowClick = false;
-
+				
                 this.startFlow();
             }
         }
@@ -747,8 +814,9 @@ export default class FloodMultiPlayer extends Phaser.Scene {
 
         this.time.delayedCall(100, this.boom, [], this);
     }
-    fromCornerToCoords() {
-        switch (this.playersCorner) {
+	
+    getCoords(corner) {
+        switch (corner) {
             case 1:
                 return {x: 0, y: 0};
             case 2:
@@ -761,8 +829,9 @@ export default class FloodMultiPlayer extends Phaser.Scene {
                 console.log("How did you just do this?! o_0")
         }
     }
+	
     floodFillFromCorner(oldColor, newColor) {
-        this.floodFill(oldColor, newColor, this.fromCornerToCoords().x, this.fromCornerToCoords().y);
+        this.floodFill(oldColor, newColor, this.getCoords(this.playersCorner).x, this.getCoords(this.playersCorner).y);
     }
 
     floodFill(oldColor, newColor, x, y) {
