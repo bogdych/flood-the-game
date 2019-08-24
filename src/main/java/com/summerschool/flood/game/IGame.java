@@ -20,6 +20,8 @@ public interface IGame {
 
     boolean addPlayer(Player player);
 
+    boolean run(Instant now, int waitTime);
+
     void makeAction(Player player, MakeActionMessage action);
 
     List<Player> getPlayers();

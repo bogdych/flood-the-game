@@ -10,7 +10,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -31,6 +33,8 @@ public class FloodGame implements IGame {
     private Instant creationTime;
     private Instant lastPlayerTime;
 
+    @Value("${flood.session.minPlayers}")
+    private static int minPlayers;
     private int maxPlayers;
 
     public FloodGame(GameType type, int maxPlayersCount) {
@@ -96,6 +100,21 @@ public class FloodGame implements IGame {
     }
 
     @Override
+    public boolean run(Instant now, int waitTime) {
+        synchronized (this) {
+            if (state.getGameStatus() == NOT_READY
+                && players.size() >= minPlayers
+                && Duration.between(getLastPlayerTime(), now).getSeconds() >= waitTime) {
+                state.setGameStatus(READY);
+                setPlayersStartPosition();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
     public void makeAction(Player player, MakeActionMessage message) {
         FloodAction action = mapper.convertValue(message.getAction(), FloodAction.class);
         synchronized (this) {
@@ -146,13 +165,13 @@ public class FloodGame implements IGame {
         Field field = state.getField();
         Player player = players.get(ThreadLocalRandom.current().nextInt(players.size()));
 
-        switch (maxPlayers) {
+        switch (players.size()) {
             case 4:
                 state.getPositions().put(players.get(3), field.getCells()[0][field.getHeight() - 1]);
             case 3:
-                state.getPositions().put(players.get(1), field.getCells()[field.getWidth() - 1][0]);
+                state.getPositions().put(players.get(2), field.getCells()[field.getWidth() - 1][0]);
             case 2:
-                state.getPositions().put(players.get(2), field.getCells()[field.getWidth() - 1][field.getHeight() - 1]);
+                state.getPositions().put(players.get(1), field.getCells()[field.getWidth() - 1][field.getHeight() - 1]);
             case 1:
                 state.getPositions().put(players.get(0), field.getCells()[0][0]);
                 break;

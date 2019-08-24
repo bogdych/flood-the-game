@@ -4,19 +4,21 @@ import com.summerschool.flood.game.*;
 import com.summerschool.flood.game.flood.FloodGame;
 import com.summerschool.flood.message.FindGameMessage;
 import com.summerschool.flood.message.MakeActionMessage;
+
 import lombok.Data;
+
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 @Service
 @Data
@@ -24,22 +26,11 @@ public class GameService {
 
     private final static Logger LOG = LoggerFactory.getLogger(GameService.class);
 
-    @Value("${flood.scheduler.poolSize}")
-    private int poolSize;
-    @Value("${flood.scheduler.initialDelay}")
-    private int initialDelay;
-    @Value("${flood.scheduler.delay}")
-    private int delay;
+    @Value("${flood.session.waitTime}")
+    private static int waitTime;
 
-    private Executor executor;
     private final List<IGame> games = new CopyOnWriteArrayList<>();
     private final Map<String, Player> players = new ConcurrentHashMap<>();
-
-    @PostConstruct
-    public void postConstruct() {
-        executor = Executors.newScheduledThreadPool(poolSize);
-        LOG.info("Game service: scheduler: pool size: {} initial delay: {}s delay: {}s", poolSize, initialDelay, delay);
-    }
 
     public Player connect(String playerID) {
         Player player = new Player();
@@ -58,7 +49,7 @@ public class GameService {
             IGame game = games.stream()
                     .filter(g -> g.matchType(message) && g.addPlayer(player))
                     .findFirst()
-                    .orElse(createGame(player, message));
+                    .orElseGet(() -> createGame(player, message));
             player.setActiveGame(game);
 
             LOG.info("Add player to game session: {} add time: {}", game.getId(), game.getLastPlayerTime());
@@ -122,6 +113,21 @@ public class GameService {
             default:
                 throw new ServiceException("Invalid game name");
         }
+    }
+
+    @Scheduled(fixedDelay = 5000)
+    public void checkGames() {
+        final Instant time = Instant.now();
+
+        Object ready[] = games.stream()
+                .filter(game -> checkWaiting(game, time) && game.run(time, waitTime))
+                .toArray();
+
+        LOG.info("Ready games: {}", ready.length);
+    }
+
+    private boolean checkWaiting(IGame game, Instant time) {
+        return Duration.between(game.getLastPlayerTime(), time).getSeconds() >= waitTime;
     }
 
 }
