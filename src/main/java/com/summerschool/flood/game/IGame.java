@@ -8,9 +8,9 @@ import java.util.List;
 
 public interface IGame {
 
-    Instant getCreationTime();
+    Instant getCreateTime();
 
-    Instant getLastPlayerTime();
+    Instant getUpdateTime();
 
     String getId();
 
@@ -20,8 +20,6 @@ public interface IGame {
 
     boolean addPlayer(Player player);
 
-    boolean run(Instant now, int waitTime);
-
     void makeAction(Player player, MakeActionMessage action);
 
     List<Player> getPlayers();
@@ -30,5 +28,9 @@ public interface IGame {
 
     boolean isReady();
 
+    boolean isNotReady();
+
     boolean isFinished();
+
+    void start();
 }

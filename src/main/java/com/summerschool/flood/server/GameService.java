@@ -7,7 +7,6 @@ import com.summerschool.flood.message.MakeActionMessage;
 
 import lombok.Data;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +21,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class GameService {
 
     private final static Logger LOG = LoggerFactory.getLogger(GameService.class);
-
-    @Value("${flood.session.waitTime}")
-    private int waitTime;
 
     private final List<IGame> games = new CopyOnWriteArrayList<>();
     private final Map<String, Player> players = new ConcurrentHashMap<>();
@@ -49,7 +45,7 @@ public class GameService {
                     .orElseGet(() -> createGame(player, message));
             player.setActiveGame(game);
 
-            LOG.info("Add player to game session: {} add time: {}", game.getId(), game.getLastPlayerTime());
+            LOG.info("Add player to game session: {} add time: {}", game.getId(), game.getUpdateTime());
 
             return game;
         } else {

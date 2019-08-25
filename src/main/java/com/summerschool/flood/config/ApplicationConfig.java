@@ -1,5 +1,6 @@
 package com.summerschool.flood.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -29,6 +30,11 @@ public class ApplicationConfig extends WebMvcConfigurationSupport {
     @Bean
     public TaskScheduler getTaskScheduler() {
         return taskScheduler;
+    }
+
+    @Bean
+    public ObjectMapper mapper() {
+        return new ObjectMapper();
     }
 
 }

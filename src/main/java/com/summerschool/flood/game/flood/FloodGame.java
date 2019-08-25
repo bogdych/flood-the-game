@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -30,15 +29,15 @@ public class FloodGame implements IGame {
     private FloodState state;
     private String id;
     private GameType type;
-    private Instant creationTime;
-    private Instant lastPlayerTime;
+    private Instant createTime;
+    private Instant updateTime;
 
     @Value("${flood.session.minPlayers}")
     private static int minPlayers;
     private int maxPlayers;
 
     public FloodGame(GameType type, int maxPlayersCount) {
-        this.creationTime = Instant.now();
+        this.createTime = Instant.now();
         this.type = type;
         this.maxPlayers = maxPlayersCount;
         Field field = createField(type);
@@ -46,7 +45,7 @@ public class FloodGame implements IGame {
         this.firstSearch = new DepthFirstSearch(field);
         this.id = UUID.randomUUID().toString();
 
-        LOG.info("Created game session UUID: {} time: {}\nGenerate field: \n{}", id, creationTime, state.getField().getPrettyView());
+        LOG.info("Created game session UUID: {} time: {}\nGenerate field: \n{}", id, createTime, state.getField().getPrettyView());
     }
 
     private Field createField(GameType type) {
@@ -77,20 +76,19 @@ public class FloodGame implements IGame {
     @Override
     public boolean matchType(FindGameMessage findGame) {
         return findGame.getName() == GameName.FLOOD &&
-               findGame.getGameType() == type &&
-               state.getGameStatus() == NOT_READY;
+                findGame.getGameType() == type &&
+                state.getGameStatus() == NOT_READY;
     }
 
     @Override
     public boolean addPlayer(Player player) {
-        if (players.size() < maxPlayers) {
+        if (players.size() < maxPlayers && this.isNotReady()) {
             synchronized (this) {
-                if (players.size() < maxPlayers) {
+                if (players.size() < maxPlayers && this.isNotReady()) {
                     players.add(player);
-                    lastPlayerTime = Instant.now();
+                    updateTime = Instant.now();
                     if (players.size() == maxPlayers) {
-                        this.state.setGameStatus(READY);
-                        setPlayersStartPosition();
+                        start();
                     }
                     return true;
                 }
@@ -100,18 +98,14 @@ public class FloodGame implements IGame {
     }
 
     @Override
-    public boolean run(Instant now, int waitTime) {
-        synchronized (this) {
-            if (state.getGameStatus() == NOT_READY
-                && players.size() >= minPlayers
-                && Duration.between(getLastPlayerTime(), now).getSeconds() >= waitTime) {
-                state.setGameStatus(READY);
-                setPlayersStartPosition();
-                return true;
+    public void start() {
+        if (this.isNotReady())
+            synchronized (this) {
+                if (this.isNotReady()) {
+                    getState().setGameStatus(READY);
+                    setPlayersStartPosition();
+                }
             }
-        }
-
-        return false;
     }
 
     @Override
@@ -183,6 +177,11 @@ public class FloodGame implements IGame {
     @Override
     public boolean isReady() {
         return this.state.getGameStatus() == READY;
+    }
+
+    @Override
+    public boolean isNotReady() {
+        return this.state.getGameStatus() == NOT_READY;
     }
 
     @Override
