@@ -1,14 +1,18 @@
 package com.summerschool.flood.scheduler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.summerschool.flood.game.IGame;
 import com.summerschool.flood.handler.WebSocketGameHandler;
 import com.summerschool.flood.message.GameStateMessage;
 import com.summerschool.flood.message.MessageType;
 import com.summerschool.flood.server.GameService;
+
 import lombok.AllArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -20,12 +24,15 @@ import java.time.Instant;
 @Component
 public class GameScheduler implements Runnable {
 
-    private final static Logger LOG = LoggerFactory.getLogger(GameService.class);
+    private final static Logger LOG = LoggerFactory.getLogger(GameScheduler.class);
     private final GameService gameService;
     private final WebSocketGameHandler gameHandler;
     private final ObjectMapper mapper;
+
     @Value("${flood.session.waitTime}")
     private int waitTime;
+    @Value("${flood.session.minPlayers}")
+    private int minPlayers;
 
     @Override
     @Scheduled(fixedDelay = 10000)
@@ -49,7 +56,8 @@ public class GameScheduler implements Runnable {
     }
 
     private boolean isWaitingLong(IGame game, Instant currentTime) {
-        return game.getPlayers().size() > 1 && Duration.between(game.getUpdateTime(), currentTime).getSeconds() >= waitTime;
+        return game.getPlayers().size() >= minPlayers &&
+                Duration.between(game.getUpdateTime(), currentTime).getSeconds() >= waitTime;
     }
 
 }
