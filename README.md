@@ -9,6 +9,15 @@ frontend.
 * phaser3
 * spring-boot
 
+## Find game logic
+
+Player could request server to find game with specified properties.
+Flood game session could be started if 2 - 4 player were found.
+If game does not have all the players (in our case it is 4 members), 
+game will be started with its current players count. Wait time is 1 minute.
+So, if players were waiting for new member more then 1 minute, then they
+will start their game immediately.
+
 ## Communication interface
 
 This section describes fully-specified client-server communication model 

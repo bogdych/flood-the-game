@@ -26,7 +26,7 @@ public class CheckGamesTask implements Runnable {
     private final WebSocketGameHandler gameHandler;
 
     @Override
-    @Scheduled(fixedDelay = 5000)
+    @Scheduled(fixedDelay = 10000)
     public void run() {
         final Instant time = Instant.now();
 
