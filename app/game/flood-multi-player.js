@@ -39,14 +39,12 @@ export default class FloodMultiPlayer extends Phaser.Scene {
 
         this.mpService.onGameReady = (msg) => {
             console.log("Game found");
-            this.mpService.playerData.isMyTurn = msg.state.next.id === this.mpService.playerData.id;
             console.log(JSON.stringify(msg));
             this.messege.destroy();
 
             this.messege = this.add.text(300, 300, 'Game found!', {fill: '#000000', fontSize: '20px'});
             setTimeout(() => this.messege.destroy(), 2000);
 
-            this.mpService.nextPlayerId = msg.state.next.id;
             this.createAfterGameSearch(msg.state);
         };
 		
@@ -74,21 +72,34 @@ export default class FloodMultiPlayer extends Phaser.Scene {
         this.width = state.field.width;
         this.height = state.field.height;
 
-        this.text1 = this.add.bitmapText(684, 30, 'atari', 'Moves', 20).setAlpha(0);
-        this.text2 = this.add.bitmapText(694, 60, 'atari', '00', 40).setAlpha(0);
+        this.text1 = this.add.bitmapText(684, 30, 'atari', 'Your Move', 20).setAlpha(0);
+		let tmpString;
+		if (this.mpService.playerData.isMyTurn) {
+			tmpString = "Yes";
+		} else {
+			tmpString = "No";
+		}
+        this.text2 = this.add.bitmapText(694, 60, 'atari', tmpString, 40).setAlpha(0);
         this.text3 = this.add.bitmapText(180, 200, 'atari', 'So close!\n\nClick to\ntry again', 48).setAlpha(0);
 
         this.createGrid(state);
-        this.createArrow();
 		
+		this.mpService.playerData.isMyTurn = state.next.id === this.mpService.playerData.id;
+
 		this.mpService.playerData.position = state.positions[this.mpService.playerData.id];
+		
         this.currentColor = valueOfColor(state.positions[state.next.id].color);
 		
+		this.mpService.nextPlayerId = state.next.id;
+
 		this.mpService.playerData.corner = this.getCorner(this.mpService.playerData.position.x, this.mpService.playerData.position.y);
-		this.playersCorner = this.mpService.playerData.corner;
-
-        this.allowClick = this.mpService.playerData.isMyTurn;
-
+		
+		this.playersCorner = this.getCorner(state.positions[this.mpService.nextPlayerId].x, state.positions[this.mpService.nextPlayerId].y);
+		
+		this.createArrow();
+	
+		this.setArrow(this.playersCorner);
+		
         for (let i = 0; i < this.matched.length; i++)
         {
             let block = this.matched[i];
@@ -103,7 +114,9 @@ export default class FloodMultiPlayer extends Phaser.Scene {
             this.createEmitter(colorOfIndex(i));
         }
 
-        this.revealGrid();
+		this.allowClick = this.mpService.playerData.isMyTurn;
+		
+        this.revealGrid();		
     }
 
     createGrid(state) {
@@ -134,7 +147,6 @@ export default class FloodMultiPlayer extends Phaser.Scene {
         
     }
 	
-	
 	getCorner(x, y) {
 		switch (x) {
             case 0:
@@ -158,11 +170,10 @@ export default class FloodMultiPlayer extends Phaser.Scene {
         }
 	}
 	
-	
     createArrow() {
         // Creating arrow
         this.arrow = this.add.image(85, 48, 'flood', 'arrow-white').setOrigin(0).setAlpha(0);
-        let getArrowTween = () => this.tweens.add({
+        this.getArrowTween = () => this.tweens.add({
             targets: this.arrow,
             x: this.playersCorner % 2 == 0 ? '-=24' : '+=24',
             ease: 'Sine.easeInOut',
@@ -170,52 +181,35 @@ export default class FloodMultiPlayer extends Phaser.Scene {
             yoyo: true,
             repeat: -1
         });
-        this.arrow.move = getArrowTween();
-
-        // Choosing corner
-        this.input.keyboard.on('keydown_Q', () => {
-            if (this.playersCorner != 1) {
-                this.arrow.move.remove();
-                this.playersCorner = 1;
-                this.currentColor = this.grid[0][0].getData('color');
-                this.arrow.setPosition(85, 48);
-                this.arrow.flipX = false;
-                this.arrow.move = getArrowTween();
-            }
-        });
-        this.input.keyboard.on('keydown_W', () => {
-            if (this.playersCorner != 2) {
-                this.arrow.move.stop();
-                this.playersCorner = 2;
-                this.currentColor = this.grid[13][0].getData('color');
-                this.arrow.setPosition(671, 48);
-                this.arrow.flipX = true;
-                this.arrow.move = getArrowTween();
-            }
-        });
-        this.input.keyboard.on('keydown_E', () => {
-            if (this.playersCorner != 3) {
-                this.arrow.move.stop();
-                this.playersCorner = 3;
-                this.currentColor = this.grid[0][13].getData('color');
-                this.arrow.setPosition(85, 516);
-                this.arrow.flipX = false;
-                this.arrow.move = getArrowTween();
-            }
-        });
-        this.input.keyboard.on('keydown_R', () => {
-            if (this.playersCorner != 4) {
-                this.arrow.move.stop();
-                this.playersCorner = 4;
-                this.currentColor = this.grid[13][13].getData('color');
-                this.arrow.setPosition(671, 516);
-                this.arrow.flipX = true;
-                this.arrow.move = getArrowTween();
-            }
-        });
+		this.arrow.move = this.getArrowTween();
     }
-
-    revealGrid() {
+	
+	setArrow(corner) {
+		this.arrow.move.stop();
+		switch (corner) {
+			case 1:
+				this.arrow.setPosition(85, 48);
+				this.arrow.flipX = false;
+				break;
+			case 2:
+				this.arrow.setPosition(671, 48);
+				this.arrow.flipX = true;
+				break;
+			case 3:
+				this.arrow.setPosition(85, 516);
+				this.arrow.flipX = false;
+				break;
+			case 4:
+				this.arrow.setPosition(671, 516);
+				this.arrow.flipX = true;
+				break;
+			default:
+				console.log("How did you just do this?! o_0");
+		}		
+		this.arrow.move = this.getArrowTween();
+	}
+    
+	revealGrid() {
         this.tweens.add({
             targets: this.gridBG,
             y: 300,
@@ -342,7 +336,6 @@ export default class FloodMultiPlayer extends Phaser.Scene {
 		this.allowClick = false;
 		
 		if (!this.mpService.playerData.isMyTurn){
-			this.playersCorner = this.getCorner(state.positions[this.mpService.nextPlayerId].x, state.positions[this.mpService.nextPlayerId].y);
 			
 			let oldColor = this.grid[this.getCoords(this.playersCorner).x][this.getCoords(this.playersCorner).y].getData('color');
 			let newColor = valueOfColor(state.positions[this.mpService.nextPlayerId].color);
@@ -360,9 +353,6 @@ export default class FloodMultiPlayer extends Phaser.Scene {
 				this.cursor.setVisible(false);
 
 				this.moves--;
-
-				this.text2.setText(Phaser.Utils.String.Pad(this.moves, 2, '0', 1));
-
 
 
 				this.floodFillFromCorner(oldColor, newColor);
@@ -384,8 +374,15 @@ export default class FloodMultiPlayer extends Phaser.Scene {
 		
 		this.currentColor = valueOfColor(state.positions[this.mpService.playerData.id].color);
 		
+		this.setArrow(this.playersCorner);
+		
+		if (this.mpService.playerData.isMyTurn) {
+			this.text2.setText("Yes");
+		} else {
+			this.text2.setText("No");
+		}
+		
 		this.allowClick = this.mpService.playerData.isMyTurn;
-
 	}
 	
     debugBinds() {
@@ -522,8 +519,11 @@ export default class FloodMultiPlayer extends Phaser.Scene {
 
             this.moves--;
 
-            this.text2.setText(Phaser.Utils.String.Pad(this.moves, 2, '0', 1));
-
+            if (this.mpService.playerData.isMyTurn) {
+				this.text2.setText("Yes");
+			} else {
+				this.text2.setText("Yes");
+			}
 
 			this.mpService.socket.send(JSON.stringify({
 				type: "makeAction",
@@ -594,7 +594,6 @@ export default class FloodMultiPlayer extends Phaser.Scene {
 
         this.time.delayedCall(t, function () {
 
-            this.allowClick = true;
 
             if (this.checkWon())
             {
@@ -826,7 +825,7 @@ export default class FloodMultiPlayer extends Phaser.Scene {
             case 4:
                 return {x: 13, y: 13};
             default:
-                console.log("How did you just do this?! o_0")
+                console.log("How did you just do this?! o_0");
         }
     }
 	
