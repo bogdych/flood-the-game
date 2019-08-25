@@ -82,7 +82,7 @@ public class WebSocketGameHandler extends TextWebSocketHandler {
         }
     }
 
-    private void sendToAll(IGame game, String message) throws IOException {
+    public void sendToAll(IGame game, String message) throws IOException {
         for (Player player : game.getPlayers()) {
             WebSocketSession playerSession = sessions.get(player.getId());
             playerSession.sendMessage(new TextMessage(message));

@@ -8,13 +8,10 @@ import com.summerschool.flood.message.MakeActionMessage;
 import lombok.Data;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,7 +24,7 @@ public class GameService {
     private final static Logger LOG = LoggerFactory.getLogger(GameService.class);
 
     @Value("${flood.session.waitTime}")
-    private static int waitTime;
+    private int waitTime;
 
     private final List<IGame> games = new CopyOnWriteArrayList<>();
     private final Map<String, Player> players = new ConcurrentHashMap<>();
@@ -113,21 +110,6 @@ public class GameService {
             default:
                 throw new ServiceException("Invalid game name");
         }
-    }
-
-    @Scheduled(fixedDelay = 5000)
-    public void checkGames() {
-        final Instant time = Instant.now();
-
-        Object ready[] = games.stream()
-                .filter(game -> checkWaiting(game, time) && game.run(time, waitTime))
-                .toArray();
-
-        LOG.info("Ready games: {}", ready.length);
-    }
-
-    private boolean checkWaiting(IGame game, Instant time) {
-        return Duration.between(game.getLastPlayerTime(), time).getSeconds() >= waitTime;
     }
 
 }
