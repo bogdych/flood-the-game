@@ -72,16 +72,6 @@ export default class FloodMultiPlayer extends Phaser.Scene {
         this.width = state.field.width;
         this.height = state.field.height;
 
-        this.text1 = this.add.bitmapText(684, 30, 'atari', 'Your Move', 20).setAlpha(0);
-		let tmpString;
-		if (this.mpService.playerData.isMyTurn) {
-			tmpString = "Yes";
-		} else {
-			tmpString = "No";
-		}
-        this.text2 = this.add.bitmapText(694, 60, 'atari', tmpString, 40).setAlpha(0);
-        this.text3 = this.add.bitmapText(180, 200, 'atari', 'So close!\n\nClick to\ntry again', 48).setAlpha(0);
-
         this.createGrid(state);
 		
 		this.mpService.playerData.isMyTurn = state.next.id === this.mpService.playerData.id;
@@ -95,6 +85,16 @@ export default class FloodMultiPlayer extends Phaser.Scene {
 		this.mpService.playerData.corner = this.getCorner(this.mpService.playerData.position.x, this.mpService.playerData.position.y);
 		
 		this.playersCorner = this.getCorner(state.positions[this.mpService.nextPlayerId].x, state.positions[this.mpService.nextPlayerId].y);
+		
+		this.text1 = this.add.bitmapText(684, 30, 'atari', 'You', 20).setAlpha(0);
+		let tmpString;
+		if (this.mpService.playerData.isMyTurn) {
+			tmpString = 'Yes';
+		} else {
+			tmpString = 'No';
+		}
+        this.text2 = this.add.bitmapText(694, 60, 'atari', tmpString, 40).setAlpha(0);
+        this.text3 = this.add.bitmapText(180, 200, 'atari', 'So close!\n\nClick to\ntry again', 48).setAlpha(0);
 		
 		this.createArrow();
 	
@@ -302,20 +302,6 @@ export default class FloodMultiPlayer extends Phaser.Scene {
             targets: [ this.text5 ],
             alpha: 1,
             ease: 'Power3',
-            delay: i
-        });
-
-        i += 0;
-
-        let movesTween = this.tweens.addCounter({
-            from: 0,
-            to: 25,
-            ease: 'Power1',
-            onUpdate: function (tween, targets, text)
-            {
-                text.setText(Phaser.Utils.String.Pad(tween.getValue().toFixed(), 2, '0', 1));
-            },
-            onUpdateParams: [ this.text2 ],
             delay: i
         });
 
