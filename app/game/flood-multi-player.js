@@ -87,13 +87,7 @@ export default class FloodMultiPlayer extends Phaser.Scene {
 		this.playersCorner = this.getCorner(state.positions[this.mpService.nextPlayerId].x, state.positions[this.mpService.nextPlayerId].y);
 		
 		this.text1 = this.add.bitmapText(684, 30, 'atari', 'You', 20).setAlpha(0);
-		let tmpString;
-		if (this.mpService.playerData.isMyTurn) {
-			tmpString = 'Yes';
-		} else {
-			tmpString = 'No';
-		}
-        this.text2 = this.add.bitmapText(694, 60, 'atari', tmpString, 40).setAlpha(0);
+        this.text2 = this.add.bitmapText(694, 60, 'atari', this.mpService.playerData.isMyTurn ? 'Yes' : 'No', 40).setAlpha(0);
         this.text3 = this.add.bitmapText(180, 200, 'atari', 'So close!\n\nClick to\ntry again', 48).setAlpha(0);
 		
 		this.createArrow();
