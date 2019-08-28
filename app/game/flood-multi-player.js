@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import Icon from "./icon";
 import MultiplayerService from './multi-player-service';
 import {valueOfColor, colorOfIndex, COLORS} from './colors';
+
 export default class FloodMultiPlayer extends Phaser.Scene {
     constructor() {
         super({ key: 'FloodMultiPlayer'});
@@ -28,12 +29,14 @@ export default class FloodMultiPlayer extends Phaser.Scene {
     }
     
     create() {
-        this.add.image(400, 300, 'flood', 'background');
-        this.gridBG = this.add.image(400, 600 + 300, 'flood', 'grid');
+        this.centDifX = - 400 + window.innerWidth / 2;
+        this.centDifY =  - 300 + window.innerHeight / 2;
+        this.add.image(window.innerWidth / 2, window.innerHeight / 2, 'flood', 'background');
+        this.gridBG = this.add.image(400 + this.centDifX, 600 + 300 + this.centDifY, 'flood', 'grid');
 
         this.mpService = new MultiplayerService(() => {
             this.mpService.findFloodGameStandard();
-            this.messege = this.add.text(300, 300, 'Search game', {fill: '#000000', fontSize: '20px'});
+            this.messege = this.add.text(300 + this.centDifX, 300 + this.centDifY, 'Search game', {fill: '#000000', fontSize: '20px'});
         });
 
         this.mpService.onGameReady = (msg) => {
@@ -42,7 +45,7 @@ export default class FloodMultiPlayer extends Phaser.Scene {
             console.log(JSON.stringify(msg));
             this.messege.destroy();
 
-            this.messege = this.add.text(300, 300, 'Game found!', {fill: '#000000', fontSize: '20px'});
+            this.messege = this.add.text(300 + this.centDifX, 300 + this.centDifY, 'Game found!', {fill: '#000000', fontSize: '20px'});
             setTimeout(() => this.messege.destroy(), 2000);
 
             this.mpService.nextPlayerId = msg.state.next.id;
@@ -57,21 +60,21 @@ export default class FloodMultiPlayer extends Phaser.Scene {
     }
 
     createAfterGameSearch(state) {
-        this.icon[0] = new Icon(this, 'grey', 16, 156);
-        this.icon[1] = new Icon(this, 'red', 16, 312);
-        this.icon[2] = new Icon(this, 'green', 16, 458);
-        this.icon[3] = new Icon(this, 'yellow', 688, 156);
-        this.icon[4] = new Icon(this, 'blue', 688, 312);
-        this.icon[5] = new Icon(this, 'purple', 688, 458);
+        this.icon[0] = new Icon(this, 'grey', 16 + this.centDifX, 156  + this.centDifY);
+        this.icon[1] = new Icon(this, 'red', 16 + this.centDifX, 312  + this.centDifY);
+        this.icon[2] = new Icon(this, 'green', 16 + this.centDifX, 458  + this.centDifY);
+        this.icon[3] = new Icon(this, 'yellow', 688 + this.centDifX, 156  + this.centDifY);
+        this.icon[4] = new Icon(this, 'blue', 688 + this.centDifX, 312  + this.centDifY);
+        this.icon[5] = new Icon(this, 'purple', 688 + this.centDifX, 458  + this.centDifY);
 
-        this.cursor = this.add.image(16, 156, 'flood', 'cursor-over').setOrigin(0).setVisible(false);
+        this.cursor = this.add.image(16 + this.centDifX, 156 + this.centDifY, 'flood', 'cursor-over').setOrigin(0).setVisible(false);
 
         this.width = state.field.width;
         this.height = state.field.height;
 
-        this.text1 = this.add.bitmapText(684, 30, 'atari', 'Moves', 20).setAlpha(0);
-        this.text2 = this.add.bitmapText(694, 60, 'atari', '00', 40).setAlpha(0);
-        this.text3 = this.add.bitmapText(180, 200, 'atari', 'So close!\n\nClick to\ntry again', 48).setAlpha(0);
+        this.text1 = this.add.bitmapText(684 + this.centDifX, 30 + this.centDifY, 'atari', 'You', 20).setAlpha(0);
+        this.text2 = this.add.bitmapText(694 + this.centDifX, 60 + this.centDifY, 'atari', this.mpService.playerData.isMyTurn ? 'Yes' : 'No', 40).setAlpha(0);
+        this.text3 = this.add.bitmapText(180 + this.centDifX, 200 + this.centDifY, 'atari', 'So close!\n\nClick to\ntry again', 48).setAlpha(0);
 
         this.createGrid(state);
         this.createArrow();
@@ -106,8 +109,8 @@ export default class FloodMultiPlayer extends Phaser.Scene {
 
             for (let y = 0; y < state.field.height; y++)
             {
-                let sx = 166 + (x * 36);
-                let sy = 66 + (y * 36);
+                let sx = 166 + (x * 36) + this.centDifX;
+                let sy = 66 + (y * 36) + this.centDifY;
                 let color = state.field.cells[x][y].color;
 
                 let block = this.add.image(sx, -600 + sy, 'flood', color);
@@ -151,7 +154,8 @@ export default class FloodMultiPlayer extends Phaser.Scene {
 
     createArrow() {
         // Creating arrow
-        this.arrow = this.add.image(85, 48, 'flood', 'arrow-white').setOrigin(0).setAlpha(0);
+        this.arrow = this.add.image(109 - 24 + this.centDifX, 48 + this.centDifY, 'flood', 'arrow-white').setOrigin(0).setAlpha(0);
+
         let getArrowTween = () => this.tweens.add({
             targets: this.arrow,
             x: this.playersCorner % 2 == 0 ? '-=24' : '+=24',
@@ -168,7 +172,7 @@ export default class FloodMultiPlayer extends Phaser.Scene {
                 this.arrow.move.remove();
                 this.playersCorner = 1;
                 this.currentColor = this.grid[0][0].getData('color');
-                this.arrow.setPosition(85, 48);
+                this.arrow.setPosition(85 + this.centDifX, 48 + this.centDifY);
                 this.arrow.flipX = false;
                 this.arrow.move = getArrowTween();
             }
@@ -178,7 +182,7 @@ export default class FloodMultiPlayer extends Phaser.Scene {
                 this.arrow.move.stop();
                 this.playersCorner = 2;
                 this.currentColor = this.grid[13][0].getData('color');
-                this.arrow.setPosition(671, 48);
+                this.arrow.setPosition(671 + this.centDifX, 48 + this.centDifY);
                 this.arrow.flipX = true;
                 this.arrow.move = getArrowTween();
             }
@@ -188,7 +192,7 @@ export default class FloodMultiPlayer extends Phaser.Scene {
                 this.arrow.move.stop();
                 this.playersCorner = 3;
                 this.currentColor = this.grid[0][13].getData('color');
-                this.arrow.setPosition(85, 516);
+                this.arrow.setPosition(85 + this.centDifX, 516 + this.centDifY);
                 this.arrow.flipX = false;
                 this.arrow.move = getArrowTween();
             }
@@ -198,7 +202,7 @@ export default class FloodMultiPlayer extends Phaser.Scene {
                 this.arrow.move.stop();
                 this.playersCorner = 4;
                 this.currentColor = this.grid[13][13].getData('color');
-                this.arrow.setPosition(671, 516);
+                this.arrow.setPosition(671 + this.centDifX, 516 + this.centDifY);
                 this.arrow.flipX = true;
                 this.arrow.move = getArrowTween();
             }
@@ -491,10 +495,10 @@ export default class FloodMultiPlayer extends Phaser.Scene {
     }
 
     startFlow() {
-        this.matched.sort(function (a, b) {
+        this.matched.sort( (a, b) => {
 
-            let aDistance = Phaser.Math.Distance.Between(a.x, a.y, 166, 66);
-            let bDistance = Phaser.Math.Distance.Between(b.x, b.y, 166, 66);
+            let aDistance = Phaser.Math.Distance.Between(a.x, a.y, 166 + this.centDifX, 66 + this.centDifY);
+            let bDistance = Phaser.Math.Distance.Between(b.x, b.y, 166 + this.centDifX, 66 + this.centDifY);
 
             return aDistance - bDistance;
 
@@ -720,7 +724,7 @@ export default class FloodMultiPlayer extends Phaser.Scene {
 
         //  Put the winning monster in the middle
 
-        let monster = this.add.image(400, 300, 'flood', 'icon-' + colorOfIndex(this.currentColor));
+        let monster = this.add.image(400 + this.centDifX, 300 + this.centDifY, 'flood', 'icon-' + this.frames[this.currentColor]);
 
         monster.setScale(0);
 
@@ -739,11 +743,11 @@ export default class FloodMultiPlayer extends Phaser.Scene {
     boom() {
         let color = colorOfIndex(Phaser.Math.Between(0, 5));
 
-        this.emitters[color].explode(8, Phaser.Math.Between(128, 672), Phaser.Math.Between(28, 572))
+        this.emitters[color].explode(8, Phaser.Math.Between(128 + this.centDifX, 672 + this.centDifX), Phaser.Math.Between(28 + this.centDifY, 572 + this.centDifY))
 
         color = colorOfIndex(Phaser.Math.Between(0, 5));
 
-        this.emitters[color].explode(8, Phaser.Math.Between(128, 672), Phaser.Math.Between(28, 572))
+        this.emitters[color].explode(8, Phaser.Math.Between(128 + this.centDifX, 672 + this.centDifY), Phaser.Math.Between(28 + this.centDifX, 572 + this.centDifY))
 
         this.time.delayedCall(100, this.boom, [], this);
     }
