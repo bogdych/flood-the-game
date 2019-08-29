@@ -1,32 +1,18 @@
 import Phaser from 'phaser';
 import Icon from './Icon';
+import FloodScene from "./flood-scene";
 
-export default class FloodSinglePlayer extends Phaser.Scene {
+export default class FloodSinglePlayer extends FloodScene {
+
     constructor() {
-        super({ key: 'FloodSinglePlayer' });
-
-        this.allowClick = true;
-
+        super('FloodSinglePlayer');
         this.currentColor = '';
-
-        this.emitters = {};
-
-        this.grid = [];
-        this.matched = [];
-
         this.moves = 25;
-
         this.frames = [ 'blue', 'green', 'grey', 'purple', 'red', 'yellow' ];
     }
 
-    preload() {
-        this.load.bitmapFont('atari', 'assets/fonts/bitmap/atari-smooth.png', 'assets/fonts/bitmap/atari-smooth.xml');
-        this.load.atlas('flood', 'assets/games/flood/blobs.png', 'assets/games/flood/blobs.json');
-    }
-
     create() {
-        this.add.image(400, 300, 'flood', 'background');
-        this.gridBG = this.add.image(400, 600 + 300, 'flood', 'grid');
+		super.create();
 
         this.icon1 = new Icon(this, 'grey', 16, 156);
         this.icon2 = new Icon(this, 'red', 16, 312);
@@ -81,7 +67,7 @@ export default class FloodSinglePlayer extends Phaser.Scene {
             this.createEmitter(this.frames[i]);
         }
 
-        this.createArrow();
+        this.createArrow('+=24');
 
         this.text1 = this.add.bitmapText(684, 30, 'atari', 'Moves', 20).setAlpha(0);
         this.text2 = this.add.bitmapText(694, 60, 'atari', '00', 40).setAlpha(0);
@@ -110,20 +96,20 @@ export default class FloodSinglePlayer extends Phaser.Scene {
         }
     }
 
-    createArrow() {
-        this.arrow = this.add.image(109 - 24, 48, 'flood', 'arrow-white').setOrigin(0).setAlpha(0);
-
-        this.tweens.add({
-
-            targets: this.arrow,
-            x: '+=24',
-            ease: 'Sine.easeInOut',
-            duration: 900,
-            yoyo: true,
-            repeat: -1
-
-        });
-    }
+    // createArrow() {
+    //     this.arrow = this.add.image(109 - 24, 48, 'flood', 'arrow-white').setOrigin(0).setAlpha(0);
+	//
+    //     this.tweens.add({
+	//
+    //         targets: this.arrow,
+    //         x: '+=24',
+    //         ease: 'Sine.easeInOut',
+    //         duration: 900,
+    //         yoyo: true,
+    //         repeat: -1
+	//
+    //     });
+    // }
 
     revealGrid() {
         this.tweens.add({
@@ -330,7 +316,7 @@ export default class FloodSinglePlayer extends Phaser.Scene {
     }
 
     onIconDown(pointer, gameObject) {
-        if (!this.allowClick)
+        if (!this._inputEnabled)
         {
             return;
         }
@@ -404,7 +390,7 @@ export default class FloodSinglePlayer extends Phaser.Scene {
         let t = 0;
         let inc = (this.matched.length > 98) ? 6 : 12;
 
-        this.allowClick = false;
+        this._inputEnabled = false;
 
         for (let i = 0; i < this.matched.length; i++)
         {
@@ -428,7 +414,7 @@ export default class FloodSinglePlayer extends Phaser.Scene {
 
         this.time.delayedCall(t, function () {
 
-            this.allowClick = true;
+            this._inputEnabled = true;
 
             if (this.checkWon())
             {
