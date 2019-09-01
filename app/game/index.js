@@ -2,29 +2,22 @@ import MainMenu from './main-menu';
 import FloodSinglePlayer from './flood-single-player';
 import FloodMultiPlayer from './flood-multi-player';
 import canvas from './canvas.css';
-
-let wratio = window.innerWidth / window.innerHeight;
-let w = window.innerWidth;
-let h = window.innerHeight;
-let ratio = 4 / 3;
-if (wratio < ratio) {
-	w = Math.min(800, w) + "px";
-	h = (w / ratio) + "px";
-} else {
-	h = Math.min(600, h) + "px";
-	w = (h * ratio) + "px";
-}
+import img from '../assets/games/background/background.png';
+import body from './back.css';
 
 var config = {
     type: Phaser.WEBGL,
-	//width: canvas.width;
-    class: "canvas",
+	width: 800,
+	height: 600,
     pixelArt: true,
     parent: 'phaser-example',
     scene: [ MainMenu, FloodMultiPlayer, FloodSinglePlayer ],
 };
-let as = '<canvas class="canvas" id="can"></canvas>';
-var div = document.getElementsByTagName("body");
-div.innerHTML = as;
-//document.getElementsByTagName("body")[0].appendChild(div);*/
+
+window.onload = () => {
+	var can = document.querySelector("canvas");
+	can.id = "canvas";
+}
+
 var game = new Phaser.Game(config);
+
