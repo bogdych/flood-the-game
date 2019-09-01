@@ -22,6 +22,7 @@ import static com.summerschool.flood.game.GameStatus.*;
 @Data
 public class FloodGame implements IGame {
 
+    private final static int DEFAULT_PLAYERS_COUNT = 4;
     private final static Logger LOG = LoggerFactory.getLogger(FloodGame.class);
     private static ObjectMapper mapper = new ObjectMapper();
     private List<Player> players = new CopyOnWriteArrayList<>();
@@ -36,16 +37,23 @@ public class FloodGame implements IGame {
     private static int minPlayers;
     private int maxPlayers;
 
-    public FloodGame(GameType type, int maxPlayersCount) {
+    public FloodGame(GameType type, Map<String,String> params) {
         this.createTime = Instant.now();
         this.type = type;
-        this.maxPlayers = maxPlayersCount;
+        this.maxPlayers = getMaxPlayersFromParams(params);
         Field field = createField(type);
         this.state = new FloodState(field);
         this.firstSearch = new DepthFirstSearch(field);
         this.id = UUID.randomUUID().toString();
 
         LOG.info("Created game session UUID: {} time: {}\nGenerate field: \n{}", id, createTime, state.getField().getPrettyView());
+    }
+
+    private int getMaxPlayersFromParams(Map<String,String> params) {
+        return Optional
+                .ofNullable(params.get("maxPlayers"))
+                .map(Integer::valueOf)
+                .orElse(DEFAULT_PLAYERS_COUNT);
     }
 
     private Field createField(GameType type) {
@@ -77,7 +85,8 @@ public class FloodGame implements IGame {
     public boolean matchType(FindGameMessage findGame) {
         return findGame.getName() == GameName.FLOOD &&
                 findGame.getGameType() == type &&
-                state.getGameStatus() == NOT_READY;
+                state.getGameStatus() == NOT_READY &&
+                maxPlayers == getMaxPlayersFromParams(findGame.getGameParams());
     }
 
     @Override

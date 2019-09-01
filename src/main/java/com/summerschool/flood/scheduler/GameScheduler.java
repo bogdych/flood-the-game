@@ -8,8 +8,7 @@ import com.summerschool.flood.message.GameStateMessage;
 import com.summerschool.flood.message.MessageType;
 import com.summerschool.flood.server.GameService;
 
-import lombok.AllArgsConstructor;
-
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +19,7 @@ import org.springframework.stereotype.Component;
 import java.time.Duration;
 import java.time.Instant;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Component
 public class GameScheduler implements Runnable {
 

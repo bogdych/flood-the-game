@@ -8,6 +8,6 @@ public enum GameType {
     FAST,
 
     @JsonProperty("standard")
-    STANDARD
+    STANDARD,
 
 }

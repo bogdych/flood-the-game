@@ -10,13 +10,14 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class FloodGameTest {
     @Test
     public void testValidMakeStep() {
-        FloodGame floodGame = new FloodGame(GameType.STANDARD, 4);
+        FloodGame floodGame = new FloodGame(GameType.STANDARD, new HashMap<>());
         floodGame.setPlayers(new CopyOnWriteArrayList<>(Arrays.asList(
                 new Player("0", "Zero", floodGame),
                 new Player("1", "First", floodGame),

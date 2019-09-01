@@ -99,7 +99,7 @@ public class GameService {
     private IGame createGame(Player player, FindGameMessage message) {
         switch (message.getName()) {
             case FLOOD:
-                IGame game = new FloodGame(message.getGameType(), 4);
+                IGame game = new FloodGame(message.getGameType(),  message.getGameParams());
                 game.addPlayer(player);
                 games.add(game);
                 return game;
