@@ -1,0 +1,5 @@
+body { 
+    background-image: url(../assets/games/background/background.png); /* Путь к фоновому рисунку */
+    background-position: left bottom; /* Положение фона */
+    background-repeat: repeat; /* Повторяем фон*/
+}
