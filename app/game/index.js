@@ -36,7 +36,7 @@ window.onload = () => {
 };
 
 window.onresize﻿ = () => {
-  resize();
+    resize();
 };
 
 var game = new Phaser.Game(config);
