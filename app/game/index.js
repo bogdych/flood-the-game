@@ -20,20 +20,6 @@ function resize() {
     }
 }
 
-/*
-let w = window.innerWidth;
-let h = window.innerHeight;
-let wratio = w / h;
-let ratio = 4 / 3;
-
-if (wratio < ratio) {
-	w = Math.min(800, w);
-	h = (w / ratio);
-} else {
-	h = Math.min(600, h);
-	w = (h * ratio);
-}
-*/
 var config = {
     type: Phaser.WEBGL,
 	width: 800,
