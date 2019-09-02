@@ -30,14 +30,12 @@ var config = {
 };
 
 window.onload = () => {
-	var can = document.querySelector("canvas");
+	const can = document.querySelector("canvas");
 	can.id = "canvas";
     resize();
 };
 
-window.onresize﻿ = () => {
-    resize();
-};
+window.onresize﻿ = resize;
 
 var game = new Phaser.Game(config);
 
