@@ -17,7 +17,7 @@ var config = {
 window.onload = () => {
 	var can = document.querySelector("canvas");
 	can.id = "canvas";
-}
+};
 
 var game = new Phaser.Game(config);
 
