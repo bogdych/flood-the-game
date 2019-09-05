@@ -4,7 +4,9 @@ import com.summerschool.flood.game.*;
 import com.summerschool.flood.game.flood.FloodGame;
 import com.summerschool.flood.message.FindGameMessage;
 import com.summerschool.flood.message.MakeActionMessage;
+
 import lombok.Data;
+
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,8 +42,11 @@ public class GameService {
             IGame game = games.stream()
                     .filter(g -> g.matchType(message) && g.addPlayer(player))
                     .findFirst()
-                    .orElse(createGame(player, message));
+                    .orElseGet(() -> createGame(player, message));
             player.setActiveGame(game);
+
+            LOG.info("Add player to game session: {} add time: {}", game.getId(), game.getUpdateTime());
+
             return game;
         } else {
             throw new ServiceException("Player has active game session " + playerID);
@@ -94,7 +99,7 @@ public class GameService {
     private IGame createGame(Player player, FindGameMessage message) {
         switch (message.getName()) {
             case FLOOD:
-                IGame game = new FloodGame(message.getGameType(), 4);
+                IGame game = new FloodGame(message.getGameType(),  message.getGameParams());
                 game.addPlayer(player);
                 games.add(game);
                 return game;

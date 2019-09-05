@@ -3,9 +3,14 @@ package com.summerschool.flood.game;
 import com.summerschool.flood.message.FindGameMessage;
 import com.summerschool.flood.message.MakeActionMessage;
 
+import java.time.Instant;
 import java.util.List;
 
 public interface IGame {
+
+    Instant getCreateTime();
+
+    Instant getUpdateTime();
 
     String getId();
 
@@ -23,5 +28,9 @@ public interface IGame {
 
     boolean isReady();
 
+    boolean isNotReady();
+
     boolean isFinished();
+
+    void start();
 }
