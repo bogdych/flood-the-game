@@ -28,12 +28,11 @@ public class WebSocketGameHandler extends TextWebSocketHandler {
 
     private final static Logger LOG = LoggerFactory.getLogger(WebSocketGameHandler.class);
     private final GameService service;
-    private final ObjectMapper mapper;
+    private final ObjectMapper mapper = new ObjectMapper();
     private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
 
-    public WebSocketGameHandler(GameService service, ObjectMapper mapper) {
+    public WebSocketGameHandler(GameService service) {
         this.service = service;
-        this.mapper = mapper;
     }
 
     @Override
