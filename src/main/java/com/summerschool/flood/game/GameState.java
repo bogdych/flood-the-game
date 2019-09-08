@@ -8,8 +8,8 @@ import java.util.Map;
 
 public interface GameState {
 
-    /** @return Winner, if the game is finished, or null otherwise */
-    Player getWinner();
+    /** @return List of Winner (if the game is finished) or null otherwise */
+    Map<Player, String> getPlayersStatus();
 
     /** @return Next player supposed to make an action [could be null] */
     Player getNext();

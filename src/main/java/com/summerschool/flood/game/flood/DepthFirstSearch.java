@@ -2,6 +2,9 @@ package com.summerschool.flood.game.flood;
 
 import com.summerschool.flood.game.IFirstSearch;
 
+import java.util.List;
+import java.util.ArrayList;
+
 public class DepthFirstSearch implements IFirstSearch {
 
     private Color startColor;
@@ -12,10 +15,12 @@ public class DepthFirstSearch implements IFirstSearch {
         this.field = field;
     }
 
-    public void start(int x, int y, Color color) {
+    public List<Cell> start(int x, int y, Color color, List<Cell> otherPlayers) {
+        List<Cell> changeList= new ArrayList<>();
         startColor = field.getCells()[x][y].getColor();
         fillColor = color;
-        runNext(x, y);
+        runNext(x, y, otherPlayers, changeList);
+        return changeList;
     }
 
     /**
@@ -23,17 +28,20 @@ public class DepthFirstSearch implements IFirstSearch {
      * @param x X coordinate of the cell to be filled
      * @param y Y coordinate of the cell to be filled
      */
-    private void runNext(int x, int y) {
-        if(!field.isInternalAt(x, y) ||
+    private void runNext(int x, int y, List<Cell> otherPlayers, List<Cell> changeList) {
+        if (!field.isInternalAt(x, y) ||
             field.getCells()[x][y].getColor() != startColor)
             return;
 
+        if (otherPlayers.contains(field.getCells()[x][y]))
+            changeList.add(field.getCells()[x][y]);
+
         field.getCells()[x][y].setColor(fillColor);
 
-        runNext(x - 1, y);
-        runNext(x + 1, y);
-        runNext(x, y - 1);
-        runNext(x, y + 1);
+        runNext(x - 1, y, otherPlayers, changeList);
+        runNext(x + 1, y, otherPlayers, changeList);
+        runNext(x, y - 1, otherPlayers, changeList);
+        runNext(x, y + 1, otherPlayers, changeList);
     }
 
 }

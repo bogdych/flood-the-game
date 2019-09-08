@@ -1,7 +1,9 @@
 package com.summerschool.flood.game;
 
+import com.summerschool.flood.game.flood.Cell;
 import com.summerschool.flood.game.flood.Color;
 
+import java.util.List;
 public interface IFirstSearch {
-    void start(int x, int y, Color color);
+    List<Cell> start(int x, int y, Color color, List<Cell> otherPlayers);
 }

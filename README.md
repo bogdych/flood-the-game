@@ -166,9 +166,10 @@ Note: property winner could be null (depends on the game status)
             "color": "red"
           }
     },
-    "winner": {
-      "id": "<winner id>",
-      "nickname": "<Winner optional nickname, could be null>"
+    "playersStatus": {
+      "070d40ed-9d7d-6efb-e420-d8e0a6e6fa20": "winner",
+      ...
+      "123f40ef-1d9f-3adc-e333-cca0a0e6fa19": "loser"
     },
     "field": {
       "cells": [
