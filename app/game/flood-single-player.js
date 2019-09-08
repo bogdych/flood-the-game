@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import Icon from './Icon';
+import Icon from './icon';
 import FloodScene from "./flood-scene";
 
 export default class FloodSinglePlayer extends FloodScene {
