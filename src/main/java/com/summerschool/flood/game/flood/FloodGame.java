@@ -135,7 +135,7 @@ public class FloodGame implements IGame {
 
         Cell tmpCell = state.getPositions().get(this.state.getNext());
 
-        return !state.getPlayersStatus().getOrDefault(player, "null").equals("loser") &&
+        return !state.getPlayersStatus().getOrDefault(player, "inGame").equals("loser") &&
                 player.equals(this.state.getNext()) &&
                 tmpCell.getX() == action.getX() && tmpCell.getY() == action.getY() &&
                 tmpCell.getColor() != action.getColor() &&
@@ -152,6 +152,7 @@ public class FloodGame implements IGame {
                     if (state.getPositions().get(player).getX() == cell.getX() &&
                             state.getPositions().get(player).getY() == cell.getY()) {
                         state.getPlayersStatus().put(player, "loser");
+                        LOG.info("Game session UUID: {}\nPlayer Id: {}\nChange playerStatus: loser", id, player.getId());
                         break;
                     }
                 }
@@ -167,8 +168,14 @@ public class FloodGame implements IGame {
 
     private void changeStateToNext() {
         int index = players.indexOf(state.getNext());
-        Player next = players.get((index + 1) % players.size());
-        state.setNext(next);
+        Player next = null;
+        for (int i = (index + 1) % players.size(); next  == null; i = (i + 1) % players.size()) {
+            if (state.getPlayersStatus().getOrDefault(players.get(i), "inGame") == "inGame"){
+                next = players.get(i);
+                state.setNext(next);
+
+            }
+        }
     }
 
     private void changeStateToFinish(Player winner) {
