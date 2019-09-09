@@ -3,6 +3,8 @@ import Icon from "./icon";
 import MultiplayerService from './multi-player-service';
 import {colorOfIndex, valueOfColor} from './colors';
 import FloodScene from "./flood-scene";
+import Arrow from './arrow';
+import PlayerData from './player-data';
 
 export default class FloodMultiPlayer extends FloodScene {
 
@@ -90,8 +92,23 @@ export default class FloodMultiPlayer extends FloodScene {
 		this.text2 = this.add.bitmapText(694, 60, 'atari', turnMessage, 40).setAlpha(0);
 		this.text3 = this.add.bitmapText(180, 200, 'atari', 'So close!\n\nClick to\ntry again', 48).setAlpha(0);
 
-		this.createArrow(this.playersCorner % 2 === 0 ? '-=24' : '+=24');
-		this.setArrow(this.playersCorner);
+		//this.createArrow(this.playersCorner % 2 === 0 ? '-=24' : '+=24');
+		//this.setArrow(this.playersCorner);
+		
+
+		const myCorner = this.getCorner(
+			playerPositions[playerData.id].x,
+			playerPositions[playerData.id].y
+			);
+		this.playerArrow = new Arrow(this, myCorner, true);
+		this.enemyArrow = new Arrow(this, this.playersCorner, false);
+		if (playerData.isMyTurn) {
+			this.enemyArrow.hideArrow();
+		}
+		else {
+			this.playerArrow.stopTween();
+		}
+
 
 		for (let i = 0; i < this.matched.length; i++) {
 			let block = this.matched[i];
@@ -171,30 +188,30 @@ export default class FloodMultiPlayer extends FloodScene {
 	// 	this.arrow.move = this.getArrowTween();
 	// }
 
-	setArrow(corner) {
-		this.arrow.move.stop();
-		switch (corner) {
-			case 1:
-				this.arrow.setPosition(85, 48);
-				this.arrow.flipX = false;
-				break;
-			case 2:
-				this.arrow.setPosition(671, 48);
-				this.arrow.flipX = true;
-				break;
-			case 3:
-				this.arrow.setPosition(85, 516);
-				this.arrow.flipX = false;
-				break;
-			case 4:
-				this.arrow.setPosition(671, 516);
-				this.arrow.flipX = true;
-				break;
-			default:
-				console.log("How did you just do this?! o_0");
-		}
-		this.getArrowTween(this.playersCorner % 2 === 0 ? '-=24' : '+=24');
-	}
+	// setArrow(corner) {
+	// 	this.arrow.move.stop();
+	// 	switch (corner) {
+	// 		case 1:
+	// 			this.arrow.setPosition(85, 48);
+	// 			this.arrow.flipX = false;
+	// 			break;
+	// 		case 2:
+	// 			this.arrow.setPosition(671, 48);
+	// 			this.arrow.flipX = true;
+	// 			break;
+	// 		case 3:
+	// 			this.arrow.setPosition(85, 516);
+	// 			this.arrow.flipX = false;
+	// 			break;
+	// 		case 4:
+	// 			this.arrow.setPosition(671, 516);
+	// 			this.arrow.flipX = true;
+	// 			break;
+	// 		default:
+	// 			console.log("How did you just do this?! o_0");
+	// 	}
+	// 	this.getArrowTween(this.playersCorner % 2 === 0 ? '-=24' : '+=24');
+	// }
 
 	revealGrid() {
 		this.tweens.add({
@@ -282,7 +299,7 @@ export default class FloodMultiPlayer extends FloodScene {
 		});
 
 		this.tweens.add({
-			targets: [this.arrow],
+			targets: [this.playerArrow.arrow],
 			alpha: 1,
 			ease: 'Power3',
 			delay: i
@@ -319,12 +336,17 @@ export default class FloodMultiPlayer extends FloodScene {
 		this.playersCorner = this.getCorner(state.positions[this.mpService.nextPlayerId].x, state.positions[this.mpService.nextPlayerId].y);
 		this.currentColor = valueOfColor(state.positions[playerData.id].color);
 
-		this.setArrow(this.playersCorner);
+		//this.setArrow(this.playersCorner);
 
 		if (playerData.isMyTurn) {
 			this.text2.setText("Yes");
+			this.playerArrow.restartTween();
+			this.enemyArrow.hideArrow();
 		} else {
 			this.text2.setText("No");
+			this.playerArrow.stopTween();
+			this.enemyArrow.moveArrow(this.playersCorner);
+			this.enemyArrow.showArrow();
 		}
 
 		this.inputEnabled = playerData.isMyTurn;
@@ -364,7 +386,7 @@ export default class FloodMultiPlayer extends FloodScene {
 		this.cursor.setVisible(true);
 
 		//  Change arrow color
-		this.arrow.setFrame('arrow-' + colorOfIndex(newColor));
+		this.playerArrow.arrow.setFrame('arrow-' + colorOfIndex(newColor));
 
 		//  Jiggle the monster :)
 		let monster = icon.getData('monster');
@@ -392,7 +414,7 @@ export default class FloodMultiPlayer extends FloodScene {
 			duration: 300
 		});
 
-		this.arrow.setFrame('arrow-white');
+		this.playerArrow.arrow.setFrame('arrow-white');
 	}
 
 	onIconDown(pointer, gameObject) {
@@ -544,7 +566,7 @@ export default class FloodMultiPlayer extends FloodScene {
 				this.icons[3].monster, this.icons[3].shadow,
 				this.icons[4].monster, this.icons[4].shadow,
 				this.icons[5].monster, this.icons[5].shadow,
-				this.arrow,
+				this.playerArrow.arrow,
 				this.cursor
 			],
 			alpha: 0,
@@ -606,7 +628,7 @@ export default class FloodMultiPlayer extends FloodScene {
 
 		//  Show everything :)
 
-		this.arrow.setFrame('arrow-white');
+		this.playerArrow.arrow.setFrame('arrow-white');
 
 		this.tweens.add({
 			targets: [
@@ -616,7 +638,7 @@ export default class FloodMultiPlayer extends FloodScene {
 				this.icons[3].monster, this.icons[3].shadow,
 				this.icons[4].monster, this.icons[4].shadow,
 				this.icons[5].monster, this.icons[5].shadow,
-				this.arrow,
+				this.playerArrow.arrow,
 				this.cursor
 			],
 			alpha: 1,
