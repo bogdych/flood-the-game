@@ -3,16 +3,10 @@ export default class Arrow {
         this.getCoods = function (arg) {
             switch (arg) {
                 case 1:
-                    this.x = 85;
-                    this.y = 48;
                     return {x: 85, y: 48};
                 case 2:
-                    this.x = 671;
-                    this.y = 48;
                     return {x: 671, y: 48};
                 case 3:
-                    this.x = 85;
-                    this.y = 516;
                     return {x: 85, y: 516};
                 case 4:
                     return {x: 671, y: 516};
@@ -27,7 +21,6 @@ export default class Arrow {
 
         this.isActive = isActive;
         this.isMirrored = corner % 2 === 0;
-        this.isStopped = false;
 
         this.arrow = scene.add.image(
             this.x, 
@@ -38,7 +31,7 @@ export default class Arrow {
 
 
         if (this.isActive) {
-            this.getArrowTween = () => this.scene.tweens.add({
+            this.arrow.move = this.scene.tweens.add({
                 targets: this.arrow,
                 x: this.isMirrored ? '-=24' : '+=24',
                 ease: 'Sine.easeInOut',
@@ -46,26 +39,29 @@ export default class Arrow {
                 yoyo: true,
                 repeat: -1
             });
-            this.arrow.move = this.getArrowTween();
+            this.arrow.move.pause();
+            console.log('tween created and paused');
         } 
         else {
-            this.arrow.setTint(0x777777);
+            this.arrow.setTint(0x777777).setAlpha(0.75);
         }
     }
 
-    restartTween() {
-        if (this.isActive && !this.isStopped) {
-            this.arrow.move.remove();
-            this.arrow.move = this.getArrowTween();
-            this.isStopped = false;
+    startTween() {
+        if (this.isActive && this.arrow.move.isPaused()) {
+            this.arrow.move.restart();
+            this.arrow.move.pause();
+            this.arrow.move.resume();
+            console.log('tween started');
         }
     }
 
     stopTween() {
-        if (this.isActive && !this.isStopped) {
-            this.arrow.move.remove();
+        if (this.isActive && this.arrow.move.isPlaying()) {
+            this.arrow.move.restart();
+            this.arrow.move.pause();
             this.arrow.setPosition(this.x, this.y);
-            this.isStopped = true;
+            console.log('tween stopped');
         }
     }
 

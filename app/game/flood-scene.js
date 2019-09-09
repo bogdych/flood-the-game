@@ -35,24 +35,4 @@ export default class FloodScene extends Phaser.Scene {
 		this.gridBG = this.add.image(400, 600 + 300, 'flood', 'grid');
 	}
 
-	createArrow(tweenX) {
-		this.arrow = this.add.image(
-			85,
-			48,
-			'flood',
-			'arrow-white').setOrigin(0).setAlpha(0);
-		this.getArrowTween(tweenX);
-	}
-
-	getArrowTween(tweenX) {
-		this.arrow.move = this.tweens.add({
-			targets: this.arrow,
-			x: tweenX,
-			ease: 'Sine.easeInOut',
-			duration: 900,
-			yoyo: true,
-			repeat: -1
-		});
-	}
-
 }

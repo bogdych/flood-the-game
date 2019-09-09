@@ -104,6 +104,7 @@ export default class FloodMultiPlayer extends FloodScene {
 		this.enemyArrow = new Arrow(this, this.playersCorner, false);
 		if (playerData.isMyTurn) {
 			this.enemyArrow.hideArrow();
+			this.playerArrow.startTween();
 		}
 		else {
 			this.playerArrow.stopTween();
@@ -173,45 +174,6 @@ export default class FloodMultiPlayer extends FloodScene {
 				console.log("Wrong! (${x},${y}) corner");
 		}
 	}
-
-	// createArrow() {
-	// 	// Creating arrow
-	// 	this.arrow = this.add.image(85, 48, 'flood', 'arrow-white').setOrigin(0).setAlpha(0);
-	// 	this.getArrowTween = () => this.tweens.add({
-	// 		targets: this.arrow,
-	// 		x: this.playersCorner % 2 === 0 ? '-=24' : '+=24',
-	// 		ease: 'Sine.easeInOut',
-	// 		duration: 900,
-	// 		yoyo: true,
-	// 		repeat: -1
-	// 	});
-	// 	this.arrow.move = this.getArrowTween();
-	// }
-
-	// setArrow(corner) {
-	// 	this.arrow.move.stop();
-	// 	switch (corner) {
-	// 		case 1:
-	// 			this.arrow.setPosition(85, 48);
-	// 			this.arrow.flipX = false;
-	// 			break;
-	// 		case 2:
-	// 			this.arrow.setPosition(671, 48);
-	// 			this.arrow.flipX = true;
-	// 			break;
-	// 		case 3:
-	// 			this.arrow.setPosition(85, 516);
-	// 			this.arrow.flipX = false;
-	// 			break;
-	// 		case 4:
-	// 			this.arrow.setPosition(671, 516);
-	// 			this.arrow.flipX = true;
-	// 			break;
-	// 		default:
-	// 			console.log("How did you just do this?! o_0");
-	// 	}
-	// 	this.getArrowTween(this.playersCorner % 2 === 0 ? '-=24' : '+=24');
-	// }
 
 	revealGrid() {
 		this.tweens.add({
@@ -299,7 +261,7 @@ export default class FloodMultiPlayer extends FloodScene {
 		});
 
 		this.tweens.add({
-			targets: [this.playerArrow.arrow],
+			targets: [this.playerArrow.arrow, this.enemyArrow.arrow],
 			alpha: 1,
 			ease: 'Power3',
 			delay: i
@@ -340,7 +302,7 @@ export default class FloodMultiPlayer extends FloodScene {
 
 		if (playerData.isMyTurn) {
 			this.text2.setText("Yes");
-			this.playerArrow.restartTween();
+			this.playerArrow.startTween();
 			this.enemyArrow.hideArrow();
 		} else {
 			this.text2.setText("No");
@@ -567,6 +529,7 @@ export default class FloodMultiPlayer extends FloodScene {
 				this.icons[4].monster, this.icons[4].shadow,
 				this.icons[5].monster, this.icons[5].shadow,
 				this.playerArrow.arrow,
+				this.enemyArrow.arrow,
 				this.cursor
 			],
 			alpha: 0,
@@ -639,6 +602,7 @@ export default class FloodMultiPlayer extends FloodScene {
 				this.icons[4].monster, this.icons[4].shadow,
 				this.icons[5].monster, this.icons[5].shadow,
 				this.playerArrow.arrow,
+				this.enemyArrow.arrow,
 				this.cursor
 			],
 			alpha: 1,
