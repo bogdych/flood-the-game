@@ -40,7 +40,6 @@ export default class Arrow {
                 repeat: -1
             });
             this.arrow.move.pause();
-            console.log('tween created and paused');
         } 
         else {
             this.arrow.setTint(0x777777).setAlpha(0.75);
@@ -52,7 +51,6 @@ export default class Arrow {
             this.arrow.move.restart();
             this.arrow.move.pause();
             this.arrow.move.resume();
-            console.log('tween started');
         }
     }
 
@@ -61,7 +59,6 @@ export default class Arrow {
             this.arrow.move.restart();
             this.arrow.move.pause();
             this.arrow.setPosition(this.x, this.y);
-            console.log('tween stopped');
         }
     }
 

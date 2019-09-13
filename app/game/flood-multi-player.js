@@ -16,6 +16,11 @@ export default class FloodMultiPlayer extends FloodScene {
 		this.playersCorner = 1;
 	}
 
+	preload() {
+		super.preload();
+		this.load.multiatlas('avatars', 'assets/games/flood/avatars.json', 'assets/games/flood');
+	}
+
 	create() {
 		super.create();
 		this.initMPlayerSession();
@@ -110,6 +115,16 @@ export default class FloodMultiPlayer extends FloodScene {
 			this.playerArrow.stopTween();
 		}
 
+		this.avatarArray = [];
+		for (let propt in playerPositions) {
+			this.avatarArray.push(
+				this.getAvatar(
+					playerPositions[propt].x,
+					playerPositions[propt].y, 
+					this.avatarArray.length
+				)
+			);
+		}
 
 		for (let i = 0; i < this.matched.length; i++) {
 			let block = this.matched[i];
@@ -124,6 +139,31 @@ export default class FloodMultiPlayer extends FloodScene {
 
 		this.inputEnabled = playerData.isMyTurn;
 		this.revealGrid();
+	}
+
+	getAvatar(x, y, count) {
+		let name = '';
+		switch (count) {
+			case 0:
+				name = 'crown.png';
+				break;
+			case 1:
+				name = 'star.png';
+				break;
+			case 2:
+				name = 'ghost.png';
+				break;
+			case 3:
+				name = 'robot.png';
+				break;
+			default:
+				console.log('count error in getAvatar');
+		}
+		return this.add.image(
+			166 + x * 36, 
+			66 + y * 36,
+			'avatars',
+			name);
 	}
 
 	createGrid(state) {
@@ -266,6 +306,15 @@ export default class FloodMultiPlayer extends FloodScene {
 			ease: 'Power3',
 			delay: i
 		});
+
+		for (let i = 0; i < this.avatarArray.length; i++) {
+			this.tweens.add({
+				targets: [this.avatarArray[i]],
+				alpha: 1,
+				ease: 'Power3',
+				delay: i
+			});
+		}
 
 		this.time.delayedCall(i, this.startInputEvents, [], this);
 	}
@@ -537,6 +586,15 @@ export default class FloodMultiPlayer extends FloodScene {
 			delay: 500
 		});
 
+		for (let i = 0; i < this.avatarArray.length; i++) {
+			this.tweens.add({
+				targets: [this.avatarArray[i]],
+				alpha: 0,
+				duration: 500,
+				delay: 500
+			});
+		}
+
 		let i = 500;
 
 		for (let y = 13; y >= 0; y--) {
@@ -609,6 +667,15 @@ export default class FloodMultiPlayer extends FloodScene {
 			duration: 500,
 			delay: 500
 		});
+
+		for (let i = 0; i < this.avatarArray.length; i++) {
+			this.tweens.add({
+				targets: [this.avatarArray[i]],
+				alpha: 0,
+				duration: 500,
+				delay: 500
+			});
+		}
 
 		let i = 500;
 
