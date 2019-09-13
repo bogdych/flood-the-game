@@ -70,13 +70,14 @@ public class FloodGame implements IGame {
     @Override
     public synchronized void removePlayer(Player player) {
         players.remove(player);
+        state.getPlayersStatus().remove(player);
         player.setActiveGame(null);
 
         if (players.size() == 0) {
             state.setGameStatus(FINISHED);
         } else if (players.size() == 1) {
             changeStateToFinish(players.get(0));
-        } else if (state.getNext().equals(player)) {
+        } else if (state.getNext() != null && state.getNext().equals(player)) {
             changeStateToNext();
         }
     }
@@ -167,17 +168,32 @@ public class FloodGame implements IGame {
     }
 
     private void changeStateToNext() {
-        int index = players.indexOf(state.getNext());
-        Player next = null;
-        for (int i = (index + 1) % players.size(); next  == null; i = (i + 1) % players.size()) {
-            if (state.getPlayersStatus().getOrDefault(players.get(i), "inGame") == "inGame"){
-                next = players.get(i);
-                state.setNext(next);
+        Player next = getValidNext();
 
-            }
+        if (players.size() == state.getPlayersStatus().size() + 1) {
+            changeStateToFinish(next);
+            return;
+        }
+        state.setNext(next);
+    }
+    private int iNextModSize(int i) {
+        if (players.size() != 0) {
+            return (i + 1) % players.size();
+        } else {
+            return i;
         }
     }
+    private Player getValidNext() {
 
+        int index = players.indexOf(state.getNext());
+
+        for (int i = iNextModSize(index); i != index; i = iNextModSize(i)) {
+            if (state.getPlayersStatus().getOrDefault(players.get(i), "inGame").equals("inGame")) {
+                return players.get(i);
+            }
+        }
+        return players.get(index);
+    }
     private void changeStateToFinish(Player winner) {
         state.getPlayersStatus().put(winner, "winner");
         for (Player player : players) {

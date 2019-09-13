@@ -38,20 +38,9 @@ export default class FloodMultiPlayer extends FloodScene {
 			this.onGameFound(msg.state);
 		};
 
-		this.mpService.onGameState = (msg) => {
-			switch (msg.state.gameStatus) {
-				case "ready":
-					this.onStateChange(msg.state);
-					break;
-				case "finished":
-					this.onFinished(msg.state, this.mpService.playerData);
-					break;
-			}
-		};
+		this.mpService.onGameState = (msg) => this.onStateChange(msg.state);
 
-		this.mpService.onServerError = (msg) => {
-			alert(msg.message);
-		};
+		this.mpService.onServerError = (msg) => alert(msg.message);
 		
 		this.mpService.socket.onClose(() => {
 			this.scene.stop('FloodMultiPlayer');
@@ -100,7 +89,7 @@ export default class FloodMultiPlayer extends FloodScene {
 		this.text1 = this.add.bitmapText(684, 30, 'atari', 'You', 20).setAlpha(0);
 		const turnMessage = playerData.isMyTurn ? 'Yes' : 'No';
 		this.text2 = this.add.bitmapText(694, 60, 'atari', turnMessage, 40).setAlpha(0);
-		this.text3 = this.add.bitmapText(180, 200, 'atari', 'So close!\n\nClick to\ntry again', 48).setAlpha(0);
+		this.text3 = this.add.bitmapText(180, 200, 'atari', 'So close!\n\nClick to\nmain menu', 48).setAlpha(0);
 
 		this.createArrow(this.playersCorner % 2 === 0 ? '-=24' : '+=24');
 		this.setArrow(this.playersCorner);
@@ -307,7 +296,11 @@ export default class FloodMultiPlayer extends FloodScene {
 		this.inputEnabled = false;
 		const playerData = this.mpService.playerData;
 
-
+		if (state.gameStatus === "finished") {
+			this.onFinished(state, this.mpService.playerData);
+			return;
+		}
+			
 		let oldColor = this.grid[this.getCoords(this.playersCorner).x][this.getCoords(this.playersCorner).y].getData('color');
 		let newColor = valueOfColor(state.positions[this.mpService.nextPlayerId].color);
 
@@ -346,6 +339,16 @@ export default class FloodMultiPlayer extends FloodScene {
 		}
 
 		this.inputEnabled = playerData.isMyTurn;
+		
+		if (state.playersStatus[playerData.id] === "loser") {
+			this.stopInputEvents();
+			this.text1.setText("Lost!");
+			this.text2.setText(':(');
+            this.time.delayedCall(6000,
+                                () => this.input.once('pointerdown', this.resetGame, this),
+                                [],
+                                this);
+		}
 	}
 
 	onFinished(state, playerData) {
@@ -609,8 +612,9 @@ export default class FloodMultiPlayer extends FloodScene {
 	}
 
 	resetGame() {
+		this.mpService.socket.socket.close();
 		this.scene.stop('FloodMultiPlayer');
-		this.scene.start('FloodMultiPlayer');
+		this.scene.start('MainMenu');
 	}
 
 	gameWon() {
@@ -637,6 +641,7 @@ export default class FloodMultiPlayer extends FloodScene {
 		});
 
 		this.time.delayedCall(2000, this.boom, [], this);
+		this.time.delayedCall(6000, () => this.input.once('pointerdown', this.resetGame, this), [], this);
 	}
 
 	boom() {
