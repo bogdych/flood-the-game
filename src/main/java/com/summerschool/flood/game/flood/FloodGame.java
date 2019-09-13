@@ -89,6 +89,11 @@ public class FloodGame implements IGame {
     }
 
     @Override
+    public synchronized void removePlayers() {
+        players.forEach(player -> player.setActiveGame(null));
+    }
+
+    @Override
     public boolean matchType(FindGameMessage findGame) {
         return findGame.getName() == GameName.FLOOD &&
                 findGame.getGameType() == type &&

@@ -70,6 +70,7 @@ public class GameService {
     public void finishGame(IGame game) {
         boolean removed = games.remove(game);
         if (removed) {
+            game.removePlayers();
             LOG.info("Finish game session: {}", game.getId());
         }
     }
