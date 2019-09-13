@@ -344,11 +344,11 @@ export default class FloodMultiPlayer extends FloodScene {
 			this.stopInputEvents();
 			this.text1.setText("Lost!");
 			this.text2.setText(':(');
-            /*this.time.delayedCall(6000,
+            this.time.delayedCall(6000,
                                 () => this.input.once('pointerdown', this.resetGame, this),
                                 [],
                                 this);
-								*/
+								
 		}
 	}
 

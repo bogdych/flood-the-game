@@ -72,6 +72,7 @@ public class FloodGame implements IGame {
         players.remove(player);
         state.getPlayersStatus().remove(player);
         player.setActiveGame(null);
+		state.getPositions().remove(player);
 
         if (players.size() == 0) {
             state.setGameStatus(FINISHED);
@@ -170,6 +171,10 @@ public class FloodGame implements IGame {
     private void changeStateToNext() {
         Player next = getValidNext();
 
+		if (next == null) {
+			changeStateToFinish(state.getNext());
+			return;
+		}
         if (players.size() == state.getPlayersStatus().size() + 1) {
             changeStateToFinish(next);
             return;
@@ -192,7 +197,12 @@ public class FloodGame implements IGame {
                 return players.get(i);
             }
         }
-        return players.get(index);
+		/*
+		if (state.getPlayersStatus().size() + 1 == players.size()) {
+			return players.get(index);
+		}
+		*/
+		return null;
     }
     private void changeStateToFinish(Player winner) {
         state.getPlayersStatus().put(winner, "winner");
