@@ -68,9 +68,10 @@ public class GameService {
     }
 
     public void finishGame(IGame game) {
-        games.remove(game);
+        boolean removed = games.remove(game);
 
-        LOG.info("Finish game session: {}", game.getId());
+        if (removed)
+            LOG.info("Finish game session: {}", game.getId());
     }
 
     public void disconnect(String playerID) throws ServiceException {
