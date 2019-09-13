@@ -10,13 +10,19 @@ public class FieldTraverse {
         this.field = field;
     }
 
-    public void traverse(int x, int y, Color color, FieldTraverseCallback onCell) {
+    public void traverse(int x, int y, FieldTraverseCallback onCell) {
         color = field.getCells()[x][y].getColor();
         callback = onCell;
-        next(x, y);
+
+        int left = -1, right = 1, top = 1, bottom = -1;
+
+        next(x, y + top, right, top);
+        next(x + right, y, right, bottom);
+        next(x, y + bottom, left, bottom);
+        next(x + left, y, left, top);
     }
 
-    private void next(int x, int y) {
+    private void next(int x, int y, int advanceX, int advanceY) {
         if (!field.isInternalAt(x, y) || field.getCells()[x][y].getColor() != color) {
             return;
         }
@@ -24,10 +30,8 @@ public class FieldTraverse {
         final Cell cell = field.getCells()[x][y];
         callback.accept(cell);
 
-        next(x - 1, y);
-        next(x + 1, y);
-        next(x, y - 1);
-        next(x, y + 1);
+        next(x + advanceX, y, advanceX, advanceY);
+        next(x, y + advanceY, advanceX, advanceY);
     }
 
 }

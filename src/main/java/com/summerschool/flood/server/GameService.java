@@ -69,24 +69,26 @@ public class GameService {
 
     public void finishGame(IGame game) {
         boolean removed = games.remove(game);
-
-        if (removed)
+        if (removed) {
             LOG.info("Finish game session: {}", game.getId());
+        }
     }
 
-    public void disconnect(String playerID) throws ServiceException {
+    public IGame disconnect(String playerID) throws ServiceException {
         Player player = findPlayer(playerID);
 
         IGame game = player.getActiveGame();
         if (game != null) {
             game.removePlayer(player);
             if (game.isFinished()) {
-                LOG.info("Deleted the game with id: {}", game.getId());
                 finishGame(game);
             }
         }
+
         players.remove(playerID);
         LOG.info("Disconnect player: {} nickname: {}", player.getId(), player.getNickname());
+
+        return game;
     }
 
     private Player findPlayer(String playerID) {

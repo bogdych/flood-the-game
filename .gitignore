@@ -1,13 +1,12 @@
 node_modules
-/src/main/resources/static/
 *.map
-
 
 HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**
 !**/src/test/**
+src/main/resources/static/
 
 ### STS ###
 .apt_generated
