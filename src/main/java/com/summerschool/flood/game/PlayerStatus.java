@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public enum PlayerStatus {
 
-    @JsonProperty("Winner")
+    @JsonProperty("winner")
     WINNER,
 
-    @JsonProperty("Loser")
+    @JsonProperty("loser")
     LOSER,
 
     @JsonProperty("inGame")
