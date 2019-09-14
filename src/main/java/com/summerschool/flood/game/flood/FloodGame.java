@@ -26,7 +26,9 @@ public class FloodGame implements IGame {
     private final static Logger LOG = LoggerFactory.getLogger(FloodGame.class);
     private static ObjectMapper mapper = new ObjectMapper();
     private List<Player> players = new CopyOnWriteArrayList<>();
+    private List<Player> activePlayers = new ArrayList<>();
     private IFirstSearch firstSearch;
+    private FieldTraverse fieldTraverse;
     private FloodState state;
     private String id;
     private GameType type;
@@ -44,6 +46,7 @@ public class FloodGame implements IGame {
         Field field = createField(type);
         this.state = new FloodState(field);
         this.firstSearch = new DepthFirstSearch(field);
+        this.fieldTraverse = new FieldTraverse(field);
         this.id = UUID.randomUUID().toString();
 
         LOG.info("Created game session UUID: {} time: {}\nGenerate field: \n{}", id, createTime, state.getField().getPrettyView());
@@ -70,15 +73,23 @@ public class FloodGame implements IGame {
     @Override
     public synchronized void removePlayer(Player player) {
         players.remove(player);
+        state.getPositions().remove(player);
+        state.getPlayersStatus().remove(player);
+
         player.setActiveGame(null);
 
         if (players.size() == 0) {
             state.setGameStatus(FINISHED);
         } else if (players.size() == 1) {
             changeStateToFinish(players.get(0));
-        } else if (state.getNext().equals(player)) {
+        } else if (state.getNext() == player) {
             changeStateToNext();
         }
+    }
+
+    @Override
+    public synchronized void removePlayers() {
+        players.forEach(player -> player.setActiveGame(null));
     }
 
     @Override
@@ -134,7 +145,9 @@ public class FloodGame implements IGame {
         Field field = this.state.getField();
 
         Cell tmpCell = state.getPositions().get(this.state.getNext());
-        return player.equals(this.state.getNext()) &&
+
+        return !state.getPlayersStatus().getOrDefault(player, PlayerStatus.IN_GAME).equals(PlayerStatus.LOSER) &&
+                player.equals(this.state.getNext()) &&
                 tmpCell.getX() == action.getX() && tmpCell.getY() == action.getY() &&
                 tmpCell.getColor() != action.getColor() &&
                 field.isInternalAt(action.getX(), action.getY()) &&
@@ -142,31 +155,57 @@ public class FloodGame implements IGame {
     }
 
     private void makeStep(FloodAction action) {
-        firstSearch.start(action.getX(), action.getY(), action.getColor());
+        int x = action.getX();
+        int y = action.getY();
+        Color color = action.getColor();
 
-        if (state.getField().isFilledByOneColor()) {
+        firstSearch.start(x, y, color);
+        fieldTraverse.traverse(x, y, cell -> {
+            activePlayers.removeIf(player -> {
+                Cell pos = state.getPositions().get(player);
+                if (pos.equals(cell)) {
+                    state.getPlayersStatus().put(player, PlayerStatus.LOSER);
+                    return true;
+                }
+
+                return false;
+            });
+        });
+
+        LOG.info("Active players: {}", activePlayers.size());
+
+        if (state.getField().isFilledByOneColor() || activePlayers.size() == 1) {
             changeStateToFinish(this.state.getNext());
         } else {
             changeStateToNext();
         }
     }
 
-
     private void changeStateToNext() {
-        int index = players.indexOf(state.getNext());
-        Player next = players.get((index + 1) % players.size());
-        state.setNext(next);
+        Player prevPlayer = state.getNext();
+        int prevPlayerIndex = activePlayers.indexOf(prevPlayer);
+
+        if (prevPlayerIndex == -1) {
+            int i = ThreadLocalRandom.current().nextInt(activePlayers.size());
+            state.setNext(activePlayers.get(i));
+        } else {
+            int i = (prevPlayerIndex + 1) % activePlayers.size();
+            state.setNext(activePlayers.get(i));
+        }
     }
 
     private void changeStateToFinish(Player winner) {
-        state.setWinner(winner);
+        state.getPlayersStatus().replaceAll((player, playerStatus) -> PlayerStatus.LOSER);
+        state.getPlayersStatus().put(winner, PlayerStatus.WINNER);
+
+        LOG.info("Winner: {} ", winner.getId());
+
         state.setNext(null);
         state.setGameStatus(FINISHED);
     }
 
     public void setPlayersStartPosition() {
         Field field = state.getField();
-        Player player = players.get(ThreadLocalRandom.current().nextInt(players.size()));
 
         switch (players.size()) {
             case 4:
@@ -180,6 +219,10 @@ public class FloodGame implements IGame {
                 break;
         }
 
+        players.forEach(p -> state.getPlayersStatus().put(p, PlayerStatus.IN_GAME));
+        activePlayers.addAll(players);
+
+        Player player = players.get(ThreadLocalRandom.current().nextInt(players.size()));
         state.setNext(player);
     }
 
@@ -201,7 +244,7 @@ public class FloodGame implements IGame {
     @Data
     public class FloodState implements GameState {
         private Player next;
-        private Player winner;
+        private Map<Player, PlayerStatus> playersStatus = new HashMap<>();
         private Field field;
         private Map<Player, Cell> positions = new HashMap<>();
         private GameStatus gameStatus = NOT_READY;
