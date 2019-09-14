@@ -26,7 +26,7 @@ public class FloodGame implements IGame {
     private final static Logger LOG = LoggerFactory.getLogger(FloodGame.class);
     private static ObjectMapper mapper = new ObjectMapper();
     private List<Player> players = new CopyOnWriteArrayList<>();
-    private List<Player> activePlayers;
+    private List<Player> activePlayers = new ArrayList<>();
     private IFirstSearch firstSearch;
     private FieldTraverse fieldTraverse;
     private FloodState state;
@@ -73,7 +73,6 @@ public class FloodGame implements IGame {
     @Override
     public synchronized void removePlayer(Player player) {
         players.remove(player);
-		activePlayers.remove(player);
         state.getPositions().remove(player);
         state.getPlayersStatus().remove(player);
 
@@ -221,7 +220,6 @@ public class FloodGame implements IGame {
         }
 
         players.forEach(p -> state.getPlayersStatus().put(p, PlayerStatus.IN_GAME));
-        activePlayers = new ArrayList<>();
         activePlayers.addAll(players);
 
         Player player = players.get(ThreadLocalRandom.current().nextInt(players.size()));
