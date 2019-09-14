@@ -199,6 +199,8 @@ public class FloodGame implements IGame {
         state.getPlayersStatus().replaceAll((player, playerStatus) -> PlayerStatus.LOSER);
         state.getPlayersStatus().put(winner, PlayerStatus.WINNER);
 
+        LOG.info("Winner: {} ", winner.getId());
+
         state.setNext(null);
         state.setGameStatus(FINISHED);
     }
