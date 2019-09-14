@@ -1,37 +1,49 @@
 package com.summerschool.flood.game.flood;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class FieldTraverse {
 
     private Field field;
     private Color color;
     private FieldTraverseCallback callback;
+    private Set<Cell> visited = new HashSet<>();
 
     public FieldTraverse(Field field) {
         this.field = field;
     }
 
     public void traverse(int x, int y, FieldTraverseCallback onCell) {
-        color = field.getCells()[x][y].getColor();
+        Cell cell = field.getCells()[x][y];
+        color = cell.getColor();
         callback = onCell;
+        visited.clear();
+        visited.add(cell);
 
-        int left = -1, right = 1, top = 1, bottom = -1;
+        // skip origin cell
 
-        next(x, y + top, right, top);
-        next(x + right, y, right, bottom);
-        next(x, y + bottom, left, bottom);
-        next(x + left, y, left, top);
+        next(x + 1, y);
+        next(x - 1, y);
+        next(x, y + 1);
+        next(x, y - 1);
     }
 
-    private void next(int x, int y, int advanceX, int advanceY) {
-        if (!field.isInternalAt(x, y) || field.getCells()[x][y].getColor() != color) {
+    private void next(int x, int y) {
+        if (!field.isInternalAt(x, y) ||
+             field.getCells()[x][y].getColor() != color ||
+             visited.contains(field.getCells()[x][y])) {
             return;
         }
 
         final Cell cell = field.getCells()[x][y];
         callback.accept(cell);
+        visited.add(cell);
 
-        next(x + advanceX, y, advanceX, advanceY);
-        next(x, y + advanceY, advanceX, advanceY);
+        next(x + 1, y);
+        next(x - 1, y);
+        next(x, y + 1);
+        next(x, y - 1);
     }
 
 }
