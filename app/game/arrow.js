@@ -3,9 +3,9 @@ import { GRID_COODS, DELTA } from "./flood-multi-player";
 
 
 export default class Arrow {
-    constructor (scene, x, y, corner, isActive) {
+    constructor (scene, x, y, corner, myCorner, isActive) {
         this.isActive = isActive;
-        this.isMirrored = corner % 2 === 0;
+        this.isMirrored = myCorner % 2 === 0;
 
 
         // this.getCoods = function (arg) {
@@ -53,14 +53,13 @@ export default class Arrow {
             this.y, 
             'flood', 
             'arrow-white').setAlpha(0);
-        this.arrow.flipX = this.isMirrored;
-
-
-        if (this.isActive) {
-            this.arrow.move = this.scene.tweens.add({
-                targets: this.arrow,
-                x: this.isMirrored ? '-=24' : '+=24',
-                ease: 'Sine.easeInOut',
+            
+            
+            if (this.isActive) {
+                this.arrow.move = this.scene.tweens.add({
+                    targets: this.arrow,
+                    x: this.isMirrored ? '-=24' : '+=24',
+                    ease: 'Sine.easeInOut',
                 duration: 900,
                 yoyo: true,
                 repeat: -1
@@ -70,8 +69,10 @@ export default class Arrow {
         else {
             this.arrow.setTint(0x777777);
         }
+        this.isMirrored = corner % 2 === 0;
+        this.arrow.flipX = this.isMirrored;
     }
-
+    
     startTween() {
         if (this.isActive && this.arrow.move.isPaused()) {
             this.arrow.move.restart();

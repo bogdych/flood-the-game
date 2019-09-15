@@ -129,6 +129,7 @@ export default class FloodMultiPlayer extends FloodScene {
 			playerPositions[nextPlayerId].x,
 			playerPositions[nextPlayerId].y,
 			this.playersCorner, 
+			myCorner,
 			true);
 		// this.enemyArrow = new Arrow(
 		// 	this,
@@ -412,6 +413,7 @@ export default class FloodMultiPlayer extends FloodScene {
 			this.playerArrow.moveArrow(
 				state.positions[this.mpService.nextPlayerId],
 				this.playersCorner);
+			this.playerArrow.arrow.setFrame('arrow-white');
 			//this.enemyArrow.showArrow();
 		}
 
@@ -422,7 +424,7 @@ export default class FloodMultiPlayer extends FloodScene {
 			this.text1.setText("Lost!");
 			this.text2.setText(':(');
             this.time.delayedCall(6000,
-                                () => this.input.once('pointerdown', this.resetGame, this),
+                                () => this.input.once('pointerup', this.resetGame, this),
                                 [],
                                 this);
 								
@@ -455,11 +457,16 @@ export default class FloodMultiPlayer extends FloodScene {
 
 		let newColor = icon.getData('color');
 
+		if (this.isInputEnabled()) {
 		//  Valid color?
-		if (newColor !== this.currentColor) {
+			if (newColor !== this.currentColor) {
+				this.cursor.setFrame('cursor-over');
+			} else {
+				this.cursor.setFrame('cursor-invalid');
+			}
+		}
+		else {
 			this.cursor.setFrame('cursor-over');
-		} else {
-			this.cursor.setFrame('cursor-invalid');
 		}
 
 		this.cursor.setPosition(icon.x, icon.y);
@@ -472,7 +479,7 @@ export default class FloodMultiPlayer extends FloodScene {
 		this.cursor.setVisible(true);
 
 		//  Change arrow color
-		this.playerArrow.arrow.setFrame('arrow-' + colorOfIndex(newColor));
+		if (this.isInputEnabled()) this.playerArrow.arrow.setFrame('arrow-' + colorOfIndex(newColor));
 
 		//  Jiggle the monster :)
 		let monster = icon.getData('monster');
