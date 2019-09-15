@@ -39,7 +39,7 @@ export default class FloodMultiPlayer extends FloodScene {
 	update() {
 		if (this.isGameStarted) {
 			this.children.bringToTop(this.playerArrow.arrow);
-			this.children.bringToTop(this.enemyArrow.arrow);
+			// this.children.bringToTop(this.enemyArrow.arrow);
 		}
 	}
 
@@ -126,18 +126,18 @@ export default class FloodMultiPlayer extends FloodScene {
 			);
 		this.playerArrow = new Arrow(
 			this, 
-			playerPositions[playerData.id].x,
-			playerPositions[playerData.id].y,
-			myCorner, 
-			true);
-		this.enemyArrow = new Arrow(
-			this,
 			playerPositions[nextPlayerId].x,
 			playerPositions[nextPlayerId].y,
 			this.playersCorner, 
-			false);
+			true);
+		// this.enemyArrow = new Arrow(
+		// 	this,
+		// 	playerPositions[nextPlayerId].x,
+		// 	playerPositions[nextPlayerId].y,
+		// 	this.playersCorner, 
+		// 	false);
 		if (playerData.isMyTurn) {
-			this.enemyArrow.hideArrow();
+			//this.enemyArrow.hideArrow();
 			this.playerArrow.startTween();
 		}
 		else {
@@ -159,10 +159,10 @@ export default class FloodMultiPlayer extends FloodScene {
 			this.avatarArray.push(temp);
 			count++;
 			if (temp.isMe) {
-				this.text2 = this.add.bitmapText(694, 115, 'atari', temp.name, 20).setAlpha(0);
+				this.text2 = this.add.bitmapText(685, 115, 'atari', temp.name, 20).setAlpha(0);
 			}
 		}
-		this.text1 = this.add.bitmapText(684, 90, 'atari', 'You', 20).setAlpha(0);
+		this.text1 = this.add.bitmapText(674, 90, 'atari', "You're", 20).setAlpha(0);
 
 		for (let i = 0; i < this.matched.length; i++) {
 			let block = this.matched[i];
@@ -321,12 +321,12 @@ export default class FloodMultiPlayer extends FloodScene {
 			delay: i
 		});
 
-		this.tweens.add({
-			targets: [this.enemyArrow.arrow],
-			alpha: 0.75,
-			ease: 'Power3',
-			delay: i
-		});
+		// this.tweens.add({
+		// 	targets: [this.enemyArrow.arrow],
+		// 	alpha: 0.75,
+		// 	ease: 'Power3',
+		// 	delay: i
+		// });
 
 
 		// for (let i = 0; i < this.avatarArray.length; i++) {
@@ -402,16 +402,17 @@ export default class FloodMultiPlayer extends FloodScene {
 		//this.setArrow(this.playersCorner);
 
 		if (playerData.isMyTurn) {
-			this.text2.setText("Yes");
-			this.playerArrow.startTween();
-			this.enemyArrow.hideArrow();
-		} else {
-			this.text2.setText("No");
-			this.playerArrow.stopTween();
-			this.enemyArrow.moveArrow(
+			this.playerArrow.moveArrow(
 				state.positions[this.mpService.nextPlayerId],
 				this.playersCorner);
-			this.enemyArrow.showArrow();
+			this.playerArrow.startTween();
+			//this.enemyArrow.hideArrow();
+		} else {
+			this.playerArrow.stopTween();
+			this.playerArrow.moveArrow(
+				state.positions[this.mpService.nextPlayerId],
+				this.playersCorner);
+			//this.enemyArrow.showArrow();
 		}
 
 		this.inputEnabled = playerData.isMyTurn;
@@ -540,12 +541,6 @@ export default class FloodMultiPlayer extends FloodScene {
 
 				this.cursor.setVisible(false);
 
-				if (this.mpService.playerData.isMyTurn) {
-					this.text2.setText("Yes");
-				} else {
-					this.text2.setText("No");
-				}
-
 				this.mpService.socket.send(JSON.stringify({
 					type: "makeAction",
 					action: {
@@ -634,7 +629,7 @@ export default class FloodMultiPlayer extends FloodScene {
 				this.icons[4].monster, this.icons[4].shadow,
 				this.icons[5].monster, this.icons[5].shadow,
 				this.playerArrow.arrow,
-				this.enemyArrow.arrow,
+				// this.enemyArrow.arrow,
 				this.cursor
 			],
 			alpha: 0,
@@ -652,6 +647,15 @@ export default class FloodMultiPlayer extends FloodScene {
 		// }
 
 		let i = 500;
+
+		for (let i = 0; i < this.avatarArray.length; i++) {
+			this.tweens.add({
+				targets: [this.avatarArray[i].image],
+				alpha: 0,
+				ease: 'Power3',
+				delay: 500
+			});
+		}
 
 		for (let y = 13; y >= 0; y--) {
 			for (let x = 0; x < 14; x++) {
