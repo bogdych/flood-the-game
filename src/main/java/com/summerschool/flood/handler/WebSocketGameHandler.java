@@ -20,6 +20,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Data
@@ -94,7 +95,11 @@ public class WebSocketGameHandler extends TextWebSocketHandler {
         WebSocketSession sessionToClose = sessions.remove(session.getId());
         if (sessionToClose != null) {
             sessionToClose.close(status);
-            service.disconnect(session.getId());
+            IGame game = service.disconnect(session.getId());
+            if (game != null) {
+                String message = mapper.writeValueAsString(new GameStateMessage(game.getState(), MessageType.GAME_STATE));
+                sendToAll(game, message);
+            }
         }
     }
 }

@@ -34,7 +34,7 @@ public class GameScheduler implements Runnable {
     private int minPlayers;
 
     @Override
-    @Scheduled(fixedDelay = 10000)
+    @Scheduled(fixedDelay = 1000)
     public void run() {
         final Instant currentTime = Instant.now();
 

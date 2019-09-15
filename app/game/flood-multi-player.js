@@ -21,7 +21,6 @@ export default class FloodMultiPlayer extends FloodScene {
 	constructor() {
 		super('FloodMultiPlayer');
 		this.currentColor = -1;
-		this.moves = 25;
 		this.icons = [];
 		this.playersCorner = 1;
 		this.isGameStarted = false;
@@ -64,14 +63,14 @@ export default class FloodMultiPlayer extends FloodScene {
 			this.onGameFound(msg.state);
 		};
 
-		this.mpService.onGameState = (msg) => {
-			this.onStateChange(msg.state);
-		};
+		this.mpService.onGameState = (msg) => this.onStateChange(msg.state);
 
-		this.mpService.onServerError = (msg) => {
-			this.stopInputEvents();
-			console.log(msg);
-		}
+		this.mpService.onServerError = (msg) => alert(msg.message);
+		
+		this.mpService.socket.onClose(() => {
+			this.scene.stop('FloodMultiPlayer');
+            this.scene.start('MainMenu');
+		});
 	}
 
 	onGameFound(state) {
@@ -95,14 +94,16 @@ export default class FloodMultiPlayer extends FloodScene {
 
 		this.width = gameField.width;
 		this.height = gameField.height;
-
+		
 		this.createGrid(state);
+		
 		playerData.isMyTurn = nextPlayerId === playerData.id;
 		playerData.position = playerPositions[playerData.id];
 
 		this.currentColor = valueOfColor(playerPositions[nextPlayerId].color);
 
 		this.mpService.nextPlayerId = nextPlayerId;
+		
 		playerData.corner = this.getCorner(playerData.position.x, playerData.position.y);
 
 		this.playersCorner = this.getCorner(
@@ -364,28 +365,38 @@ export default class FloodMultiPlayer extends FloodScene {
 		this.inputEnabled = false;
 		const playerData = this.mpService.playerData;
 
-		if (!playerData.isMyTurn) {
+		if (state.gameStatus === "finished") {
+			this.onFinished(state, this.mpService.playerData);
+			return;
+		}
+			
+		let oldColor = this.grid[this.getCoords(this.playersCorner).x][this.getCoords(this.playersCorner).y].getData('color');
+		let newColor = valueOfColor(state.positions[this.mpService.nextPlayerId].color);
 
-			let oldColor = this.grid[this.getCoords(this.playersCorner).x][this.getCoords(this.playersCorner).y].getData('color');
-			let newColor = valueOfColor(state.positions[this.mpService.nextPlayerId].color);
-
-			if (oldColor !== newColor) {
-				this.currentColor = newColor;
-				this.matched = [];
-				if (this.monsterTween) {
-					this.monsterTween.stop(0);
-				}
-				this.cursor.setVisible(false);
-				this.floodFillFromCorner(oldColor, newColor);
-				if (this.matched.length > 0) {
-					this.startFlow();
-				}
+		if (oldColor !== newColor) {
+			this.currentColor = newColor;
+			
+			this.matched = [];
+			
+			if (this.monsterTween) {
+				this.monsterTween.stop(0);
+			}
+			
+			this.cursor.setVisible(false);
+			
+			this.floodFillFromCorner(oldColor, newColor);
+			
+			if (this.matched.length > 0) {
+				this.startFlow();
 			}
 		}
 
 		playerData.isMyTurn = state.next.id === playerData.id;
+		
 		this.mpService.nextPlayerId = state.next.id;
+		
 		this.playersCorner = this.getCorner(state.positions[this.mpService.nextPlayerId].x, state.positions[this.mpService.nextPlayerId].y);
+		
 		this.currentColor = valueOfColor(state.positions[playerData.id].color);
 
 		//this.setArrow(this.playersCorner);
@@ -404,8 +415,28 @@ export default class FloodMultiPlayer extends FloodScene {
 		}
 
 		this.inputEnabled = playerData.isMyTurn;
+		
+		if (state.playersStatus[playerData.id] === "loser") {
+			this.stopInputEvents();
+			this.text1.setText("Lost!");
+			this.text2.setText(':(');
+            this.time.delayedCall(6000,
+                                () => this.input.once('pointerdown', this.resetGame, this),
+                                [],
+                                this);
+								
+		}
 	}
 
+	onFinished(state, playerData) {
+		
+		if (state.playersStatus[playerData.id] === "winner") {
+			this.gameWon();
+		} else {
+			this.gameLost();
+		}
+	}
+	
 	startInputEvents() {
 		this.input.on('gameobjectover', this.onIconOver, this);
 		this.input.on('gameobjectout', this.onIconOut, this);
@@ -509,12 +540,10 @@ export default class FloodMultiPlayer extends FloodScene {
 
 				this.cursor.setVisible(false);
 
-				this.moves--;
-
 				if (this.mpService.playerData.isMyTurn) {
 					this.text2.setText("Yes");
 				} else {
-					this.text2.setText("Yes");
+					this.text2.setText("No");
 				}
 
 				this.mpService.socket.send(JSON.stringify({
@@ -525,13 +554,8 @@ export default class FloodMultiPlayer extends FloodScene {
 						color: colorOfIndex(newColor)
 					}
 				}));
-				this.floodFillFromCorner(oldColor, newColor);
+				
 
-				if (this.matched.length > 0) {
-					this.inputEnabled = false;
-
-					this.startFlow();
-				}
 			}
 		}
 	}
@@ -582,24 +606,13 @@ export default class FloodMultiPlayer extends FloodScene {
 
 			t += inc;
 		}
-
-		this.time.delayedCall(t, function () {
-
-
-			if (this.checkWon()) {
-				this.gameWon();
-			} else if (this.moves === 0) {
-				this.gameLost();
-			}
-
-		}, [], this);
 	}
 
 	checkWon() {
 		let topLeft = this.grid[0][0].getData('color');
 
-		for (let x = 0; x < 14; x++) {
-			for (let y = 0; y < 14; y++) {
+		for (let x = 0; x < this.width; x++) {
+			for (let y = 0; y < this.height; y++) {
 				if (this.grid[x][y].getData('color') !== topLeft) {
 					return false;
 				}
@@ -687,93 +700,9 @@ export default class FloodMultiPlayer extends FloodScene {
 	}
 
 	resetGame() {
-		this.text1.setText("Moves");
-		this.text2.setText("00");
-		this.text3.setVisible(false);
-
-		//  Show everything :)
-
-		this.playerArrow.arrow.setFrame('arrow-white');
-
-		this.tweens.add({
-			targets: [
-				this.icons[0].monster, this.icons[0].shadow,
-				this.icons[1].monster, this.icons[1].shadow,
-				this.icons[2].monster, this.icons[2].shadow,
-				this.icons[3].monster, this.icons[3].shadow,
-				this.icons[4].monster, this.icons[4].shadow,
-				this.icons[5].monster, this.icons[5].shadow,
-				this.playerArrow.arrow,
-				this.enemyArrow.arrow,
-				this.cursor
-			],
-			alpha: 1,
-			duration: 500,
-			delay: 500
-		});
-
-		for (let i = 0; i < this.avatarArray.length; i++) {
-			this.tweens.add({
-				targets: [this.avatarArray[i].image],
-				alpha: 0,
-				duration: 500,
-				delay: 500
-			});
-		}
-
-		let i = 500;
-
-		for (let y = 13; y >= 0; y--) {
-			for (let x = 0; x < 14; x++) {
-				let block = this.grid[x][y];
-
-				//  Set a new color
-				let color = Phaser.Math.Between(0, 5);
-
-				block.setFrame(colorOfIndex(color));
-
-				block.setData('oldColor', color);
-				block.setData('color', color);
-
-				this.tweens.add({
-
-					targets: block,
-
-					scaleX: 1,
-					scaleY: 1,
-
-					ease: 'Power3',
-					duration: 800,
-					delay: i
-
-				});
-
-				i += 10;
-			}
-		}
-
-		for (let i = 0; i < this.matched.length; i++) {
-			let block = this.matched[i];
-
-			block.setFrame(colorOfIndex(block.getData('color')));
-		}
-
-		this.currentColor = this.grid[0][0].getData('color');
-
-		let movesTween = this.tweens.addCounter({
-			from: 0,
-			to: 25,
-			ease: 'Power1',
-			onUpdate: function (tween, targets, text) {
-				text.setText(Phaser.Utils.String.Pad(tween.getValue().toFixed(), 2, '0', 1));
-			},
-			onUpdateParams: [this.text2],
-			delay: i
-		});
-
-		this.moves = 25;
-
-		this.time.delayedCall(i, this.startInputEvents, [], this);
+		this.mpService.socket.socket.close();
+		this.scene.stop('FloodMultiPlayer');
+		this.scene.start('MainMenu');
 	}
 
 	gameWon() {
@@ -801,16 +730,17 @@ export default class FloodMultiPlayer extends FloodScene {
 		});
 
 		this.time.delayedCall(2000, this.boom, [], this);
+		this.time.delayedCall(6000, () => this.input.once('pointerdown', this.resetGame, this), [], this);
 	}
 
 	boom() {
 		let color = colorOfIndex(Phaser.Math.Between(0, 5));
 
-		this.emitters[color].explode(8, Phaser.Math.Between(128, 672), Phaser.Math.Between(28, 572))
+		this.emitters[color].explode(8, Phaser.Math.Between(128, 672), Phaser.Math.Between(28, 572));
 
 		color = colorOfIndex(Phaser.Math.Between(0, 5));
 
-		this.emitters[color].explode(8, Phaser.Math.Between(128, 672), Phaser.Math.Between(28, 572))
+		this.emitters[color].explode(8, Phaser.Math.Between(128, 672), Phaser.Math.Between(28, 572));
 
 		this.time.delayedCall(100, this.boom, [], this);
 	}
