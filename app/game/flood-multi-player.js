@@ -4,7 +4,17 @@ import MultiplayerService from './multi-player-service';
 import {colorOfIndex, valueOfColor} from './colors';
 import FloodScene from "./flood-scene";
 import Arrow from './arrow';
-import PlayerData from './player-data';
+import Avatar from './avatar';
+
+export const GRID_COODS = {
+	X: 166,
+	Y: 66
+}
+
+export const DELTA = {
+    X: GRID_COODS.X - 107, 
+    Y: GRID_COODS.Y - 66
+}
 
 export default class FloodMultiPlayer extends FloodScene {
 
@@ -14,6 +24,7 @@ export default class FloodMultiPlayer extends FloodScene {
 		this.moves = 25;
 		this.icons = [];
 		this.playersCorner = 1;
+		this.isGameStarted = false;
 	}
 
 	preload() {
@@ -24,6 +35,13 @@ export default class FloodMultiPlayer extends FloodScene {
 	create() {
 		super.create();
 		this.initMPlayerSession();
+	}
+
+	update() {
+		if (this.isGameStarted) {
+			this.children.bringToTop(this.playerArrow.arrow);
+			this.children.bringToTop(this.enemyArrow.arrow);
+		}
 	}
 
 	initMPlayerSession() {
@@ -76,8 +94,8 @@ export default class FloodMultiPlayer extends FloodScene {
 		const playerData = this.mpService.playerData;
 
 		this.width = gameField.width;
-
 		this.height = gameField.height;
+
 		this.createGrid(state);
 		playerData.isMyTurn = nextPlayerId === playerData.id;
 		playerData.position = playerPositions[playerData.id];
@@ -92,21 +110,31 @@ export default class FloodMultiPlayer extends FloodScene {
 			playerPositions[nextPlayerId].y
 		);
 
-		this.text1 = this.add.bitmapText(684, 30, 'atari', 'You', 20).setAlpha(0);
-		const turnMessage = playerData.isMyTurn ? 'Yes' : 'No';
-		this.text2 = this.add.bitmapText(694, 60, 'atari', turnMessage, 40).setAlpha(0);
+		//const turnMessage = playerData.isMyTurn ? 'Yes' : 'No';
+		
 		this.text3 = this.add.bitmapText(180, 200, 'atari', 'So close!\n\nClick to\ntry again', 48).setAlpha(0);
-
+		
 		//this.createArrow(this.playersCorner % 2 === 0 ? '-=24' : '+=24');
 		//this.setArrow(this.playersCorner);
 		
-
+		
+		// Creating arrows
 		const myCorner = this.getCorner(
 			playerPositions[playerData.id].x,
 			playerPositions[playerData.id].y
 			);
-		this.playerArrow = new Arrow(this, myCorner, true);
-		this.enemyArrow = new Arrow(this, this.playersCorner, false);
+		this.playerArrow = new Arrow(
+			this, 
+			playerPositions[playerData.id].x,
+			playerPositions[playerData.id].y,
+			myCorner, 
+			true);
+		this.enemyArrow = new Arrow(
+			this,
+			playerPositions[nextPlayerId].x,
+			playerPositions[nextPlayerId].y,
+			this.playersCorner, 
+			false);
 		if (playerData.isMyTurn) {
 			this.enemyArrow.hideArrow();
 			this.playerArrow.startTween();
@@ -115,16 +143,25 @@ export default class FloodMultiPlayer extends FloodScene {
 			this.playerArrow.stopTween();
 		}
 
+		// Creating avatars
 		this.avatarArray = [];
+		let count = 0;
 		for (let propt in playerPositions) {
-			this.avatarArray.push(
-				this.getAvatar(
+			let temp = new Avatar(
+					this,
 					playerPositions[propt].x,
 					playerPositions[propt].y, 
-					this.avatarArray.length
-				)
-			);
+					propt,
+					count,
+					propt == playerData.id	
+				);
+			this.avatarArray.push(temp);
+			count++;
+			if (temp.isMe) {
+				this.text2 = this.add.bitmapText(694, 115, 'atari', temp.name, 20).setAlpha(0);
+			}
 		}
+		this.text1 = this.add.bitmapText(684, 90, 'atari', 'You', 20).setAlpha(0);
 
 		for (let i = 0; i < this.matched.length; i++) {
 			let block = this.matched[i];
@@ -136,34 +173,10 @@ export default class FloodMultiPlayer extends FloodScene {
 		for (let i = 0; i < 6; i++) {
 			this.createEmitter(colorOfIndex(i));
 		}
-
+		
+		this.isGameStarted = true;
 		this.inputEnabled = playerData.isMyTurn;
 		this.revealGrid();
-	}
-
-	getAvatar(x, y, count) {
-		let name = '';
-		switch (count) {
-			case 0:
-				name = 'crown.png';
-				break;
-			case 1:
-				name = 'star.png';
-				break;
-			case 2:
-				name = 'ghost.png';
-				break;
-			case 3:
-				name = 'robot.png';
-				break;
-			default:
-				console.log('count error in getAvatar');
-		}
-		return this.add.image(
-			166 + x * 36, 
-			66 + y * 36,
-			'avatars',
-			name);
 	}
 
 	createGrid(state) {
@@ -175,8 +188,8 @@ export default class FloodMultiPlayer extends FloodScene {
 			this.grid[x] = [];
 
 			for (let y = 0; y < state.field.height; y++) {
-				let sx = 166 + (x * 36);
-				let sy = 66 + (y * 36);
+				let sx = GRID_COODS.X + (x * 36);
+				let sy = GRID_COODS.Y + (y * 36);
 				let color = state.field.cells[x][y].color;
 
 				let block = this.add.image(sx, -600 + sy, 'flood', color);
@@ -287,7 +300,7 @@ export default class FloodMultiPlayer extends FloodScene {
 		//  Text
 
 		this.tweens.add({
-			targets: [this.text1, this.text2, this.text4],
+			targets: [this.text1, this.text2],
 			alpha: 1,
 			ease: 'Power3',
 			delay: i
@@ -301,22 +314,50 @@ export default class FloodMultiPlayer extends FloodScene {
 		});
 
 		this.tweens.add({
-			targets: [this.playerArrow.arrow, this.enemyArrow.arrow],
+			targets: [this.playerArrow.arrow],
 			alpha: 1,
 			ease: 'Power3',
 			delay: i
 		});
 
-		for (let i = 0; i < this.avatarArray.length; i++) {
-			this.tweens.add({
-				targets: [this.avatarArray[i]],
-				alpha: 1,
-				ease: 'Power3',
-				delay: i
-			});
-		}
+		this.tweens.add({
+			targets: [this.enemyArrow.arrow],
+			alpha: 0.75,
+			ease: 'Power3',
+			delay: i
+		});
+
+
+		// for (let i = 0; i < this.avatarArray.length; i++) {
+		// 	this.tweens.add({
+		// 		targets: [this.avatarArray[i]],
+		// 		alpha: 1,
+		// 		ease: 'Power3',
+		// 		delay: i * 2
+		// 	});
+		// }
 
 		this.time.delayedCall(i, this.startInputEvents, [], this);
+		this.time.delayedCall(i, function () {
+			for (let i = 0; i < this.avatarArray.length; i++) {
+				this.tweens.add({
+					targets: [this.avatarArray[i].image],
+					alpha: 1,
+					ease: 'Power3',
+					delay: i + 1000
+				});
+			}
+		}, [], this);
+		// setTimeout(function () {
+		// 	for (let i = 0; i < this.avatarArray.length; i++) {
+		// 		this.tweens.add({
+		// 			targets: [this.avatarArray[i]],
+		// 			alpha: 1,
+		// 			ease: 'Power3',
+		// 			delay: i
+		// 		})
+		// 	}
+		// }, i);
 	}
 
 	onStateChange(state) {
@@ -356,7 +397,9 @@ export default class FloodMultiPlayer extends FloodScene {
 		} else {
 			this.text2.setText("No");
 			this.playerArrow.stopTween();
-			this.enemyArrow.moveArrow(this.playersCorner);
+			this.enemyArrow.moveArrow(
+				state.positions[this.mpService.nextPlayerId],
+				this.playersCorner);
 			this.enemyArrow.showArrow();
 		}
 
@@ -509,8 +552,8 @@ export default class FloodMultiPlayer extends FloodScene {
 	startFlow() {
 		this.matched.sort(function (a, b) {
 
-			let aDistance = Phaser.Math.Distance.Between(a.x, a.y, 166, 66);
-			let bDistance = Phaser.Math.Distance.Between(b.x, b.y, 166, 66);
+			let aDistance = Phaser.Math.Distance.Between(a.x, a.y, GRID_COODS.X, GRID_COODS.Y);
+			let bDistance = Phaser.Math.Distance.Between(b.x, b.y, GRID_COODS.Y, GRID_COODS.Y);
 
 			return aDistance - bDistance;
 
@@ -586,14 +629,14 @@ export default class FloodMultiPlayer extends FloodScene {
 			delay: 500
 		});
 
-		for (let i = 0; i < this.avatarArray.length; i++) {
-			this.tweens.add({
-				targets: [this.avatarArray[i]],
-				alpha: 0,
-				duration: 500,
-				delay: 500
-			});
-		}
+		// for (let i = 0; i < this.avatarArray.length; i++) {
+		// 	this.tweens.add({
+		// 		targets: [this.avatarArray[i]],
+		// 		alpha: 0,
+		// 		duration: 500,
+		// 		delay: 500
+		// 	});
+		// }
 
 		let i = 500;
 
@@ -623,6 +666,7 @@ export default class FloodMultiPlayer extends FloodScene {
 
 	gameLost() {
 		this.stopInputEvents();
+		this.isGameStarted = false;
 
 		this.text1.setText("Lost!");
 		this.text2.setText(':(');
@@ -670,7 +714,7 @@ export default class FloodMultiPlayer extends FloodScene {
 
 		for (let i = 0; i < this.avatarArray.length; i++) {
 			this.tweens.add({
-				targets: [this.avatarArray[i]],
+				targets: [this.avatarArray[i].image],
 				alpha: 0,
 				duration: 500,
 				delay: 500
@@ -734,6 +778,7 @@ export default class FloodMultiPlayer extends FloodScene {
 
 	gameWon() {
 		this.stopInputEvents();
+		this.isGameStarted = false;
 
 		this.text1.setText("Won!!");
 		this.text2.setText(':)');

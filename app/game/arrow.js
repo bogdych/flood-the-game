@@ -1,32 +1,58 @@
-export default class Arrow {
-    constructor (scene, corner, isActive) {
-        this.getCoods = function (arg) {
-            switch (arg) {
-                case 1:
-                    return {x: 85, y: 48};
-                case 2:
-                    return {x: 671, y: 48};
-                case 3:
-                    return {x: 85, y: 516};
-                case 4:
-                    return {x: 671, y: 516};
-                default:
-                    console.log("Nah, man... That's impossible");
-                    return {x: -1, y: -1};
-            }
-        }
-        this.x = this.getCoods(corner).x;
-        this.y = this.getCoods(corner).y;
-        this.scene = scene;
+import { GRID_COODS, DELTA } from "./flood-multi-player";
 
+
+
+export default class Arrow {
+    constructor (scene, x, y, corner, isActive) {
         this.isActive = isActive;
         this.isMirrored = corner % 2 === 0;
+
+
+        // this.getCoods = function (arg) {
+        //     switch (arg) {
+        //         case 1:
+        //             return {x: 107, y: 66};
+        //         case 2:
+        //             return {x: 693, y: 66};
+        //         case 3:
+        //             return {x: 107, y: 534};
+        //         case 4:
+        //             return {x: 693, y: 534};
+        //         default:
+        //             console.log("Nah, man... That's impossible");
+        //             return {x: -1, y: -1};
+        //     }
+        // }
+
+        this.getCoods = function(sx, sy) {
+            if (this.isMirrored) {
+                let res = {
+                    x: GRID_COODS.X + sx * 36 + DELTA.X,
+                    y: GRID_COODS.Y + sy * 36 + DELTA.Y
+                }
+                console.log(res);
+                return res;
+            }
+            else {
+                let res = {
+                    x: GRID_COODS.X + sx * 36 - DELTA.X,
+                    y: GRID_COODS.Y + sy * 36 - DELTA.Y
+                }
+                console.log(res);
+                return res;
+            }
+        }
+
+        this.x = this.getCoods(x, y).x;
+        this.y = this.getCoods(x, y).y;
+        this.scene = scene;
+
 
         this.arrow = scene.add.image(
             this.x, 
             this.y, 
             'flood', 
-            'arrow-white').setOrigin(0);
+            'arrow-white').setAlpha(0);
         this.arrow.flipX = this.isMirrored;
 
 
@@ -42,7 +68,7 @@ export default class Arrow {
             this.arrow.move.pause();
         } 
         else {
-            this.arrow.setTint(0x777777).setAlpha(0.75);
+            this.arrow.setTint(0x777777);
         }
     }
 
@@ -70,12 +96,13 @@ export default class Arrow {
         this.arrow.setVisible(true);
     }
 
-    moveArrow(corner) {
-        this.arrow.setPosition(
-            this.getCoods(corner).x,
-            this.getCoods(corner).y
-            );
+    moveArrow(coods, corner) {
         this.isMirrored = corner % 2 === 0;
+        console.log(corner);
         this.arrow.flipX = this.isMirrored;
+        this.arrow.setPosition(
+            this.getCoods(coods.x, coods.y).x,
+            this.getCoods(coods.x, coods.y).y
+            );
     }
 }
