@@ -323,6 +323,8 @@ export default class FloodMultiPlayer extends FloodScene {
 					this.startFlow();
 				}
 			}
+		} else {
+			//alert("Player at position " + this.getCorner())
 		}
 		playerData.isMyTurn = state.next.id === playerData.id;
 		
