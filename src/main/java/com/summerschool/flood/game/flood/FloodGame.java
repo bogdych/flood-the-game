@@ -75,7 +75,8 @@ public class FloodGame implements IGame {
         players.remove(player);
         state.getPositions().remove(player);
         state.getPlayersStatus().remove(player);
-
+        activePlayers.remove(player);
+        
         player.setActiveGame(null);
 
         if (players.size() == 0) {
