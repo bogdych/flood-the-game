@@ -19,4 +19,5 @@ public class Cell {
         this.y = y;
         this.color = Color.values()[RANDOM.nextInt(COLORS_COUNT)];
     }
+
 }

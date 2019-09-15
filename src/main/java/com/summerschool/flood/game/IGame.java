@@ -16,6 +16,8 @@ public interface IGame {
 
     void removePlayer(Player player);
 
+    void removePlayers();
+
     boolean matchType(FindGameMessage findGame);
 
     boolean addPlayer(Player player);

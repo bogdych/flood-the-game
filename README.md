@@ -142,6 +142,13 @@ Property 'positions' describes all the current players positions. Maps
 players id to theirs cells. The next player position could be easily 
 found from this list of data. 
 
+Property 'playersStatus' describes current status of the all connected to the 
+game players. It equals 'inGame' for all players when game started. If player 
+lose he has 'loser' status. If player win the game he has 'winner' status. 
+
+Note: if player lost, he cannot make actions any more, however he could watch how the 
+game is processed. 
+
 Note: property nickname could be null
 Note: property next could be null (depends on the game status)
 Note: property winner could be null (depends on the game status)
@@ -166,9 +173,12 @@ Note: property winner could be null (depends on the game status)
             "color": "red"
           }
     },
-    "winner": {
-      "id": "<winner id>",
-      "nickname": "<Winner optional nickname, could be null>"
+    "playersStatus": {
+      "070d40ed-9d7d-6efb-e420-d8e0a6e6fa20": "winner",
+      ...
+      "123f40ef-1d9f-3adc-e333-cca0a0e6fa19": "loser",
+      ...
+      "3730b279-161c-50de-b0d2-7ad352032cb8": "inGame"
     },
     "field": {
       "cells": [
@@ -204,6 +214,12 @@ Note: case-sensitive
 * gameReady
 * gameState
 * playerInfo
+
+### Player status enum
+
+* inGame
+* winner
+* loser
 
 ### Game status enum
 
