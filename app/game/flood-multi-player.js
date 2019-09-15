@@ -300,28 +300,30 @@ export default class FloodMultiPlayer extends FloodScene {
 			this.onFinished(state, this.mpService.playerData);
 			return;
 		}
-			
-		let oldColor = this.grid[this.getCoords(this.playersCorner).x][this.getCoords(this.playersCorner).y].getData('color');
-		let newColor = valueOfColor(state.positions[this.mpService.nextPlayerId].color);
+		
+		//check if player which should make step are still in game
+		if (state.positions[this.mpService.nextPlayerId]) {
+			let oldColor = this.grid[this.getCoords(this.playersCorner).x][this.getCoords(this.playersCorner).y].getData('color');
+			let newColor = valueOfColor(state.positions[this.mpService.nextPlayerId].color);
 
-		if (oldColor !== newColor) {
-			this.currentColor = newColor;
-			
-			this.matched = [];
-			
-			if (this.monsterTween) {
-				this.monsterTween.stop(0);
-			}
-			
-			this.cursor.setVisible(false);
-			
-			this.floodFillFromCorner(oldColor, newColor);
-			
-			if (this.matched.length > 0) {
-				this.startFlow();
+			if (oldColor !== newColor) {
+				this.currentColor = newColor;
+				
+				this.matched = [];
+				
+				if (this.monsterTween) {
+					this.monsterTween.stop(0);
+				}
+				
+				this.cursor.setVisible(false);
+				
+				this.floodFillFromCorner(oldColor, newColor);
+				
+				if (this.matched.length > 0) {
+					this.startFlow();
+				}
 			}
 		}
-
 		playerData.isMyTurn = state.next.id === playerData.id;
 		
 		this.mpService.nextPlayerId = state.next.id;
