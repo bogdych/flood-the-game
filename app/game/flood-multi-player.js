@@ -8,7 +8,8 @@ import Avatar from './avatar';
 
 export const GRID_COODS = {
 	X: 166,
-	Y: 66
+	Y: 66,
+	OFFSET: -600
 }
 
 export const DELTA = {
@@ -194,7 +195,7 @@ export default class FloodMultiPlayer extends FloodScene {
 				let sy = GRID_COODS.Y + (y * 36);
 				let color = state.field.cells[x][y].color;
 
-				let block = this.add.image(sx, -600 + sy, 'flood', color);
+				let block = this.add.image(sx, GRID_COODS.OFFSET + sy, 'flood', color);
 
 				block.setData('oldColor', valueOfColor(color));
 				block.setData('color', valueOfColor(color));
@@ -707,7 +708,7 @@ export default class FloodMultiPlayer extends FloodScene {
 			delay: i
 		});
 
-		this.input.once('pointerdown', this.resetGame, this);
+		this.input.once('pointerup', this.resetGame, this);
 	}
 
 	resetGame() {
@@ -741,7 +742,7 @@ export default class FloodMultiPlayer extends FloodScene {
 		});
 
 		this.time.delayedCall(2000, this.boom, [], this);
-		this.time.delayedCall(6000, () => this.input.once('pointerdown', this.resetGame, this), [], this);
+		this.time.delayedCall(6000, () => this.input.once('pointerup', this.resetGame, this), [], this);
 	}
 
 	boom() {
