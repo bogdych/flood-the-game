@@ -380,30 +380,30 @@ export default class FloodMultiPlayer extends FloodScene {
 		this.inputEnabled = false;
 		const playerData = this.mpService.playerData;
 
-		// if (state.gameStatus === "finished") {
-		// 	this.onFinished(state, this.mpService.playerData);
-		// 	return;
-		// }
-			
-		let oldColor = this.grid[this.getCoords(this.playersCorner).x][this.getCoords(this.playersCorner).y].getData('color');
-		let newColor = valueOfColor(state.positions[this.mpService.nextPlayerId].color);
+		if (state.positions[this.mpService.nextPlayerId]) {
+			let oldColor = this.grid[this.getCoords(this.playersCorner).x][this.getCoords(this.playersCorner).y].getData('color');
+			let newColor = valueOfColor(state.positions[this.mpService.nextPlayerId].color);
+		//check if player which should make step are still in game
 
-		if (oldColor !== newColor) {
-			this.currentColor = newColor;
-			
-			this.matched = [];
-			
-			if (this.monsterTween) {
-				this.monsterTween.stop(0);
+			if (oldColor !== newColor) {
+				this.currentColor = newColor;
+				
+				this.matched = [];
+				
+				if (this.monsterTween) {
+					this.monsterTween.stop(0);
+				}
+				
+				this.cursor.setVisible(false);
+				
+				this.floodFillFromCorner(oldColor, newColor);
+				
+				if (this.matched.length > 0) {
+					this.startFlow();
+				}
 			}
-			
-			this.cursor.setVisible(false);
-			
-			this.floodFillFromCorner(oldColor, newColor);
-			
-			if (this.matched.length > 0) {
-				this.startFlow();
-			}
+		} else {
+			//alert("Player at position " + this.getCorner())
 		}
 
 		if (state.gameStatus === "finished") {
