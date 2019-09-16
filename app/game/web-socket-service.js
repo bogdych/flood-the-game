@@ -4,7 +4,7 @@ export default class WebSocketService {
 		if (!port) {
 			port = window.location.protocol === "http" ? 80 : 443;
 		}
-		return `ws://${window.location.hostname}:${port}/game`;
+		return `wss://${window.location.hostname}:${port}/game`;
 	}
 
 	constructor() {
