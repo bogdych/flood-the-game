@@ -135,7 +135,7 @@ public class FloodGame implements IGame {
         synchronized (this) {
             if (isValidAction(player, action)) {
                 makeStep(action);
-                LOG.info("Game session UUID: {}\nChange field: \n{}", id, state.getField().getPrettyView());
+                //LOG.info("Game session UUID: {}\nChange field: \n{}", id, state.getField().getPrettyView());
             } else {
                 throw new ServiceException("Wrong action");
             }
