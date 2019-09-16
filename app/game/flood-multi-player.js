@@ -8,7 +8,8 @@ import Avatar from './avatar';
 
 export const GRID_COODS = {
 	X: 166,
-	Y: 66
+	Y: 66,
+	OFFSET: -600
 }
 
 export const DELTA = {
@@ -39,7 +40,7 @@ export default class FloodMultiPlayer extends FloodScene {
 	update() {
 		if (this.isGameStarted) {
 			this.children.bringToTop(this.playerArrow.arrow);
-			this.children.bringToTop(this.enemyArrow.arrow);
+			// this.children.bringToTop(this.enemyArrow.arrow);
 		}
 	}
 
@@ -126,43 +127,57 @@ export default class FloodMultiPlayer extends FloodScene {
 			);
 		this.playerArrow = new Arrow(
 			this, 
-			playerPositions[playerData.id].x,
-			playerPositions[playerData.id].y,
-			myCorner, 
-			true);
-		this.enemyArrow = new Arrow(
-			this,
 			playerPositions[nextPlayerId].x,
 			playerPositions[nextPlayerId].y,
 			this.playersCorner, 
-			false);
+			myCorner,
+			true);
+		// this.enemyArrow = new Arrow(
+		// 	this,
+		// 	playerPositions[nextPlayerId].x,
+		// 	playerPositions[nextPlayerId].y,
+		// 	this.playersCorner, 
+		// 	false);
 		if (playerData.isMyTurn) {
-			this.enemyArrow.hideArrow();
+			//this.enemyArrow.hideArrow();
 			this.playerArrow.startTween();
+			this.playerArrow.turnOn();
+			this.playerArrow.arrow.setAlpha(0);
 		}
 		else {
 			this.playerArrow.stopTween();
+			this.playerArrow.turnOff();
+			this.playerArrow.arrow.setAlpha(0);
 		}
 
 		// Creating avatars
 		this.avatarArray = [];
-		let count = 0;
 		for (let propt in playerPositions) {
 			let temp = new Avatar(
 					this,
 					playerPositions[propt].x,
 					playerPositions[propt].y, 
 					propt,
-					count,
 					propt == playerData.id	
 				);
 			this.avatarArray.push(temp);
-			count++;
-			if (temp.isMe) {
-				this.text2 = this.add.bitmapText(694, 115, 'atari', temp.name, 20).setAlpha(0);
-			}
 		}
-		this.text1 = this.add.bitmapText(684, 90, 'atari', 'You', 20).setAlpha(0);
+		
+		if (playerData.isMyTurn) {
+			this.text1 = this.add.bitmapText(
+				674, 
+				90, 
+				'atari', 
+				'Your', 20).setAlpha(0);
+		}
+		else {
+			this.text1 = this.add.bitmapText(
+				674, 
+				90, 
+				'atari', 
+				"Enemy", 20).setAlpha(0);
+		}
+		this.text2 = this.add.bitmapText(685, 115, 'atari', 'turn', 20).setAlpha(0);
 
 		for (let i = 0; i < this.matched.length; i++) {
 			let block = this.matched[i];
@@ -193,7 +208,7 @@ export default class FloodMultiPlayer extends FloodScene {
 				let sy = GRID_COODS.Y + (y * 36);
 				let color = state.field.cells[x][y].color;
 
-				let block = this.add.image(sx, -600 + sy, 'flood', color);
+				let block = this.add.image(sx, GRID_COODS.OFFSET + sy, 'flood', color);
 
 				block.setData('oldColor', valueOfColor(color));
 				block.setData('color', valueOfColor(color));
@@ -321,12 +336,12 @@ export default class FloodMultiPlayer extends FloodScene {
 			delay: i
 		});
 
-		this.tweens.add({
-			targets: [this.enemyArrow.arrow],
-			alpha: 0.75,
-			ease: 'Power3',
-			delay: i
-		});
+		// this.tweens.add({
+		// 	targets: [this.enemyArrow.arrow],
+		// 	alpha: 0.75,
+		// 	ease: 'Power3',
+		// 	delay: i
+		// });
 
 
 		// for (let i = 0; i < this.avatarArray.length; i++) {
@@ -365,15 +380,10 @@ export default class FloodMultiPlayer extends FloodScene {
 		this.inputEnabled = false;
 		const playerData = this.mpService.playerData;
 
-		if (state.gameStatus === "finished") {
-			this.onFinished(state, this.mpService.playerData);
-			return;
-		}
-		
-		//check if player which should make step are still in game
 		if (state.positions[this.mpService.nextPlayerId]) {
 			let oldColor = this.grid[this.getCoords(this.playersCorner).x][this.getCoords(this.playersCorner).y].getData('color');
 			let newColor = valueOfColor(state.positions[this.mpService.nextPlayerId].color);
+		//check if player which should make step are still in game
 
 			if (oldColor !== newColor) {
 				this.currentColor = newColor;
@@ -395,6 +405,12 @@ export default class FloodMultiPlayer extends FloodScene {
 		} else {
 			//alert("Player at position " + this.getCorner())
 		}
+
+		if (state.gameStatus === "finished") {
+			this.onFinished(state, this.mpService.playerData);
+			return;
+		}
+
 		playerData.isMyTurn = state.next.id === playerData.id;
 		
 		this.mpService.nextPlayerId = state.next.id;
@@ -406,16 +422,22 @@ export default class FloodMultiPlayer extends FloodScene {
 		//this.setArrow(this.playersCorner);
 
 		if (playerData.isMyTurn) {
-			this.text2.setText("Yes");
-			this.playerArrow.startTween();
-			this.enemyArrow.hideArrow();
-		} else {
-			this.text2.setText("No");
-			this.playerArrow.stopTween();
-			this.enemyArrow.moveArrow(
+			this.playerArrow.moveArrow(
 				state.positions[this.mpService.nextPlayerId],
 				this.playersCorner);
-			this.enemyArrow.showArrow();
+			this.playerArrow.startTween();
+			this.playerArrow.turnOn();
+			this.text1.setText('Your');
+			//this.enemyArrow.hideArrow();
+		} else {
+			this.playerArrow.stopTween();
+			this.playerArrow.moveArrow(
+				state.positions[this.mpService.nextPlayerId],
+				this.playersCorner);
+			this.playerArrow.arrow.setFrame('arrow-white');
+			this.playerArrow.turnOff();
+			this.text1.setText("Enemy");
+			//this.enemyArrow.showArrow();
 		}
 
 		this.inputEnabled = playerData.isMyTurn;
@@ -425,7 +447,7 @@ export default class FloodMultiPlayer extends FloodScene {
 			this.text1.setText("Lost!");
 			this.text2.setText(':(');
             this.time.delayedCall(6000,
-                                () => this.input.once('pointerdown', this.resetGame, this),
+                                () => this.input.once('pointerup', this.resetGame, this),
                                 [],
                                 this);
 								
@@ -458,11 +480,16 @@ export default class FloodMultiPlayer extends FloodScene {
 
 		let newColor = icon.getData('color');
 
+		if (this.isInputEnabled()) {
 		//  Valid color?
-		if (newColor !== this.currentColor) {
+			if (newColor !== this.currentColor) {
+				this.cursor.setFrame('cursor-over');
+			} else {
+				this.cursor.setFrame('cursor-invalid');
+			}
+		}
+		else {
 			this.cursor.setFrame('cursor-over');
-		} else {
-			this.cursor.setFrame('cursor-invalid');
 		}
 
 		this.cursor.setPosition(icon.x, icon.y);
@@ -475,7 +502,7 @@ export default class FloodMultiPlayer extends FloodScene {
 		this.cursor.setVisible(true);
 
 		//  Change arrow color
-		this.playerArrow.arrow.setFrame('arrow-' + colorOfIndex(newColor));
+		if (this.isInputEnabled()) this.playerArrow.arrow.setFrame('arrow-' + colorOfIndex(newColor));
 
 		//  Jiggle the monster :)
 		let monster = icon.getData('monster');
@@ -543,12 +570,6 @@ export default class FloodMultiPlayer extends FloodScene {
 				}
 
 				this.cursor.setVisible(false);
-
-				if (this.mpService.playerData.isMyTurn) {
-					this.text2.setText("Yes");
-				} else {
-					this.text2.setText("No");
-				}
 
 				this.mpService.socket.send(JSON.stringify({
 					type: "makeAction",
@@ -638,7 +659,7 @@ export default class FloodMultiPlayer extends FloodScene {
 				this.icons[4].monster, this.icons[4].shadow,
 				this.icons[5].monster, this.icons[5].shadow,
 				this.playerArrow.arrow,
-				this.enemyArrow.arrow,
+				// this.enemyArrow.arrow,
 				this.cursor
 			],
 			alpha: 0,
@@ -656,6 +677,15 @@ export default class FloodMultiPlayer extends FloodScene {
 		// }
 
 		let i = 500;
+
+		for (let i = 0; i < this.avatarArray.length; i++) {
+			this.tweens.add({
+				targets: [this.avatarArray[i].image],
+				alpha: 0,
+				ease: 'Power3',
+				delay: 500
+			});
+		}
 
 		for (let y = 13; y >= 0; y--) {
 			for (let x = 0; x < 14; x++) {
@@ -700,7 +730,7 @@ export default class FloodMultiPlayer extends FloodScene {
 			delay: i
 		});
 
-		this.input.once('pointerdown', this.resetGame, this);
+		this.input.once('pointerup', this.resetGame, this);
 	}
 
 	resetGame() {
@@ -734,7 +764,7 @@ export default class FloodMultiPlayer extends FloodScene {
 		});
 
 		this.time.delayedCall(2000, this.boom, [], this);
-		this.time.delayedCall(6000, () => this.input.once('pointerdown', this.resetGame, this), [], this);
+		this.time.delayedCall(6000, () => this.input.once('pointerup', this.resetGame, this), [], this);
 	}
 
 	boom() {
