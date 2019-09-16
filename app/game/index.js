@@ -29,6 +29,8 @@ var config = {
     scene: [ MainMenu, FloodMultiPlayer, FloodSinglePlayer ],
 };
 
+document.title = "Flood";
+
 window.onload = () => {
 	const can = document.querySelector("canvas");
 	can.id = "canvas";

@@ -47,20 +47,18 @@ export default class FloodMultiPlayer extends FloodScene {
 	initMPlayerSession() {
 		this.mpService = new MultiplayerService(() => {
 			this.mpService.findFloodGameStandard();
-			this.message = this.add.text(
-				300,
-				300,
-				'Search game',
-				{
-					fill: '#000000',
-					fontSize: '20px'
-				});
+			this.searchText = this.add.bitmapText(230, 300, 'atari', 'Search game', 30).setAlpha(0);
+			this.tweens.add({
+				targets: [this.searchText],
+				alpha: 1,
+				ease: 'Power3',
+			});
 		});
 
 		this.mpService.onGameReady = (msg) => {
 			console.log("Game found");
 			console.log(JSON.stringify(msg));
-			this.message.destroy();
+			this.searchText.destroy();
 			this.onGameFound(msg.state);
 		};
 
