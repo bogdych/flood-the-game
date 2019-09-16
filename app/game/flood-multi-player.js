@@ -111,7 +111,6 @@ export default class FloodMultiPlayer extends FloodScene {
 			playerPositions[nextPlayerId].y
 		);
 
-		//const turnMessage = playerData.isMyTurn ? 'Yes' : 'No';
 		
 		this.text3 = this.add.bitmapText(180, 200, 'atari', 'So close!\n\nClick to\ntry again', 48).setAlpha(0);
 		
@@ -159,10 +158,10 @@ export default class FloodMultiPlayer extends FloodScene {
 			this.avatarArray.push(temp);
 			count++;
 			if (temp.isMe) {
-				this.text2 = this.add.bitmapText(694, 115, 'atari', temp.name, 20).setAlpha(0);
+				this.text5 = this.add.bitmapText(15, 30, 'atari', temp.name, 20).setAlpha(0);
 			}
 		}
-		this.text1 = this.add.bitmapText(684, 90, 'atari', 'You', 20).setAlpha(0);
+		this.text4 = this.add.bitmapText(5, 5, 'atari', 'You are', 20).setAlpha(0);
 
 		for (let i = 0; i < this.matched.length; i++) {
 			let block = this.matched[i];
@@ -174,6 +173,15 @@ export default class FloodMultiPlayer extends FloodScene {
 		for (let i = 0; i < 6; i++) {
 			this.createEmitter(colorOfIndex(i));
 		}
+		
+		 
+		for (let avatar of this.avatarArray) {
+			if (avatar.propt == nextPlayerId) {
+				const turnMessage = playerData.isMyTurn ? 'Your' : (avatar.name + "'s");
+				this.text1 = this.add.bitmapText(684, 90, 'atari', turnMessage, 20).setAlpha(0);
+			}
+		}
+		this.text2 = this.add.bitmapText(694, 115, 'atari', "step", 20).setAlpha(0);
 		
 		this.isGameStarted = true;
 		this.inputEnabled = playerData.isMyTurn;
@@ -404,9 +412,16 @@ export default class FloodMultiPlayer extends FloodScene {
 		this.currentColor = valueOfColor(state.positions[playerData.id].color);
 
 		//this.setArrow(this.playersCorner);
-
+		
+		for (let avatar of this.avatarArray) {
+			if (avatar.propt == nextPlayerId) {
+				const turnMessage = playerData.isMyTurn ? 'Your' : (avatar.name + "'s");
+				this.text1.setText(turnMessage);
+			}
+		}
+		this.text2.setText("step");
+		
 		if (playerData.isMyTurn) {
-			this.text2.setText("Yes");
 			this.playerArrow.startTween();
 			this.enemyArrow.hideArrow();
 		} else {
