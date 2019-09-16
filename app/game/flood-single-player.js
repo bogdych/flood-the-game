@@ -96,20 +96,25 @@ export default class FloodSinglePlayer extends FloodScene {
         }
     }
 
-    // createArrow() {
-    //     this.arrow = this.add.image(109 - 24, 48, 'flood', 'arrow-white').setOrigin(0).setAlpha(0);
-	//
-    //     this.tweens.add({
-	//
-    //         targets: this.arrow,
-    //         x: '+=24',
-    //         ease: 'Sine.easeInOut',
-    //         duration: 900,
-    //         yoyo: true,
-    //         repeat: -1
-	//
-    //     });
-    // }
+    createArrow(tweenX) {
+		this.arrow = this.add.image(
+			85,
+			48,
+			'flood',
+			'arrow-white').setOrigin(0).setAlpha(0);
+		this.getArrowTween(tweenX);
+    }
+    
+    getArrowTween(tweenX) {
+		this.arrow.move = this.tweens.add({
+			targets: this.arrow,
+			x: tweenX,
+			ease: 'Sine.easeInOut',
+			duration: 900,
+			yoyo: true,
+			repeat: -1
+		});
+	}
 
     revealGrid() {
         this.tweens.add({
