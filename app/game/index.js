@@ -4,7 +4,17 @@ import FloodMultiPlayer from './flood-multi-player';
 import canvas from './canvas.css';
 import img from '../assets/games/background/background.png';
 import body from './back.css';
+//import favicon from '../assets/games/flood/favicon'
 
+/*
+(function() {
+    var link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+    link.type = 'image/x-icon';
+    link.rel = 'shortcut icon';
+    link.href = '../assets/games/flood/favicon';
+    document.getElementsByTagName('head')[0].appendChild(link);
+})();
+*/
 function resize() {
     let canvas = document.querySelector("canvas");
     let width = window.innerWidth;
@@ -28,6 +38,8 @@ var config = {
     parent: 'phaser-example',
     scene: [ MainMenu, FloodMultiPlayer, FloodSinglePlayer ],
 };
+
+document.title = "Flood";
 
 window.onload = () => {
 	const can = document.querySelector("canvas");

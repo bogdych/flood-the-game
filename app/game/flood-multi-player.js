@@ -46,6 +46,15 @@ export default class FloodMultiPlayer extends FloodScene {
 	initMPlayerSession() {
 		this.mpService = new MultiplayerService(() => {
 			this.mpService.findFloodGameStandard();
+			
+			this.searchText = this.add.bitmapText(300, 300, 'atari', 'Search game', 18).setAlpha(0);
+			this.tweens.add({
+				targets: [this.searchText],
+				alpha: 1,
+				ease: 'Power3',
+				//delay: i
+			});
+			/*
 			this.message = this.add.text(
 				300,
 				300,
@@ -54,12 +63,13 @@ export default class FloodMultiPlayer extends FloodScene {
 					fill: '#000000',
 					fontSize: '20px'
 				});
+			*/
 		});
 
 		this.mpService.onGameReady = (msg) => {
 			console.log("Game found");
 			console.log(JSON.stringify(msg));
-			this.message.destroy();
+			this.searchText.destroy();
 			this.onGameFound(msg.state);
 		};
 
@@ -158,10 +168,10 @@ export default class FloodMultiPlayer extends FloodScene {
 			this.avatarArray.push(temp);
 			count++;
 			if (temp.isMe) {
-				this.text5 = this.add.bitmapText(15, 30, 'atari', temp.name, 20).setAlpha(0);
+				this.text5 = this.add.bitmapText(15, 30, 'atari', temp.name, 18).setAlpha(0);
 			}
 		}
-		this.text4 = this.add.bitmapText(5, 5, 'atari', 'You are', 20).setAlpha(0);
+		this.text4 = this.add.bitmapText(5, 5, 'atari', 'You are', 18).setAlpha(0);
 
 		for (let i = 0; i < this.matched.length; i++) {
 			let block = this.matched[i];
@@ -176,12 +186,12 @@ export default class FloodMultiPlayer extends FloodScene {
 		
 		 
 		for (let avatar of this.avatarArray) {
-			if (avatar.propt == nextPlayerId) {
+			if (avatar.id == nextPlayerId) {
 				const turnMessage = playerData.isMyTurn ? 'Your' : (avatar.name + "'s");
-				this.text1 = this.add.bitmapText(684, 90, 'atari', turnMessage, 20).setAlpha(0);
+				this.text1 = this.add.bitmapText(674, 90, 'atari', turnMessage, 18).setAlpha(0);
 			}
 		}
-		this.text2 = this.add.bitmapText(694, 115, 'atari', "step", 20).setAlpha(0);
+		this.text2 = this.add.bitmapText(694, 115, 'atari', "step", 18).setAlpha(0);
 		
 		this.isGameStarted = true;
 		this.inputEnabled = playerData.isMyTurn;
@@ -316,7 +326,7 @@ export default class FloodMultiPlayer extends FloodScene {
 		});
 
 		this.tweens.add({
-			targets: [this.text5],
+			targets: [this.text4, this.text5],
 			alpha: 1,
 			ease: 'Power3',
 			delay: i
@@ -414,7 +424,7 @@ export default class FloodMultiPlayer extends FloodScene {
 		//this.setArrow(this.playersCorner);
 		
 		for (let avatar of this.avatarArray) {
-			if (avatar.propt == nextPlayerId) {
+			if (avatar.id == this.mpService.nextPlayerId) {
 				const turnMessage = playerData.isMyTurn ? 'Your' : (avatar.name + "'s");
 				this.text1.setText(turnMessage);
 			}
@@ -425,7 +435,6 @@ export default class FloodMultiPlayer extends FloodScene {
 			this.playerArrow.startTween();
 			this.enemyArrow.hideArrow();
 		} else {
-			this.text2.setText("No");
 			this.playerArrow.stopTween();
 			this.enemyArrow.moveArrow(
 				state.positions[this.mpService.nextPlayerId],
@@ -558,12 +567,6 @@ export default class FloodMultiPlayer extends FloodScene {
 				}
 
 				this.cursor.setVisible(false);
-
-				if (this.mpService.playerData.isMyTurn) {
-					this.text2.setText("Yes");
-				} else {
-					this.text2.setText("No");
-				}
 
 				this.mpService.socket.send(JSON.stringify({
 					type: "makeAction",
