@@ -2,9 +2,10 @@ export default class WebSocketService {
 	static get URL() {
 		let port = window.location.port;
 		if (!port) {
-			port = window.location.protocol === "http" ? 80 : 443;
+			port = window.location.protocol === "http:" ? 80 : 443;
 		}
-		return `ws://${window.location.hostname}:${port}/game`;
+		let protocol = window.location.protocol === "http:" ? 'ws' : 'wss';
+		return `${protocol}://${window.location.hostname}:${port}/game`;
 	}
 
 	constructor() {
