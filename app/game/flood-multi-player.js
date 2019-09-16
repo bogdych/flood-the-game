@@ -141,30 +141,43 @@ export default class FloodMultiPlayer extends FloodScene {
 		if (playerData.isMyTurn) {
 			//this.enemyArrow.hideArrow();
 			this.playerArrow.startTween();
+			this.playerArrow.turnOn();
+			this.playerArrow.arrow.setAlpha(0);
 		}
 		else {
 			this.playerArrow.stopTween();
+			this.playerArrow.turnOff();
+			this.playerArrow.arrow.setAlpha(0);
 		}
 
 		// Creating avatars
 		this.avatarArray = [];
-		let count = 0;
 		for (let propt in playerPositions) {
 			let temp = new Avatar(
 					this,
 					playerPositions[propt].x,
 					playerPositions[propt].y, 
 					propt,
-					count,
 					propt == playerData.id	
 				);
 			this.avatarArray.push(temp);
-			count++;
-			if (temp.isMe) {
-				this.text2 = this.add.bitmapText(685, 115, 'atari', temp.name, 20).setAlpha(0);
-			}
 		}
-		this.text1 = this.add.bitmapText(674, 90, 'atari', "You're", 20).setAlpha(0);
+		
+		if (playerData.isMyTurn) {
+			this.text1 = this.add.bitmapText(
+				674, 
+				90, 
+				'atari', 
+				'Your', 20).setAlpha(0);
+		}
+		else {
+			this.text1 = this.add.bitmapText(
+				674, 
+				90, 
+				'atari', 
+				"Enemy", 20).setAlpha(0);
+		}
+		this.text2 = this.add.bitmapText(685, 115, 'atari', 'turn', 20).setAlpha(0);
 
 		for (let i = 0; i < this.matched.length; i++) {
 			let block = this.matched[i];
@@ -367,10 +380,10 @@ export default class FloodMultiPlayer extends FloodScene {
 		this.inputEnabled = false;
 		const playerData = this.mpService.playerData;
 
-		if (state.gameStatus === "finished") {
-			this.onFinished(state, this.mpService.playerData);
-			return;
-		}
+		// if (state.gameStatus === "finished") {
+		// 	this.onFinished(state, this.mpService.playerData);
+		// 	return;
+		// }
 			
 		let oldColor = this.grid[this.getCoords(this.playersCorner).x][this.getCoords(this.playersCorner).y].getData('color');
 		let newColor = valueOfColor(state.positions[this.mpService.nextPlayerId].color);
@@ -393,6 +406,11 @@ export default class FloodMultiPlayer extends FloodScene {
 			}
 		}
 
+		if (state.gameStatus === "finished") {
+			this.onFinished(state, this.mpService.playerData);
+			return;
+		}
+
 		playerData.isMyTurn = state.next.id === playerData.id;
 		
 		this.mpService.nextPlayerId = state.next.id;
@@ -408,6 +426,8 @@ export default class FloodMultiPlayer extends FloodScene {
 				state.positions[this.mpService.nextPlayerId],
 				this.playersCorner);
 			this.playerArrow.startTween();
+			this.playerArrow.turnOn();
+			this.text1.setText('Your');
 			//this.enemyArrow.hideArrow();
 		} else {
 			this.playerArrow.stopTween();
@@ -415,6 +435,8 @@ export default class FloodMultiPlayer extends FloodScene {
 				state.positions[this.mpService.nextPlayerId],
 				this.playersCorner);
 			this.playerArrow.arrow.setFrame('arrow-white');
+			this.playerArrow.turnOff();
+			this.text1.setText("Enemy");
 			//this.enemyArrow.showArrow();
 		}
 
