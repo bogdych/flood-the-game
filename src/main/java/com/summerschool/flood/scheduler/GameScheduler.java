@@ -20,7 +20,7 @@ import java.time.Duration;
 import java.time.Instant;
 
 @RequiredArgsConstructor
-@Component
+//@Component
 public class GameScheduler implements Runnable {
 
     private final static Logger LOG = LoggerFactory.getLogger(GameScheduler.class);
@@ -34,7 +34,7 @@ public class GameScheduler implements Runnable {
     private int minPlayers;
 
     @Override
-    @Scheduled(fixedDelay = 2000)
+    //@Scheduled(fixedDelay = 2000)
     public void run() {
         final Instant currentTime = Instant.now();
 
